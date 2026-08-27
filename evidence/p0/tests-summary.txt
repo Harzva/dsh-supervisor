@@ -27,7 +27,10 @@ Fresh-remote proof:
 
 Closure revalidation:
 - A fresh clone of stage HEAD 0ec0bbe4939865be138a1dc25af5ce6e30bfec69 repeated frozen offline install and npm run verify:p0 successfully: 16 passed, 0 failed, 0 skipped; preflight passed; public scan reported 0 findings; pack contained 19 approved files.
-- The production Profile gate failed independently: manifest and lock/projection produced multiple distinct observations after the pre-closure baseline, so no time-point digest was promoted to LKG.
-- No closure tag was created. The final exact commit requires another fresh-clone verification after an explicit LKG disposition.
+- A fresh clone of pre-disposition stage commit 3f0e3144a98a70bafee8c8a1775028993f3f40b6 repeated the same full gate: 16 passed, 0 failed, 0 skipped; preflight and zero-finding public scan passed; the 19-file pack SHA-256 was d050211669774ef8d932a951db088ca84690a15059123203d1d2ed9c3075585f. Because the packaged planning documents changed for closure, this remains historical proof rather than proof for the final closure commit.
+- Historical production Profile drift was retained as audit evidence. The product owner explicitly promoted the latest exact manifest and lock/projection pair to the new P0 LKG, conditional on a matching final pre-tag check and without restoring the old lock.
+- The closure candidate's local full gate passed: 16 passed, 0 failed, 0 skipped; preflight passed; public scan reported 0 findings; pack contained exactly 19 approved files with SHA-256 e45d633889265a5f3577eabb20fbe2f0cb491e77a3040c590a7c99d7e39d2a36.
+- The exact remote-commit fresh-clone run and immediately-pre-tag Profile digest check remain pending external gates for this candidate.
+- p0-0.2.4 is a post-commit marker authorized only after these gates pass; its existence and exact target are verified from Git refs rather than asserted by this tag-target commit.
 
 No model, network-dependent product test, Profile mutation or real Council was executed.

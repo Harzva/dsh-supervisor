@@ -29,9 +29,9 @@
       "reason": "No separate P2 scope authorization."
     },
     {
-      "id": "production-profile-immutability",
-      "status": "blocked",
-      "reason": "The production Profile manifest and lockfile produced multiple distinct observations during closure revalidation. Composition, bootstrap and Loader-row digests remain unchanged. Causality is unproven, stability failed, no exact LKG pair is approved and no restoration was attempted.",
+      "id": "production-profile-lkg-disposition",
+      "status": "pass",
+      "summary": "Historical drift is retained with unproven causality. The product owner explicitly accepted manifest 1b0533552d05842998e7151280d84f5b4a9a9e4915510c1f1738e48df9876af2 and lock/projection 1a75aa1ecd07dfb2a2d35b3e9df5a6c571fc7af8e0b456a82975f2e3819339f1 as the new LKG. Local closure checks matched exactly, lock/projection were byte-identical, composition/bootstrap/Loader row stayed unchanged, and the old lock was not restored. The external exact-commit fresh-clone and final pre-tag recheck remain pending for this candidate.",
       "evidence": "evidence/p0/profile-drift.md"
     },
     {
@@ -45,5 +45,5 @@
       "evidence": "The product owner approved the exact isolated matrix, active catalog route, one three-participant advisory (7-call 2N+1 ceiling) and CNY 10 hard stop. P0 executed zero model calls; P10 execution remains separately phase-gated."
     }
   ],
-  "stageExit": "not-met"
+  "stageExit": "pending-external-gates"
 }

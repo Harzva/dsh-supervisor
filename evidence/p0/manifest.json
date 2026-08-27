@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "stage": "P0",
   "recordedAt": "2026-08-28",
-  "status": "partial",
+  "status": "closure-candidate",
   "package": {
     "name": "dsh-supervisor",
     "version": "0.2.4",
@@ -41,7 +41,7 @@
   },
   "runtimeBaseline": {
     "profileAlias": "digital-me",
-    "profileState": "volatile-manifest-and-lock-during-revalidation",
+    "profileState": "approved-lkg-after-observed-drift",
     "node": "24.16.0",
     "dsh": {
       "version": "0.1.1-rc.2",
@@ -88,9 +88,21 @@
         "supervisorLoaderRow": true
       },
       "stability": "failed-multiple-distinct-observations",
+      "closureGate": "pending-external-exact-commit-fresh-clone-and-final-pre-tag-recheck",
       "causality": "unproven-external-state-change",
       "recoveryAttempted": false,
-      "lkgDisposition": "not-explicitly-approved",
+      "lkgDisposition": {
+        "status": "explicitly-approved",
+        "manifestSha256": "1b0533552d05842998e7151280d84f5b4a9a9e4915510c1f1738e48df9876af2",
+        "lockfileSha256": "1a75aa1ecd07dfb2a2d35b3e9df5a6c571fc7af8e0b456a82975f2e3819339f1",
+        "installedLockProjectionSha256": "1a75aa1ecd07dfb2a2d35b3e9df5a6c571fc7af8e0b456a82975f2e3819339f1",
+        "lockProjectionByteEqual": true,
+        "approvedAt": "2026-08-28",
+        "approvalEvidence": "evidence/p0/approval-request.md",
+        "finalPreTagMatch": null,
+        "oldLockRestored": false,
+        "tagCondition": "all-exact-digests-must-match-immediately-before-tag"
+      },
       "evidence": "evidence/p0/profile-drift.md"
     }
   },
@@ -114,7 +126,8 @@
       "defaultBranch": "main",
       "stageBranch": "feat/smart-supervision-v2",
       "baselineCommit": "e27e9208dda5972916cdc0aee2cfaccf90d05cb1",
-      "plannedClosureTag": "p0-0.2.4",
+      "closureTag": "p0-0.2.4",
+      "closureTagPolicy": "post-commit-marker-after-exact-fresh-clone-and-profile-gates",
       "approvedTarget": {
         "repository": "https://github.com/Harzva/dsh-supervisor.git",
         "visibility": "private",
@@ -122,7 +135,7 @@
         "stageBranch": "feat/smart-supervision-v2",
         "historyPolicy": "single-transparent-import-baseline"
       },
-      "provenanceDiscovery": {
+      "preImportProvenanceDiscovery": {
         "manifestRepositoryFieldsPresent": false,
         "declaredLocalRemoteFound": false,
         "harzvaGithubRepositoryFound": false,

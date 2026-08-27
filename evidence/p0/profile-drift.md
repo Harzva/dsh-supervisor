@@ -1,4 +1,4 @@
-# P0 production Profile drift
+# P0 production Profile drift and LKG disposition
 
 Detected and revalidated: 2026-08-28
 
@@ -11,6 +11,8 @@ Detected and revalidated: 2026-08-28
 - The base composition, local composition patch, bootstrap patch and Supervisor Loader row still match the P0 baseline. The Loader row remains unique, enabled and configured with three faculties.
 - The protected GroupX branch, HEAD, tracked/untracked status-entry counts and dirty-tree digest still match the P0 baseline.
 - P0 executed no Profile install command, no explicit restart command, no Loader mutation and no model/Council call.
+- The product owner explicitly accepted the latest exact manifest and lock/projection pair as the new P0 LKG, provided every digest still matches immediately before tagging. The same instruction prohibits restoring the old lock.
+- Closure rechecks found manifest `1b0533552d05842998e7151280d84f5b4a9a9e4915510c1f1738e48df9876af2`, lockfile `1a75aa1ecd07dfb2a2d35b3e9df5a6c571fc7af8e0b456a82975f2e3819339f1` and installed projection `1a75aa1ecd07dfb2a2d35b3e9df5a6c571fc7af8e0b456a82975f2e3819339f1`; the two lock files were byte-identical. An independent read-only audit repeated the same result and found the unchanged composition, Loader-row and GroupX safeguards still matched.
 
 ## Interpretation boundary
 
@@ -18,4 +20,4 @@ The timestamps are correlated but do not prove which process or actor changed th
 
 ## Disposition
 
-No attempt was made to overwrite, reconstruct or restore the production Profile. No observation is promoted to LKG merely because its lockfile matches the installed projection. P0 remains partial until one exact manifest and lock/projection digest pair is explicitly approved and still matches at the final pre-tag recheck, or the product owner provides an authorized, byte-exact recovery source and recovery instruction. No such disposition is recorded in the P0 evidence set. The canonical Git baseline and private remote remain valid, but no closure tag is created while this gate is open.
+No attempt was made to overwrite, reconstruct or restore the production Profile. The latest observation is the approved candidate for the new P0 LKG because the product owner explicitly approved that exact pair and the local closure rechecks matched; lock/projection equality alone was not treated as approval. Earlier observations remain audit history and their cause remains unproven. Final promotion and `p0-0.2.4` remain conditional on the exact remote commit passing fresh-clone verification while the approved pair still matches immediately before tag creation; any mismatch fails closed. This disposition requires no restoration of the old lock and grants no future Profile mutation authority.

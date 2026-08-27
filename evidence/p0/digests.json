@@ -14,8 +14,11 @@
     "manifest": "ad95e44814215f99774b8783417b65e470d97c1575a9b39de9bddbc52cc97dd3",
     "lockfile": "17c814b167307942d3609c7b9d916ceddb85839573ab39baa114e30edb132a1a",
     "bundlePatch": "a51910428ce8a107ac1a15f5db6406dc547af0e217eeb7463f55253721c6cdd6",
-    "verifiedPack": "d050211669774ef8d932a951db088ca84690a15059123203d1d2ed9c3075585f",
+    "verifiedPack": "e45d633889265a5f3577eabb20fbe2f0cb491e77a3040c590a7c99d7e39d2a36",
     "verifiedPackFileCount": 19
+  },
+  "historicalRepositoryPacks": {
+    "preDispositionCommit3f0e314": "d050211669774ef8d932a951db088ca84690a15059123203d1d2ed9c3075585f"
   },
   "git": {
     "owner": "Harzva",
@@ -24,7 +27,8 @@
     "defaultBranch": "main",
     "stageBranch": "feat/smart-supervision-v2",
     "baselineCommit": "e27e9208dda5972916cdc0aee2cfaccf90d05cb1",
-    "plannedClosureTag": "p0-0.2.4"
+    "closureTag": "p0-0.2.4",
+    "closureTagPolicy": "post-commit-marker-after-exact-gates"
   },
   "runtimeModules": {
     "index.js": "4e8ec3e94bca64de70738567b1d82272601963501d976446ff34bb67d9e97e2f",
@@ -45,6 +49,15 @@
     "installedLockProjectionLatestObservation": "1a75aa1ecd07dfb2a2d35b3e9df5a6c571fc7af8e0b456a82975f2e3819339f1",
     "lockfileDriftDetected": true,
     "stability": "failed-multiple-distinct-observations",
+    "approvedLkg": {
+      "manifest": "1b0533552d05842998e7151280d84f5b4a9a9e4915510c1f1738e48df9876af2",
+      "lockfile": "1a75aa1ecd07dfb2a2d35b3e9df5a6c571fc7af8e0b456a82975f2e3819339f1",
+      "installedLockProjection": "1a75aa1ecd07dfb2a2d35b3e9df5a6c571fc7af8e0b456a82975f2e3819339f1",
+      "lockProjectionByteEqual": true,
+      "disposition": "explicitly-approved-current-pair",
+      "oldLockRestored": false
+    },
+    "closureGate": "pending-external-exact-commit-fresh-clone-and-final-pre-tag-recheck",
     "baseComposition": "c300dcf2ebc5f02062d6591268d29d3db6fe45e0cb138f5467276fe2ba06076e",
     "localCompositionPatch": "96e0ffde6f1bf17f0616546dac235d58067ca52901446cd8631c5c02398de7b8",
     "bootstrapPatch": "06c77cdb50e0aedafadb3674b66845699ebd0f590f3393e0cd46ba5e56f79e5f",
