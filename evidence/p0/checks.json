@@ -31,8 +31,14 @@
     {
       "id": "production-profile-lkg-disposition",
       "status": "pass",
-      "summary": "Historical drift is retained with unproven causality. The product owner explicitly accepted manifest 1b0533552d05842998e7151280d84f5b4a9a9e4915510c1f1738e48df9876af2 and lock/projection 1a75aa1ecd07dfb2a2d35b3e9df5a6c571fc7af8e0b456a82975f2e3819339f1 as the new LKG. Local closure checks matched exactly, lock/projection were byte-identical, composition/bootstrap/Loader row stayed unchanged, and the old lock was not restored. The external exact-commit fresh-clone and final pre-tag recheck remain pending for this candidate.",
+      "summary": "Historical drift is retained with unproven causality. The product owner explicitly accepted manifest 1b0533552d05842998e7151280d84f5b4a9a9e4915510c1f1738e48df9876af2 and lock/projection 1a75aa1ecd07dfb2a2d35b3e9df5a6c571fc7af8e0b456a82975f2e3819339f1 as the new LKG. Local closure and final pre-tag checks matched exactly, lock/projection were byte-identical, composition/bootstrap/Loader row stayed unchanged, and the old lock was not restored.",
       "evidence": "evidence/p0/profile-drift.md"
+    },
+    {
+      "id": "p0-closure-tag",
+      "status": "pass",
+      "summary": "Annotated tag p0-0.2.4 was created only after exact remote commit 910b12298386567f916a06dbdf0750904ed5b124 passed fresh-clone verify:p0 and the final Profile gate. Remote tag object 46ec25ffbc9e881505d4e364fabc3bfbc88f6aed peels to the exact commit.",
+      "evidence": "evidence/p0/git-remote.md"
     },
     {
       "id": "pinned-artifact-publication-boundary",
@@ -45,5 +51,5 @@
       "evidence": "The product owner approved the exact isolated matrix, active catalog route, one three-participant advisory (7-call 2N+1 ceiling) and CNY 10 hard stop. P0 executed zero model calls; P10 execution remains separately phase-gated."
     }
   ],
-  "stageExit": "pending-external-gates"
+  "stageExit": "met"
 }

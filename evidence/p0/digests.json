@@ -28,7 +28,10 @@
     "stageBranch": "feat/smart-supervision-v2",
     "baselineCommit": "e27e9208dda5972916cdc0aee2cfaccf90d05cb1",
     "closureTag": "p0-0.2.4",
-    "closureTagPolicy": "post-commit-marker-after-exact-gates"
+    "closureTagPolicy": "post-commit-marker-after-exact-gates",
+    "closureTagStatus": "verified-remote",
+    "closureTagTarget": "910b12298386567f916a06dbdf0750904ed5b124",
+    "closureTagObject": "46ec25ffbc9e881505d4e364fabc3bfbc88f6aed"
   },
   "runtimeModules": {
     "index.js": "4e8ec3e94bca64de70738567b1d82272601963501d976446ff34bb67d9e97e2f",
@@ -57,7 +60,7 @@
       "disposition": "explicitly-approved-current-pair",
       "oldLockRestored": false
     },
-    "closureGate": "pending-external-exact-commit-fresh-clone-and-final-pre-tag-recheck",
+    "closureGate": "passed-exact-remote-commit-fresh-clone-and-final-pre-tag-recheck",
     "baseComposition": "c300dcf2ebc5f02062d6591268d29d3db6fe45e0cb138f5467276fe2ba06076e",
     "localCompositionPatch": "96e0ffde6f1bf17f0616546dac235d58067ca52901446cd8631c5c02398de7b8",
     "bootstrapPatch": "06c77cdb50e0aedafadb3674b66845699ebd0f590f3393e0cd46ba5e56f79e5f",

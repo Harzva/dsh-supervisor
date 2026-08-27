@@ -47,7 +47,7 @@ The disposition is conditional and fail closed: if the manifest, lockfile or ins
 - Visibility/default branch: private / `main`
 - Transparent baseline: `e27e9208dda5972916cdc0aee2cfaccf90d05cb1`
 - Stage branch: `feat/smart-supervision-v2`
-- Closure tag: `p0-0.2.4` (authorized only for the exact commit that passes fresh-clone and final Profile digest gates)
+- Closure tag: `p0-0.2.4` (pushed and verified; annotated tag object `46ec25ffbc9e881505d4e364fabc3bfbc88f6aed` peels to exact commit `910b12298386567f916a06dbdf0750904ed5b124`)
 - Approved production Profile LKG: manifest `1b0533552d05842998e7151280d84f5b4a9a9e4915510c1f1738e48df9876af2`; lock/projection `1a75aa1ecd07dfb2a2d35b3e9df5a6c571fc7af8e0b456a82975f2e3819339f1`
 - Old-lock restoration: prohibited for this closure
 - Private exclusions: original rollback tarball, local runtime baselines, legacy Client backup and dependency directory

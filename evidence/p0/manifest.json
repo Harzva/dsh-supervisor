@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "stage": "P0",
   "recordedAt": "2026-08-28",
-  "status": "closure-candidate",
+  "status": "complete",
   "package": {
     "name": "dsh-supervisor",
     "version": "0.2.4",
@@ -88,7 +88,7 @@
         "supervisorLoaderRow": true
       },
       "stability": "failed-multiple-distinct-observations",
-      "closureGate": "pending-external-exact-commit-fresh-clone-and-final-pre-tag-recheck",
+      "closureGate": "passed-exact-remote-commit-fresh-clone-and-final-pre-tag-recheck",
       "causality": "unproven-external-state-change",
       "recoveryAttempted": false,
       "lkgDisposition": {
@@ -99,7 +99,8 @@
         "lockProjectionByteEqual": true,
         "approvedAt": "2026-08-28",
         "approvalEvidence": "evidence/p0/approval-request.md",
-        "finalPreTagMatch": null,
+        "finalPreTagMatch": true,
+        "finalPreTagCheckedAt": "2026-08-27T21:18:03Z",
         "oldLockRestored": false,
         "tagCondition": "all-exact-digests-must-match-immediately-before-tag"
       },
@@ -128,6 +129,9 @@
       "baselineCommit": "e27e9208dda5972916cdc0aee2cfaccf90d05cb1",
       "closureTag": "p0-0.2.4",
       "closureTagPolicy": "post-commit-marker-after-exact-fresh-clone-and-profile-gates",
+      "closureTagStatus": "verified-remote",
+      "closureTagTarget": "910b12298386567f916a06dbdf0750904ed5b124",
+      "closureTagObject": "46ec25ffbc9e881505d4e364fabc3bfbc88f6aed",
       "approvedTarget": {
         "repository": "https://github.com/Harzva/dsh-supervisor.git",
         "visibility": "private",
