@@ -31,7 +31,7 @@
     {
       "id": "production-profile-immutability",
       "status": "blocked",
-      "reason": "The production Profile lockfile changed during the closure window. Package, composition, bootstrap and Loader-row digests remain unchanged, but the lockfile no longer matches the recorded LKG digest. Causality is unproven and no restoration was attempted.",
+      "reason": "The production Profile manifest and lockfile produced multiple distinct observations during closure revalidation. Composition, bootstrap and Loader-row digests remain unchanged. Causality is unproven, stability failed, no exact LKG pair is approved and no restoration was attempted.",
       "evidence": "evidence/p0/profile-drift.md"
     },
     {

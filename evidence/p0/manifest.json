@@ -41,7 +41,7 @@
   },
   "runtimeBaseline": {
     "profileAlias": "digital-me",
-    "profileState": "lockfile-change-detected-during-closure",
+    "profileState": "volatile-manifest-and-lock-during-revalidation",
     "node": "24.16.0",
     "dsh": {
       "version": "0.1.1-rc.2",
@@ -57,13 +57,40 @@
       "sha256": "d1469cd9a198b3e7caf5c0e5aee5298b0a10da07b732dc5a5e6693a4c1212064"
     },
     "closureAudit": {
-      "lockfileBaselineSha256": "fa626cc7fac21243418b39c8c62eddc1da26f7b2ce7fcc125061b473a6029ddb",
-      "lockfileCurrentSha256": "dda3807f397320a959522906e5af2cf90d69bbff9ce01d3e10caba06f806b52b",
-      "lockfileReplacedAt": "2026-08-28T03:26:51+08:00",
-      "runtimeStartedAt": "2026-08-28T03:27:01+08:00",
-      "otherProfileDigestsUnchanged": true,
-      "causality": "unproven-concurrent-external-state-change",
+      "baseline": {
+        "manifestSha256": "8e913f799f500093f26731c3791dd526a2162ecc2b4f22d7b99bed61d0c5f962",
+        "lockfileSha256": "fa626cc7fac21243418b39c8c62eddc1da26f7b2ce7fcc125061b473a6029ddb"
+      },
+      "firstObservation": {
+        "manifestSha256": "8e913f799f500093f26731c3791dd526a2162ecc2b4f22d7b99bed61d0c5f962",
+        "lockfileSha256": "dda3807f397320a959522906e5af2cf90d69bbff9ce01d3e10caba06f806b52b",
+        "lockfileReplacedAt": "2026-08-28T03:26:51+08:00",
+        "runtimeStartedAt": "2026-08-28T03:27:01+08:00"
+      },
+      "secondObservation": {
+        "manifestSha256": "d2f008d6ef739548a323efd6991499251e91fe08875c6f0d5b161c76455f4903",
+        "lockfileSha256": "5f167a69b308fd840bbd63f65610c99c75255bca864c03370631c340bf91f481",
+        "installedLockProjectionSha256": "5f167a69b308fd840bbd63f65610c99c75255bca864c03370631c340bf91f481",
+        "lockfileReplacedAt": "2026-08-28T03:53:10+08:00",
+        "runtimeStartedAt": "2026-08-28T03:54:36+08:00"
+      },
+      "latestObservation": {
+        "manifestSha256": "1b0533552d05842998e7151280d84f5b4a9a9e4915510c1f1738e48df9876af2",
+        "lockfileSha256": "1a75aa1ecd07dfb2a2d35b3e9df5a6c571fc7af8e0b456a82975f2e3819339f1",
+        "installedLockProjectionSha256": "1a75aa1ecd07dfb2a2d35b3e9df5a6c571fc7af8e0b456a82975f2e3819339f1",
+        "observedAt": "2026-08-28T04:41:36+08:00",
+        "runtimeStartedAt": "2026-08-28T04:41:36+08:00"
+      },
+      "unchanged": {
+        "baseComposition": true,
+        "localCompositionPatch": true,
+        "bootstrapPatch": true,
+        "supervisorLoaderRow": true
+      },
+      "stability": "failed-multiple-distinct-observations",
+      "causality": "unproven-external-state-change",
       "recoveryAttempted": false,
+      "lkgDisposition": "not-explicitly-approved",
       "evidence": "evidence/p0/profile-drift.md"
     }
   },

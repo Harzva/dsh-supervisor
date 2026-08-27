@@ -14,7 +14,7 @@
     "manifest": "ad95e44814215f99774b8783417b65e470d97c1575a9b39de9bddbc52cc97dd3",
     "lockfile": "17c814b167307942d3609c7b9d916ceddb85839573ab39baa114e30edb132a1a",
     "bundlePatch": "a51910428ce8a107ac1a15f5db6406dc547af0e217eeb7463f55253721c6cdd6",
-    "verifiedPack": "d98bbdcfc6202d6af9dc41fdd276db27c870f96ecd0f370b0609e95e76c38303",
+    "verifiedPack": "d050211669774ef8d932a951db088ca84690a15059123203d1d2ed9c3075585f",
     "verifiedPackFileCount": 19
   },
   "git": {
@@ -34,10 +34,17 @@
     "handoff-service.js": "12671f0c3c54338b71dd57023643a249ac3086f0adcff9093d3c8ecea05c0ca0"
   },
   "lkgProfile": {
-    "manifest": "8e913f799f500093f26731c3791dd526a2162ecc2b4f22d7b99bed61d0c5f962",
+    "manifestBaseline": "8e913f799f500093f26731c3791dd526a2162ecc2b4f22d7b99bed61d0c5f962",
+    "manifestSecondObservation": "d2f008d6ef739548a323efd6991499251e91fe08875c6f0d5b161c76455f4903",
+    "manifestLatestObservation": "1b0533552d05842998e7151280d84f5b4a9a9e4915510c1f1738e48df9876af2",
+    "manifestDriftDetected": true,
     "lockfileBaseline": "fa626cc7fac21243418b39c8c62eddc1da26f7b2ce7fcc125061b473a6029ddb",
-    "lockfileCurrent": "dda3807f397320a959522906e5af2cf90d69bbff9ce01d3e10caba06f806b52b",
+    "lockfileFirstObservation": "dda3807f397320a959522906e5af2cf90d69bbff9ce01d3e10caba06f806b52b",
+    "lockfileSecondObservation": "5f167a69b308fd840bbd63f65610c99c75255bca864c03370631c340bf91f481",
+    "lockfileLatestObservation": "1a75aa1ecd07dfb2a2d35b3e9df5a6c571fc7af8e0b456a82975f2e3819339f1",
+    "installedLockProjectionLatestObservation": "1a75aa1ecd07dfb2a2d35b3e9df5a6c571fc7af8e0b456a82975f2e3819339f1",
     "lockfileDriftDetected": true,
+    "stability": "failed-multiple-distinct-observations",
     "baseComposition": "c300dcf2ebc5f02062d6591268d29d3db6fe45e0cb138f5467276fe2ba06076e",
     "localCompositionPatch": "96e0ffde6f1bf17f0616546dac235d58067ca52901446cd8631c5c02398de7b8",
     "bootstrapPatch": "06c77cdb50e0aedafadb3674b66845699ebd0f590f3393e0cd46ba5e56f79e5f",

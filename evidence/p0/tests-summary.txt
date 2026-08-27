@@ -23,6 +23,11 @@ Clean-source proof:
 Fresh-remote proof:
 - A fresh clone of stage commit c9d2490d23f9ef0e671d63b684942d689887f34e completed frozen offline install and npm run verify:p0.
 - Tests: 16 passed, 0 failed, 0 skipped; preflight passed; public scan reported 0 findings; pack contained exactly 19 approved files.
-- After the originating public worktree's three historical 0600 files were normalized to the Git 0644 mode, both environments produced pack SHA-256 d98bbdcfc6202d6af9dc41fdd276db27c870f96ecd0f370b0609e95e76c38303 without content changes.
+- After the originating worktree's three historical 0600 package files were normalized to the Git 0644 mode, both environments produced pack SHA-256 d98bbdcfc6202d6af9dc41fdd276db27c870f96ecd0f370b0609e95e76c38303 without content changes.
+
+Closure revalidation:
+- A fresh clone of stage HEAD 0ec0bbe4939865be138a1dc25af5ce6e30bfec69 repeated frozen offline install and npm run verify:p0 successfully: 16 passed, 0 failed, 0 skipped; preflight passed; public scan reported 0 findings; pack contained 19 approved files.
+- The production Profile gate failed independently: manifest and lock/projection produced multiple distinct observations after the pre-closure baseline, so no time-point digest was promoted to LKG.
+- No closure tag was created. The final exact commit requires another fresh-clone verification after an explicit LKG disposition.
 
 No model, network-dependent product test, Profile mutation or real Council was executed.
