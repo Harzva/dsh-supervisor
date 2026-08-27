@@ -14,8 +14,17 @@
     "manifest": "ad95e44814215f99774b8783417b65e470d97c1575a9b39de9bddbc52cc97dd3",
     "lockfile": "17c814b167307942d3609c7b9d916ceddb85839573ab39baa114e30edb132a1a",
     "bundlePatch": "a51910428ce8a107ac1a15f5db6406dc547af0e217eeb7463f55253721c6cdd6",
-    "verifiedPack": "59b9349c92d243a36e3752a4396f45b0064f8c3d2d7b8586e4cc9ecf8dffcc57",
+    "verifiedPack": "d6cd59d86d43b9761772715ef1b0964e752f6eb873392369d1eaad6361cf4100",
     "verifiedPackFileCount": 19
+  },
+  "git": {
+    "owner": "Harzva",
+    "repository": "https://github.com/Harzva/dsh-supervisor.git",
+    "visibility": "private",
+    "defaultBranch": "main",
+    "stageBranch": "feat/smart-supervision-v2",
+    "baselineCommit": "e27e9208dda5972916cdc0aee2cfaccf90d05cb1",
+    "plannedClosureTag": "p0-0.2.4"
   },
   "runtimeModules": {
     "index.js": "4e8ec3e94bca64de70738567b1d82272601963501d976446ff34bb67d9e97e2f",
@@ -26,7 +35,9 @@
   },
   "lkgProfile": {
     "manifest": "8e913f799f500093f26731c3791dd526a2162ecc2b4f22d7b99bed61d0c5f962",
-    "lockfile": "fa626cc7fac21243418b39c8c62eddc1da26f7b2ce7fcc125061b473a6029ddb",
+    "lockfileBaseline": "fa626cc7fac21243418b39c8c62eddc1da26f7b2ce7fcc125061b473a6029ddb",
+    "lockfileCurrent": "dda3807f397320a959522906e5af2cf90d69bbff9ce01d3e10caba06f806b52b",
+    "lockfileDriftDetected": true,
     "baseComposition": "c300dcf2ebc5f02062d6591268d29d3db6fe45e0cb138f5467276fe2ba06076e",
     "localCompositionPatch": "96e0ffde6f1bf17f0616546dac235d58067ca52901446cd8631c5c02398de7b8",
     "bootstrapPatch": "06c77cdb50e0aedafadb3674b66845699ebd0f590f3393e0cd46ba5e56f79e5f",

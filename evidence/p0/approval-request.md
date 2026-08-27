@@ -31,6 +31,16 @@ These checks prove that no presently visible source can be promoted to canonical
 
 `P0-D3` deliberately separates the immutable rollback LKG from the forward integration candidate. The P4 upstream seam is locked to `deepseek-ai/deepseek-harness@master` commit `cd5ef8148158c3a752a658978873241fdf8e2bbc`. No Profile installation or model call occurred in P0.
 
+## Execution result
+
+- Canonical repository: `https://github.com/Harzva/dsh-supervisor.git`
+- Visibility/default branch: private / `main`
+- Transparent baseline: `e27e9208dda5972916cdc0aee2cfaccf90d05cb1`
+- Stage branch: `feat/smart-supervision-v2`
+- Planned closure tag: `p0-0.2.4` (deferred until the production Profile lock drift is dispositioned)
+- Private exclusions: original rollback tarball, local runtime baselines, legacy Client backup and dependency directory
+- P0 model/Council calls: 0
+
 ## Approval source
 
 ```text

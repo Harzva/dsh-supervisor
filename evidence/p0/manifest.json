@@ -13,7 +13,8 @@
       "./client": "./lib/client.js",
       "./package.json": "./package.json",
       "./cordis.patch.yml": "./cordis.patch.yml"
-    }
+    },
+    "repository": "https://github.com/Harzva/dsh-supervisor.git"
   },
   "sourceTruth": {
     "canonicalEditableRoot": "src/",
@@ -40,7 +41,7 @@
   },
   "runtimeBaseline": {
     "profileAlias": "digital-me",
-    "profileState": "existing-lkg-read-only",
+    "profileState": "lockfile-change-detected-during-closure",
     "node": "24.16.0",
     "dsh": {
       "version": "0.1.1-rc.2",
@@ -54,6 +55,16 @@
       "enabled": true,
       "facultyCount": 3,
       "sha256": "d1469cd9a198b3e7caf5c0e5aee5298b0a10da07b732dc5a5e6693a4c1212064"
+    },
+    "closureAudit": {
+      "lockfileBaselineSha256": "fa626cc7fac21243418b39c8c62eddc1da26f7b2ce7fcc125061b473a6029ddb",
+      "lockfileCurrentSha256": "dda3807f397320a959522906e5af2cf90d69bbff9ce01d3e10caba06f806b52b",
+      "lockfileReplacedAt": "2026-08-28T03:26:51+08:00",
+      "runtimeStartedAt": "2026-08-28T03:27:01+08:00",
+      "otherProfileDigestsUnchanged": true,
+      "causality": "unproven-concurrent-external-state-change",
+      "recoveryAttempted": false,
+      "evidence": "evidence/p0/profile-drift.md"
     }
   },
   "p4Upstream": {
@@ -69,9 +80,14 @@
   },
   "repositories": {
     "supervisor": {
-      "git": false,
-      "remote": null,
+      "git": true,
+      "remote": "https://github.com/Harzva/dsh-supervisor.git",
       "owner": "Harzva",
+      "visibility": "private",
+      "defaultBranch": "main",
+      "stageBranch": "feat/smart-supervision-v2",
+      "baselineCommit": "e27e9208dda5972916cdc0aee2cfaccf90d05cb1",
+      "plannedClosureTag": "p0-0.2.4",
       "approvedTarget": {
         "repository": "https://github.com/Harzva/dsh-supervisor.git",
         "visibility": "private",
@@ -89,7 +105,7 @@
         "thirdPartyNamespaceCollisionExcluded": true,
         "evidence": "evidence/p0/approval-request.md"
       },
-      "status": "blocking-P0-exit"
+      "status": "pass"
     },
     "groupx": {
       "repository": "https://github.com/Harzva/dsh-groupx.git",

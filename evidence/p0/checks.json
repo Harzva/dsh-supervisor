@@ -9,9 +9,9 @@
     },
     {
       "id": "A01-git-remote",
-      "status": "blocked",
-      "reason": "Bounded local, Harzva GitHub and npm discovery found no presently visible canonical Supervisor Git repository, owner or approved remote; git init and remote creation were intentionally not performed.",
-      "evidence": "evidence/p0/approval-request.md"
+      "status": "pass",
+      "evidence": "The product owner authorized a transparent import. Private Harzva/dsh-supervisor uses main, baseline e27e9208dda5972916cdc0aee2cfaccf90d05cb1 and stage branch feat/smart-supervision-v2; no synthetic history was created.",
+      "approval": "evidence/p0/approval-request.md"
     },
     {
       "id": "A19-baseline-static",
@@ -30,8 +30,9 @@
     },
     {
       "id": "production-profile-immutability",
-      "status": "pass",
-      "evidence": "All five recorded LKG Profile file digests and the Supervisor Loader-row digest were unchanged after P0 work."
+      "status": "blocked",
+      "reason": "The production Profile lockfile changed during the closure window. Package, composition, bootstrap and Loader-row digests remain unchanged, but the lockfile no longer matches the recorded LKG digest. Causality is unproven and no restoration was attempted.",
+      "evidence": "evidence/p0/profile-drift.md"
     },
     {
       "id": "pinned-artifact-publication-boundary",

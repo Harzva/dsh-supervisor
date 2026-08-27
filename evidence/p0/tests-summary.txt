@@ -15,8 +15,9 @@ Recovered working tree:
 - Pack verification: 19 files, exports and all 5 runtime module bytes matched.
 
 Clean-source proof:
-- A temporary source copy excluded both lib and node_modules before execution.
+- A temporary source copy excluded .git, lib, node_modules, the private rollback artifact and local baselines before execution.
 - pnpm install --offline --frozen-lockfile: passed.
 - npm run verify:p0: passed with the same 16 tests and the same pack digest.
+- Preflight reported the private rollback artifact absent and verified its recorded digest evidence instead.
 
 No model, network-dependent product test, Profile mutation or real Council was executed.
