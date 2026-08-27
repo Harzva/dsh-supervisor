@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "algorithm": "sha256",
+  "pinnedRollbackArtifact": {
+    "path": "artifacts/dsh-supervisor-0.2.4.tgz",
+    "digest": "302a5235c4577f040106447951364fe0db05b98d6b4573fb4e67b6d6b962e23a",
+    "fileCount": 14,
+    "manifestDigestBeforeP0": "5c14d7cd5064bdb9c46f7b66884311773ef3a5003fa80b498c10458ebbb60b3c",
+    "distribution": "local-private-gitignored",
+    "publicUpload": false,
+    "quarantineReason": "historical-runtime-session-identifier"
+  },
+  "currentRepository": {
+    "manifest": "ad95e44814215f99774b8783417b65e470d97c1575a9b39de9bddbc52cc97dd3",
+    "lockfile": "17c814b167307942d3609c7b9d916ceddb85839573ab39baa114e30edb132a1a",
+    "bundlePatch": "a51910428ce8a107ac1a15f5db6406dc547af0e217eeb7463f55253721c6cdd6",
+    "verifiedPack": "59b9349c92d243a36e3752a4396f45b0064f8c3d2d7b8586e4cc9ecf8dffcc57",
+    "verifiedPackFileCount": 19
+  },
+  "runtimeModules": {
+    "index.js": "4e8ec3e94bca64de70738567b1d82272601963501d976446ff34bb67d9e97e2f",
+    "client.js": "698ba3009dda564c5920f40503a71053a10a757aee4a7aae00673e2be37995e7",
+    "mentor-registry.js": "3b5766d88bab4e6bf94c27cb56b07b0460eb7b2d348dbe9bf4e9560ce405b3d5",
+    "supervisor-store.js": "b97690b15e3331fc58c136822de146f351f297084aa1562ad3cb86af444636f6",
+    "handoff-service.js": "12671f0c3c54338b71dd57023643a249ac3086f0adcff9093d3c8ecea05c0ca0"
+  },
+  "lkgProfile": {
+    "manifest": "8e913f799f500093f26731c3791dd526a2162ecc2b4f22d7b99bed61d0c5f962",
+    "lockfile": "fa626cc7fac21243418b39c8c62eddc1da26f7b2ce7fcc125061b473a6029ddb",
+    "baseComposition": "c300dcf2ebc5f02062d6591268d29d3db6fe45e0cb138f5467276fe2ba06076e",
+    "localCompositionPatch": "96e0ffde6f1bf17f0616546dac235d58067ca52901446cd8631c5c02398de7b8",
+    "bootstrapPatch": "06c77cdb50e0aedafadb3674b66845699ebd0f590f3393e0cd46ba5e56f79e5f",
+    "supervisorLoaderRow": "d1469cd9a198b3e7caf5c0e5aee5298b0a10da07b732dc5a5e6693a4c1212064"
+  }
+}

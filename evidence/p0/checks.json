@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "stage": "P0",
+  "checks": [
+    {
+      "id": "A01-source-build-test-pack",
+      "status": "pass",
+      "evidence": "A source-only temporary copy without lib or node_modules completed offline install, build, 16 tests, preflight, scan and pack verification."
+    },
+    {
+      "id": "A01-git-remote",
+      "status": "blocked",
+      "reason": "Bounded local, Harzva GitHub and npm discovery found no presently visible canonical Supervisor Git repository, owner or approved remote; git init and remote creation were intentionally not performed.",
+      "evidence": "evidence/p0/approval-request.md"
+    },
+    {
+      "id": "A19-baseline-static",
+      "status": "pass",
+      "evidence": "Five syntax checks, version/export/lock/source parity preflight, public scan and package-content checks passed."
+    },
+    {
+      "id": "FR-022",
+      "status": "skipped-by-scope",
+      "reason": "No separate P2 scope authorization."
+    },
+    {
+      "id": "FR-023",
+      "status": "skipped-by-scope",
+      "reason": "No separate P2 scope authorization."
+    },
+    {
+      "id": "production-profile-immutability",
+      "status": "pass",
+      "evidence": "All five recorded LKG Profile file digests and the Supervisor Loader-row digest were unchanged after P0 work."
+    },
+    {
+      "id": "pinned-artifact-publication-boundary",
+      "status": "pass",
+      "evidence": "The byte-identical rollback tarball is local-private and Git-ignored because it contains a historical runtime session identifier; only its digest and sanitized provenance may be uploaded."
+    },
+    {
+      "id": "P10-real-run-authorization",
+      "status": "pass",
+      "evidence": "The product owner approved the exact isolated matrix, active catalog route, one three-participant advisory (7-call 2N+1 ceiling) and CNY 10 hard stop. P0 executed zero model calls; P10 execution remains separately phase-gated."
+    }
+  ],
+  "stageExit": "not-met"
+}

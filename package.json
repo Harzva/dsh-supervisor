@@ -1,0 +1,72 @@
+{
+  "name": "dsh-supervisor",
+  "version": "0.2.4",
+  "description": "DSH Supervisor：每会话独立监控、角色责任分配、模型路由、建议采纳与 Handoff。",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Harzva/dsh-supervisor.git"
+  },
+  "homepage": "https://github.com/Harzva/dsh-supervisor#readme",
+  "bugs": {
+    "url": "https://github.com/Harzva/dsh-supervisor/issues"
+  },
+  "type": "module",
+  "packageManager": "pnpm@11.20.0",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json",
+    "./cordis.patch.yml": "./cordis.patch.yml"
+  },
+  "files": [
+    "lib/index.js",
+    "lib/client.js",
+    "lib/mentor-registry.js",
+    "lib/supervisor-store.js",
+    "lib/handoff-service.js",
+    "cordis.patch.yml",
+    "README.md",
+    "docs",
+    "INPUTS.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test",
+    "preflight": "node scripts/preflight.mjs",
+    "scan:public": "node scripts/scan-public.mjs",
+    "pack:check": "node scripts/verify-pack.mjs",
+    "check": "npm run build && node --check lib/index.js && node --check lib/client.js && node --check lib/mentor-registry.js && node --check lib/supervisor-store.js && node --check lib/handoff-service.js && node --test && npm run preflight",
+    "verify:p0": "npm run check && npm run scan:public && npm run pack:check",
+    "prepack": "npm run build && npm run preflight && npm run scan:public"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-runtime",
+        "@deepseek-ai/dsh-api-remotes",
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-conversation",
+        "@deepseek-ai/dsh-client-ui-model-selection"
+      ]
+    }
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "supervisor",
+    "mentor",
+    "goal",
+    "auto-continue"
+  ],
+  "engines": {
+    "node": "^22.19.0 || >=24"
+  }
+}

@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "stage": "P0",
+  "recordedAt": "2026-08-28",
+  "status": "partial",
+  "package": {
+    "name": "dsh-supervisor",
+    "version": "0.2.4",
+    "nodeEngine": "^22.19.0 || >=24",
+    "packageManager": "pnpm@11.20.0",
+    "publicExports": {
+      ".": "./lib/index.js",
+      "./client": "./lib/client.js",
+      "./package.json": "./package.json",
+      "./cordis.patch.yml": "./cordis.patch.yml"
+    }
+  },
+  "sourceTruth": {
+    "canonicalEditableRoot": "src/",
+    "derivedRuntimeRoot": "lib/",
+    "runtimeModules": [
+      "index.js",
+      "client.js",
+      "mentor-registry.js",
+      "supervisor-store.js",
+      "handoff-service.js"
+    ],
+    "recoveryBasis": [
+      "current-runtime-modules",
+      "pinned-0.2.4-rollback-artifact",
+      "existing-16-test-characterization"
+    ],
+    "knownBaselineDelta": {
+      "file": "lib/client.js",
+      "pinnedArtifactSha256": "d2bcafff9c0a4973c1001cb58a336835aa762895f39901fd6a1945a7667f0b20",
+      "preP0CurrentSha256": "431f05f65d36ac2b62d55f3049ff14edcec40295428cc997f33af0ed31642799",
+      "disposition": "preserved-current-client",
+      "reason": "The current Client contains post-artifact inline-dock and HTTP-action fixes covered by the 16-test baseline. The pinned artifact remains unchanged for rollback."
+    }
+  },
+  "runtimeBaseline": {
+    "profileAlias": "digital-me",
+    "profileState": "existing-lkg-read-only",
+    "node": "24.16.0",
+    "dsh": {
+      "version": "0.1.1-rc.2",
+      "runtimeCommit": "f63e4dbb57116716036c3663d8236c31fbb3c637",
+      "runtimeWorktreeDirty": true
+    },
+    "cordis": "4.0.1",
+    "groupx": "0.1.0-alpha.24.1",
+    "loaderRow": {
+      "id": "dsh-supervisor",
+      "enabled": true,
+      "facultyCount": 3,
+      "sha256": "d1469cd9a198b3e7caf5c0e5aee5298b0a10da07b732dc5a5e6693a4c1212064"
+    }
+  },
+  "p4Upstream": {
+    "canonicalRepository": "https://github.com/deepseek-ai/deepseek-harness.git",
+    "owner": "deepseek-ai",
+    "branch": "master",
+    "remoteHead": "cd5ef8148158c3a752a658978873241fdf8e2bbc",
+    "goalDriverVersion": "0.1.2-alpha.1",
+    "systemPromptVersion": "0.1.2-alpha.1",
+    "inspectedCheckout": "f63e4dbb57116716036c3663d8236c31fbb3c637",
+    "inspectedCheckoutVersion": "0.1.1-rc.2",
+    "implementationRule": "sync-canonical-remote-in-dedicated-worktree-and-revalidate-before-P4"
+  },
+  "repositories": {
+    "supervisor": {
+      "git": false,
+      "remote": null,
+      "owner": "Harzva",
+      "approvedTarget": {
+        "repository": "https://github.com/Harzva/dsh-supervisor.git",
+        "visibility": "private",
+        "defaultBranch": "main",
+        "stageBranch": "feat/smart-supervision-v2",
+        "historyPolicy": "single-transparent-import-baseline"
+      },
+      "provenanceDiscovery": {
+        "manifestRepositoryFieldsPresent": false,
+        "declaredLocalRemoteFound": false,
+        "harzvaGithubRepositoryFound": false,
+        "harzvaGithubCodeProvenanceFound": false,
+        "npmState": "unpublished-tombstone",
+        "npmUnpublishedAt": "2026-08-20T09:24:34.939Z",
+        "thirdPartyNamespaceCollisionExcluded": true,
+        "evidence": "evidence/p0/approval-request.md"
+      },
+      "status": "blocking-P0-exit"
+    },
+    "groupx": {
+      "repository": "https://github.com/Harzva/dsh-groupx.git",
+      "branch": "main",
+      "head": "667a5dd095cade3074ddf9db501b848393c3487c",
+      "dirty": true,
+      "trackedChangeCount": 15,
+      "untrackedPathCount": 43,
+      "statusDigest": "265e605d1b8b4485674965b09bb8fb29e5b772f9ca60fcfee11e39193effbe32"
+    },
+    "identityLibrary": {
+      "version": "0.1.0",
+      "git": false,
+      "remote": null,
+      "status": "protected-local-only"
+    }
+  },
+  "p10Lock": {
+    "profileType": "new-disposable-isolated-local-profile",
+    "lkgRollbackMatrix": {
+      "dsh": "0.1.1-rc.2",
+      "cordis": "4.0.1",
+      "groupx": "0.1.0-alpha.24.1",
+      "dshCommit": "f63e4dbb57116716036c3663d8236c31fbb3c637",
+      "groupxCommit": "667a5dd095cade3074ddf9db501b848393c3487c"
+    },
+    "integrationMatrix": {
+      "dsh": "0.1.2-alpha.1",
+      "dshCommit": "cd5ef8148158c3a752a658978873241fdf8e2bbc",
+      "cordis": "4.0.1",
+      "groupx": "0.1.0-alpha.24.1",
+      "groupxCommit": "667a5dd095cade3074ddf9db501b848393c3487c",
+      "compatibilityGate": "must-pass-isolated-profile-before-any-real-run"
+    },
+    "providerModel": {
+      "ref": "deepseek-official/deepseek-v4-flash",
+      "catalogVerifiedAt": "2026-08-28",
+      "providerActive": true,
+      "catalogFailureCount": 0,
+      "inferenceHealthVerified": false
+    },
+    "limits": {
+      "maxDeliberationsPerGoal": 1,
+      "maxParticipants": 3,
+      "maxDiscussionRounds": 1,
+      "maxCallsPerDeliberation": 7,
+      "maxCallsPerGoal": 7,
+      "callTopology": "2N+1: proposal(N)+refinement(N)+aggregation(1)"
+    },
+    "costStop": {
+      "amount": 10,
+      "currency": "CNY",
+      "basis": "pre-dispatch worst-case estimate from an execution-time provider pricing snapshot",
+      "unknownPrice": "no-dispatch",
+      "unknownUsage": "settle-full-reservation"
+    },
+    "realCallsExecutedInP0": 0,
+    "approvalScope": "P10-budget-lock-only; P10 execution still requires phase authorization",
+    "status": "approved",
+    "recheck": "before-P1-and-P10"
+  }
+}

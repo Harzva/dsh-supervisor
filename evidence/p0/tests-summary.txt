@@ -1,0 +1,22 @@
+P0 baseline date: 2026-08-28
+
+Pre-change baseline:
+- Node 24.16.0, npm 11.13.0, pnpm 11.20.0.
+- npm run check: 16 passed, 0 failed, 0 skipped.
+
+Recovered working tree:
+- npm run verify:p0: passed.
+- Build: 5 canonical src modules generated 5 lib modules.
+- Removing only the P0 source comments and startup-version diagnostic reconstructs the exact five pre-P0 current-module digests; no runtime logic delta was introduced.
+- Syntax: 5/5 runtime modules passed node --check.
+- Tests: 16 passed, 0 failed, 0 skipped.
+- Preflight: passed.
+- Public secret/private-path scan: 0 findings.
+- Pack verification: 19 files, exports and all 5 runtime module bytes matched.
+
+Clean-source proof:
+- A temporary source copy excluded both lib and node_modules before execution.
+- pnpm install --offline --frozen-lockfile: passed.
+- npm run verify:p0: passed with the same 16 tests and the same pack digest.
+
+No model, network-dependent product test, Profile mutation or real Council was executed.

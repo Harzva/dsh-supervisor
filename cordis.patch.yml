@@ -1,0 +1,7 @@
+# dsh-supervisor bundle layer.
+# - Host/global: supervisor engine (watchdog, mentor suggestion via LLM,
+#   auto-inject), /supervise command, and the client surfaces (bar/mentor
+#   float/mentor tab) registered by the same package's web client half.
+- insert:
+    - id: dsh-supervisor
+      name: 'dsh-supervisor'
