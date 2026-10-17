@@ -141,6 +141,151 @@ test('asynchronous persistence barriers prevent dispatch and completion before d
   assert.equal((await execution).status, 'completed')
 })
 
+const materializationMessage = id => `thread ${id} is not materialized yet; includeTurns is unavailable before first user message`
+function acknowledgeQueue({ message, native, reply }) {
+  const receipt = { id: QUEUED, clientUserMessageId: message.params.clientUserMessageId, input: message.params.input }
+  native.queued.push(receipt)
+  reply(message, { queuedSubmission: receipt })
+}
+
+test('queue acknowledgment before history materialization is monitored through lifecycle events first', async t => {
+  const order = []
+  let earlyReads = 0
+  const f = fixture(t, { onMessage: context => {
+    const { message, native, send } = context
+    if (message.method === 'thread/queue/add') {
+      acknowledgeQueue(context)
+      const timer = setTimeout(() => { native.start(); native.complete() }, 100)
+      t.after(() => clearTimeout(timer))
+      return true
+    }
+    if (message.method === 'thread/read') {
+      earlyReads += 1
+      send({ id: message.id, error: { code: -32603, message: 'PRIVATE premature history error' } })
+      return true
+    }
+  } })
+  const result = await f.execute({ onThread: async () => { order.push('thread') }, onDispatch: async () => { order.push('dispatch') }, onQueued: async () => { order.push('queued') }, onStarted: async () => { order.push('started') } })
+  assert.equal(result.status, 'completed')
+  assert.equal(earlyReads, 0)
+  assert.deepEqual(order, ['thread', 'dispatch', 'queued', 'started'])
+  assert.equal(f.native.messages[0].params.clientInfo.version, '0.2.1')
+})
+
+test('only the exact owned materialization read error retries on the same connection without queue replay', async t => {
+  let reads = 0
+  const f = fixture(t, { onMessage: context => {
+    const { message, send, reply, native, thread } = context
+    if (message.method === 'thread/queue/add') { acknowledgeQueue(context); return true }
+    if (message.method === 'thread/read') {
+      reads += 1
+      if (reads === 1) send({ id: message.id, error: { code: -32600, message: materializationMessage(THREAD), data: { log: 'PRIVATE read-only diagnostic' } } })
+      else { native.start(); native.complete(); reply(message, { thread: thread() }) }
+      return true
+    }
+  } })
+  const result = await f.execute({ timeoutMs: 4000 })
+  assert.equal(result.status, 'completed')
+  assert.equal(reads, 2)
+  assert.equal(f.native.processes.length, 1)
+  assert.equal(f.native.messages.filter(message => message.method === 'thread/queue/add').length, 1)
+  assert.equal(f.native.messages.some(message => message.method === 'thread/resume'), false)
+  assert.doesNotMatch(JSON.stringify(result), /PRIVATE|diagnostic|first user message/)
+})
+
+test('similar, foreign-ID, internal and disabled-Goal RPC errors remain fatal and expose only structural transport codes', { concurrency: true }, async t => {
+  await Promise.all([
+    { label: 'similar', method: 'thread/read', code: -32600, message: `${materializationMessage(THREAD)} with extra PRIVATE details` },
+    { label: 'foreign-id', method: 'thread/read', code: -32600, message: materializationMessage('another-thread') },
+    { label: 'internal', method: 'thread/read', code: -32603, message: materializationMessage(THREAD) },
+    { label: 'goal-disabled', method: 'thread/goal/get', code: -32600, message: 'Goals are disabled; PRIVATE feature configuration' },
+  ].map(variant => t.test(variant.label, async child => {
+    const f = fixture(child, { onMessage: context => {
+      const { message, send } = context
+      if (message.method === 'thread/queue/add') { acknowledgeQueue(context); return true }
+      if (message.method === variant.method) {
+        send({ id: message.id, error: { code: variant.code, message: variant.message, data: { body: 'PRIVATE raw body' } } })
+        return true
+      }
+    } })
+    const result = await f.execute({ timeoutMs: 4000 })
+    assert.equal(result.status, 'uncertain')
+    assert.deepEqual(result.transport, { code: 'NATIVE_RPC', rpcMethod: variant.method, rpcCode: variant.code })
+    assert.equal(f.native.messages.filter(message => message.method === 'thread/queue/add').length, 1)
+    assert.doesNotMatch(JSON.stringify(result), /PRIVATE|materialized|another-thread|configuration|raw body/)
+  })))
+})
+
+test('cold readonly inspection never retries even the exact materialization error', async t => {
+  const f = fixture(t, { onMessage: ({ message, send }) => {
+    if (message.method !== 'thread/read') return
+    send({ id: message.id, error: { code: -32600, message: materializationMessage(THREAD) } })
+    return true
+  } })
+  await assert.rejects(f.executor.inspect({ workspace: f.workspace, threadId: THREAD }), { code: 'NATIVE_RPC', rpcMethod: 'thread/read', rpcCode: -32600 })
+  assert.equal(f.native.messages.filter(message => message.method === 'thread/read').length, 1)
+  assert.equal(f.native.messages.some(message => message.method === 'thread/resume' || message.method === 'thread/queue/add'), false)
+})
+
+test('a repeatedly unmaterialized dispatch exhausts bounded read retries without another dispatch', async t => {
+  let reads = 0
+  const f = fixture(t, { onMessage: context => {
+    const { message, send } = context
+    if (message.method === 'thread/queue/add') { acknowledgeQueue(context); return true }
+    if (message.method === 'thread/read') {
+      reads += 1
+      send({ id: message.id, error: { code: -32600, message: materializationMessage(THREAD) } })
+      return true
+    }
+  } })
+  const started = Date.now()
+  const result = await f.execute({ timeoutMs: 5000 })
+  assert.equal(result.status, 'uncertain')
+  assert.deepEqual(result.transport, { code: 'NATIVE_RPC', rpcMethod: 'thread/read', rpcCode: -32600 })
+  assert.ok(reads <= 5)
+  assert.ok(Date.now() - started < 4900)
+  assert.equal(f.native.processes.length, 1)
+  assert.equal(f.native.messages.filter(message => message.method === 'thread/queue/add').length, 1)
+})
+
+test('startup grace never extends the original deadline and an exact pending receipt is cancelled safely', async t => {
+  const f = fixture(t, { onMessage: context => {
+    const { message, send } = context
+    if (message.method === 'thread/queue/add') { acknowledgeQueue(context); return true }
+    if (message.method === 'thread/read') {
+      send({ id: message.id, error: { code: -32600, message: materializationMessage(THREAD) } })
+      return true
+    }
+  } })
+  const started = Date.now()
+  const result = await f.execute({ timeoutMs: 40 })
+  assert.equal(result.status, 'uncertain')
+  assert.equal(result.transport.code, 'NATIVE_TIMEOUT')
+  assert.ok(Date.now() - started < 1000)
+  assert.equal(f.native.messages.filter(message => message.method === 'thread/queue/add').length, 1)
+  assert.deepEqual(f.native.messages.find(message => message.method === 'thread/queue/delete').params, { threadId: THREAD, queuedSubmissionId: QUEUED })
+  assert.equal(f.native.messages.some(message => message.method === 'turn/interrupt'), false)
+})
+
+test('cancellation before history materialization interrupts only the marker-correlated live turn', async t => {
+  const controller = new AbortController()
+  const f = fixture(t, { onMessage: ({ message, start, reply, send }) => {
+    if (message.method === 'thread/queue/add') {
+      start()
+      reply(message, { queuedSubmission: { id: QUEUED, clientUserMessageId: MARKER, input: message.params.input } })
+      return true
+    }
+    if (message.method === 'thread/read') {
+      send({ id: message.id, error: { code: -32600, message: materializationMessage(THREAD) } })
+      return true
+    }
+  } })
+  const result = await f.execute({ signal: controller.signal, onQueued: async () => { controller.abort() } })
+  assert.equal(result.status, 'interrupted')
+  assert.equal(result.transport.code, 'NATIVE_CANCELLED')
+  assert.deepEqual(f.native.messages.find(message => message.method === 'turn/interrupt').params, { threadId: THREAD, turnId: TURN })
+})
+
 test('receipt callback failures stop before dispatch and never continue native work', async t => {
   for (const name of ['onThread', 'onDispatch']) {
     const f = fixture(t)

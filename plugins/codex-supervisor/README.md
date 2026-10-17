@@ -1,10 +1,12 @@
-# Harzva Supervisor / DS 学院 — Codex 0.2.0
+# Harzva Supervisor / DS 学院 — Codex 0.2.1
 
 Codex 本地开发版：把已授权工作推进到原生执行、独立验收和持久检查点，并保留学院／导师评审与可校验上下文交接。独立插件标识为 `harzva-supervisor`；DSH 包仍为 `dsh-supervisor@0.2.4`。
 
 ## 安装与调用
 
 需要 Node.js 22 或更新版本。执行链使用已安装 Codex 的登录状态和 experimental app-server 原生队列接口，已对照本机 Codex 0.149.0 合同实现；其他版本须另行核验。插件无 npm 依赖、MCP 或 hooks。`run`／`drain` 期间会启动限定工作区的 Codex app-server 子进程，没有安装常驻后台服务。
+
+调用脚本的宿主还必须允许写入工程的受保护目录 `.codex/supervisor/`，并允许原生 CLI 使用它自己的缓存和已有登录状态。本机 SDK 的默认 `workspace-write` 调用曾在初始化受保护工程状态时返回 `PATH_ACCESS`；工程位于可写根目录内不等于其 `.codex` 自动可写。按当前任务已经授予的权限使用宿主支持的路径授权或权限 profile，并核验实际结果；插件不修改全局权限，也不自行读取或复制登录凭据。本机在既定完整 profile 中的调用结果不能证明每个默认 `workspace-write` 宿主都支持这些路径。
 
 在完整仓库根目录注册开发目录，然后通过桌面插件目录安装：
 
@@ -118,6 +120,8 @@ node "<plugin-root>/scripts/execution.mjs" status --workspace "<project>" --job 
 
 执行子进程继承已有代理环境；macOS 未设置代理环境时可使用系统已启用的 HTTP／HTTPS 代理。只设置该子进程环境，不改写个人配置、登录或系统网络设置，不禁用 TLS 验证；PAC／SOCKS 自动适配不在本版范围内。
 
+0.2.1 在 `queue/add` 确认后先观察原生启动事件，并为 thread 数据落盘留出短暂启动窗口。原生明确报告尚未 materialize 时，仅有界重试只读 receipt 查询；其他 RPC／传输歧义保留为 `uncertain`。这不会重发 `queue/add`、另建 thread 或消耗新的 attempt 来修复一次读取失败。
+
 | 字段／动作 | 行为 |
 | --- | --- |
 | `instruction`、`successCriteria` | 有界工作指令和 1–8 条可观察的验收条件 |
@@ -143,6 +147,8 @@ node "<plugin-root>/scripts/execution.mjs" status --workspace "<project>" --job 
 `cancel` 保存取消请求；活跃 runner 会中断与本次标记准确关联的原生 turn，并只删除本次准确匹配的 native queue receipt。验收命令按连接内的 process ID 请求终止并等待原生完成。发送终止请求本身不能证明进程已结束；进程丢失或验收命令结束未确认时保留 `uncertain`，须人工核对。thread 的恢复结果也不能证明另一个独立验收命令进程已经结束。
 
 `recover` 只通过原生接口检查已保存的 thread、turn、消息标记、queue 和 Goal 元数据；不会 resume、重新加入队列或恢复推理。冷读的 `notLoaded` 状态不能证明另一原生进程已停止。队列还在、标记重复、receipt 不完整、另一个 turn 使用了 worker thread，或完成状态无法确认时，保留不确定结果。不要删除记录、替换 thread ID 或再次派发来消除不确定性。
+
+原生传输失败可在 attempt 的 `result.transport` 中保留 `code`、`rpcMethod` 和 `rpcCode`，原生 turn 错误使用有界 `nativeError` 元数据。后续未能确认的恢复会保留这些诊断，便于区分启动读取、队列确认和推理失败；不保存服务端原始错误正文、日志或消息。诊断本身不允许再次执行，已确认的 queue receipt 仍须按原标记核对。
 
 命令验收前先保存 dispatch intent；如果进程在命令期间丢失，缺少完成回执就保留 `verificationUncertain`，恢复不能重跑命令。验收回执已落盘而普通检查点尚未保存时，恢复可复用有时间戳的历史命令结果，并重新读取指定文件、比较其摘要；指定文件变化会停止恢复。历史命令回执不证明未列入文件检查的依赖仍然相同，恢复后仍须核对 Git 状态和整个父任务的当前验收标准。
 

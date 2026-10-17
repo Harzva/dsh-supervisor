@@ -1,6 +1,6 @@
 {
   "name": "harzva-supervisor",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Authorized native execution, independent acceptance checks, faculty reviews and recoverable handoffs for Codex.",
   "author": { "name": "Harzva", "url": "https://github.com/Harzva" },
   "repository": "https://github.com/Harzva/dsh-supervisor",

@@ -11,6 +11,11 @@ const MAX_READ_BYTES = 16 * 1024 * 1024
 const MAX_EVENTS = 20000
 const MAX_OUTPUT_BYTES = 64 * 1024
 const TERMINAL = new Set(['completed', 'failed', 'interrupted'])
+const RPC_METHODS = new Set(['initialize', 'config/read', 'model/list', 'thread/start', 'thread/resume', 'thread/read', 'thread/queue/add', 'thread/queue/list', 'thread/queue/delete', 'thread/goal/get', 'turn/interrupt', 'command/exec', 'command/exec/terminate'])
+const RPC_CODES = new Set([-32700, -32600, -32601, -32602, -32603])
+const TRANSPORT_CODES = new Set(['INVALID_INPUT', 'NATIVE_PROTOCOL', 'NATIVE_WORKSPACE', 'NATIVE_PERMISSIONS', 'NATIVE_OWNERSHIP', 'NATIVE_START', 'NATIVE_LIMIT', 'NATIVE_IO', 'NATIVE_EXIT', 'NATIVE_RPC', 'NATIVE_TIMEOUT', 'NATIVE_CLOSED', 'NATIVE_DUPLICATE', 'NATIVE_CORRELATION', 'NATIVE_RECEIPT', 'NATIVE_CANCELLED', 'NATIVE_MODEL'])
+const STARTUP_READ_GRACE_MS = 2000
+const MATERIALIZATION_READ_RETRIES = 3
 const SIMPLE_NATIVE_ERRORS = new Set(['contextWindowExceeded', 'sessionBudgetExceeded', 'usageLimitExceeded', 'serverOverloaded', 'cyberPolicy', 'misalignmentPolicyViolation', 'internalServerError', 'unauthorized', 'badRequest', 'threadRollbackFailed', 'sandboxError', 'other'])
 const HTTP_NATIVE_ERRORS = new Set(['httpConnectionFailed', 'responseStreamConnectionFailed', 'responseStreamDisconnected', 'responseTooManyFailedAttempts'])
 const DEFAULT_ARGS = [
@@ -56,6 +61,20 @@ function timeoutValue(value = 120000) {
 function callback(value, name) {
   if (value !== undefined && typeof value !== 'function') fail('INVALID_INPUT', `${name} must be a function.`)
   return value
+}
+function rpcFailure(pending, body) {
+  const error = new NativeExecutorError('NATIVE_RPC', 'Codex rejected a native protocol request.')
+  if (RPC_METHODS.has(pending.method)) error.rpcMethod = pending.method
+  if (RPC_CODES.has(body?.code)) error.rpcCode = body.code
+  // Installed 0.149.0 has one documented pre-first-message read race. The
+  // response body is compared and discarded, never exposed or persisted.
+  const threadId = pending.params?.threadId
+  if (pending.method === 'thread/read' && pending.params?.includeTurns === true && body?.code === -32600 && typeof threadId === 'string' && body.message === `thread ${threadId} is not materialized yet; includeTurns is unavailable before first user message`) error.materializationThreadId = threadId
+  return error
+}
+function transportReceipt(error) {
+  if (!(error instanceof NativeExecutorError) || !TRANSPORT_CODES.has(error.code)) return { code: 'NATIVE_PROTOCOL' }
+  return { code: error.code, ...(RPC_METHODS.has(error.rpcMethod) ? { rpcMethod: error.rpcMethod } : {}), ...(RPC_CODES.has(error.rpcCode) ? { rpcCode: error.rpcCode } : {}) }
 }
 function nativeErrorReceipt(error) {
   const info = error?.codexErrorInfo
@@ -207,7 +226,7 @@ class RpcSession {
           this.pending.delete(message.id)
           clearTimeout(pending.timer)
           // Never expose error messages or data from the native process.
-          if (message.error) pending.reject(new NativeExecutorError('NATIVE_RPC', 'Codex rejected a native protocol request.'))
+          if (message.error) pending.reject(rpcFailure(pending, message.error))
           else if (Object.hasOwn(message, 'result')) pending.resolve(message.result)
           else pending.reject(new NativeExecutorError('NATIVE_PROTOCOL', 'Codex emitted an invalid protocol response.'))
         }
@@ -236,7 +255,8 @@ class RpcSession {
         this.pending.delete(id)
         reject(new NativeExecutorError('NATIVE_TIMEOUT', 'Native protocol request timed out.'))
       }, timeoutMs)
-      this.pending.set(id, { resolve, reject, timer })
+      // Retain only the controlled fields needed to categorize a read race.
+      this.pending.set(id, { resolve, reject, timer, method, params: method === 'thread/read' ? { threadId: params?.threadId, includeTurns: params?.includeTurns } : undefined })
       try { this.send({ id, method, params }) } catch (error) {
         clearTimeout(timer)
         this.pending.delete(id)
@@ -256,7 +276,7 @@ class RpcSession {
   }
 
   async initialize() {
-    await this.request('initialize', { clientInfo: { name: 'harzva_supervisor', title: 'Harzva Supervisor', version: '0.2.0' }, capabilities: { experimentalApi: true } })
+    await this.request('initialize', { clientInfo: { name: 'harzva_supervisor', title: 'Harzva Supervisor', version: '0.2.1' }, capabilities: { experimentalApi: true } })
     this.send({ method: 'initialized', params: {} })
   }
 
@@ -284,10 +304,7 @@ function rejectServerRequest(message, rpc) {
   else rpc.send({ id: message.id, error: { code: -32601, message: 'Unattended native request is unsupported.' } })
 }
 
-async function readSnapshot(rpc, workspace, threadId, marker, turnId, requestTimeoutMs = 10000) {
-  const read = await rpc.request('thread/read', { threadId, includeTurns: true }, requestTimeoutMs)
-  const thread = checkThread(read.thread, workspace, threadId)
-  if (!Array.isArray(thread.turns)) fail('NATIVE_PROTOCOL', 'Codex returned invalid native history.')
+async function readQueue(rpc, threadId, requestTimeoutMs = 10000) {
   let cursor = null
   const queued = []
   for (let page = 0; page < 10; page += 1) {
@@ -298,6 +315,14 @@ async function readSnapshot(rpc, workspace, threadId, marker, turnId, requestTim
     if (!cursor) break
     if (page === 9 || typeof cursor !== 'string' || cursor.length > 4096) fail('NATIVE_LIMIT', 'Native queue exceeds the bounded inspection limit.')
   }
+  return queued
+}
+
+async function readSnapshot(rpc, workspace, threadId, marker, turnId, requestTimeoutMs = 10000) {
+  const read = await rpc.request('thread/read', { threadId, includeTurns: true }, requestTimeoutMs)
+  const thread = checkThread(read.thread, workspace, threadId)
+  if (!Array.isArray(thread.turns)) fail('NATIVE_PROTOCOL', 'Codex returned invalid native history.')
+  const queued = await readQueue(rpc, threadId, requestTimeoutMs)
   const goalRead = await rpc.request('thread/goal/get', { threadId }, requestTimeoutMs)
   const activeGoal = goalRead.goal && goalRead.goal.status === 'active'
   const turns = thread.turns.map(turn => ({ ...normalizeTurn(turn), markerMatch: !!marker && Array.isArray(turn.items) && turn.items.some(item => item.type === 'userMessage' && item.clientId === marker) }))
@@ -393,7 +418,8 @@ export function createNativeExecutor({ spawnImpl = spawn, serverCommand = 'codex
     if (expectedPreviousTurnId !== undefined && expectedPreviousTurnId !== null) validId(expectedPreviousTurnId, 'previous native turn ID')
     for (const [name, handler] of Object.entries({ onThread, onDispatch, onQueued, onStarted })) callback(handler, name)
     if (signal && typeof signal.addEventListener !== 'function') fail('INVALID_INPUT', 'Invalid abort signal.')
-    const state = { threadId: threadId || null, turnId: null, queuedSubmissionId: null, dispatched: false, needsAction: false, persistenceFailed: false, starts: new Map(), terminals: new Map(), errors: new Map(), requests: [], startedSaved: false }
+    const state = { threadId: threadId || null, turnId: null, queuedSubmissionId: null, dispatched: false, needsAction: false, persistenceFailed: false, starts: new Map(), terminals: new Map(), errors: new Map(), requests: [], startedSaved: false, transport: null }
+    const deadline = Date.now() + timeoutMs
     let stopReason = null
     let stopResolve
     const stopped = new Promise(resolve => { stopResolve = resolve })
@@ -456,7 +482,8 @@ export function createNativeExecutor({ spawnImpl = spawn, serverCommand = 'codex
         if (Array.isArray(params.turn.items) && params.turn.items.some(item => item.type === 'userMessage' && item.clientId === marker)) correlate(turn.id, session)
       }
     })
-    const result = (status, summary) => ({ threadId: state.threadId, turnId: state.turnId, marker, queuedSubmissionId: state.queuedSubmissionId, status, summary, ...(state.turnId && state.errors.has(state.turnId) ? { nativeError: state.errors.get(state.turnId) } : {}) })
+    const result = (status, summary) => ({ threadId: state.threadId, turnId: state.turnId, marker, queuedSubmissionId: state.queuedSubmissionId, status, summary, ...(state.turnId && state.errors.has(state.turnId) ? { nativeError: state.errors.get(state.turnId) } : {}), ...(state.transport ? { transport: state.transport } : {}) })
+    const ownMaterializationRace = error => state.dispatched && state.queuedSubmissionId && state.threadId && error instanceof NativeExecutorError && error.materializationThreadId === state.threadId && error.rpcMethod === 'thread/read' && error.rpcCode === -32600
 
     async function reconcileLocal(requestTimeoutMs) {
       const snapshot = await readSnapshot(rpc, workspace, state.threadId, marker, state.turnId, requestTimeoutMs)
@@ -488,7 +515,27 @@ export function createNativeExecutor({ spawnImpl = spawn, serverCommand = 'codex
           await rpc.wait(revision, 100)
         }
         return (await reconcileLocal(1000)).matched?.status || null
-      } catch { return null }
+      } catch (error) {
+        if (!ownMaterializationRace(error) || rpc.failure) return null
+        // A cancellation can arrive before history materializes. Queue receipts
+        // and a marker-correlated live turn still allow exact owned cancellation;
+        // this fallback does not resume work or retry the failed history read.
+        try {
+          const queued = await readQueue(rpc, state.threadId, 1000)
+          const matches = queued.filter(entry => entry.marker === marker && entry.id === state.queuedSubmissionId)
+          if (matches.length > 1) return null
+          for (const entry of matches) await rpc.request('thread/queue/delete', { threadId: state.threadId, queuedSubmissionId: entry.id }, 1500)
+          if (!state.turnId) return null
+          if (state.terminals.has(state.turnId)) return state.terminals.get(state.turnId)
+          await rpc.request('turn/interrupt', { threadId: state.threadId, turnId: state.turnId }, 1500)
+          const end = Date.now() + 1500
+          while (Date.now() < end) {
+            if (state.terminals.has(state.turnId)) return state.terminals.get(state.turnId)
+            await rpc.wait(rpc.revision, 100)
+          }
+        } catch { /* Retain uncertainty if exact cancellation is unconfirmed. */ }
+        return null
+      }
     }
 
     async function stopOwnedWork() {
@@ -525,10 +572,13 @@ export function createNativeExecutor({ spawnImpl = spawn, serverCommand = 'codex
       if (!added?.queuedSubmission || added.queuedSubmission.clientUserMessageId !== marker) fail('NATIVE_CORRELATION', 'Codex returned a different queued dispatch receipt.')
       state.queuedSubmissionId = validId(added.queuedSubmission.id, 'queued submission ID')
       await persist(onQueued, { threadId: state.threadId, marker, queuedSubmissionId: state.queuedSubmissionId })
-      let nextRead = Date.now()
+      // Lifecycle events can precede history materialization and the add reply.
+      // Give those events priority without moving the original job deadline.
+      let nextRead = Date.now() + STARTUP_READ_GRACE_MS
+      let materializationRetries = 0
       while (true) {
         if (rpc.failure) throw rpc.failure
-        if (stopReason) throw new NativeExecutorError('NATIVE_CANCELLED', 'Native execution stopped before a confirmed result.')
+        if (stopReason) throw new NativeExecutorError(stopReason === 'timeout' ? 'NATIVE_TIMEOUT' : 'NATIVE_CANCELLED', 'Native execution stopped before a confirmed result.')
         if (state.turnId && !state.startedSaved) {
           await persist(onStarted, { threadId: state.threadId, turnId: state.turnId })
           state.startedSaved = true
@@ -540,7 +590,14 @@ export function createNativeExecutor({ spawnImpl = spawn, serverCommand = 'codex
         const terminal = state.turnId && state.terminals.get(state.turnId)
         if (terminal) return result(terminal, `Native turn ${terminal}; acceptance requires separate verification.`)
         if (Date.now() >= nextRead) {
-          await guarded(reconcileLocal())
+          try { await guarded(reconcileLocal()) } catch (error) {
+            if (ownMaterializationRace(error) && materializationRetries < MATERIALIZATION_READ_RETRIES && !stopReason && Date.now() < deadline) {
+              materializationRetries += 1
+              nextRead = Math.min(Date.now() + 500, deadline)
+              continue
+            }
+            throw error
+          }
           nextRead = Date.now() + 1000
           continue
         }
@@ -548,6 +605,7 @@ export function createNativeExecutor({ spawnImpl = spawn, serverCommand = 'codex
         await guarded(rpc.wait(revision, Math.min(1000, nextRead - Date.now())))
       }
     } catch (error) {
+      state.transport = transportReceipt(error)
       const stoppedStatus = await stopOwnedWork()
       if (state.needsAction) return result('needs-user-action', 'Native execution requires human approval or input; no approval was granted.')
       if (state.persistenceFailed) return result(state.dispatched ? 'uncertain' : 'failed', 'Native receipt persistence failed; manual recovery is required.')

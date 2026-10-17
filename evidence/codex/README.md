@@ -1,8 +1,18 @@
 # Codex 接手记录 · 2026-10-17
 
-## 0.2.0 执行链验收
+## 0.2.1 本地安装与已安装技能验收
 
-本轮在 0.1.0 本地迁移版上实现授权 proposal → Codex owned worker 原生 queue → 独立文件／命令验收 → Supervisor `progress` 检查点。旧验证原样保存在 `checks-0.1.0.json`；当前结果在 `checks.json`，真实原生执行证据在 `native-execution.json`。后续章节中的 0.1.0 行为是接手时的历史记录。
+本机以支持的 CLI 注册本地开发市场并安装、启用 `harzva-supervisor@harzva-supervisor-dev` 0.2.1。插件缓存 16 个文件与 ZIP 摘要一致。新原生进程通过 `skills/list` 识别五个已启用技能；以明确的 native skill inputs 调用缓存中的 setup 和 execute，在新隔离工程完成五导师初始化、Git 忽略、单次原生 worker 执行、两项独立验收与 sequence 1 的 progress 检查点。脱敏回执在 [local-installation.json](local-installation.json)。107 项测试通过，其中 Codex 91 项。
+
+0.2.0 首次已安装技能嵌套试用在 queue 确认后遇到 `thread/read` 内部 RPC 错误 -32603，按设计保留 uncertain，未重投该任务。单独的有界诊断表明先等待原生事件、延迟首次历史读取后执行成功。0.2.1 增加 2 秒启动窗口；仅对官方准确的自有线程尚未 materialize 错误 -32600 有界重试只读查询。观察到的 -32603 与官方的 -32600 是不同证据；未知内部错误仍停止。原截止时间不延长，queue 不重派发，结构化 transport 诊断在恢复后保留，不存储原始 RPC 正文。
+
+默认 SDK workspace-write 宿主对受保护的项目 `.codex/supervisor/` 写入返回 PATH_ACCESS。成功试用的外层宿主使用本次会话已授权的 full-access 权限，未修改持久权限设置；内部 worker 和验收命令继续使用限定工程、无网络的 workspace-write 沙箱。此结果不证明每个默认受限宿主都能初始化这些路径。当前已运行桌面聊天的技能目录刷新未直接验证；按官方本地插件说明可能需要自然重启。未执行市场发布、Release、npm 发布或 PR 合并。
+
+权威时序依据：[0.149.0 thread/read 处理](https://github.com/openai/codex/blob/rust-v0.149.0/codex-rs/app-server/src/request_processors/thread_processor.rs#L5580)、[未 materialize 测试](https://github.com/openai/codex/blob/rust-v0.149.0/codex-rs/app-server/tests/suite/v2/thread_read.rs#L1409)、[本地插件安装说明](https://developers.openai.com/plugins/build/plugins)。
+
+## 0.2.0 执行链验收（历史记录）
+
+本轮在 0.1.0 本地迁移版上实现授权 proposal → Codex owned worker 原生 queue → 独立文件／命令验收 → Supervisor `progress` 检查点。旧验证原样保存在 `checks-0.1.0.json` 和 `checks-0.2.0.json`；当前结果在 `checks.json`，真实原生执行证据在 `native-execution.json`。后续章节中的 0.1.0 行为是接手时的历史记录。
 
 使用实际安装的 Codex 0.149.0 完成了非模拟测试：worker 创建 26 字节目标文件，文件 SHA-256 为 `ba813dc8bcdeea5ef96ca5427035cd5744e0e631221f7fa5bbd748d12a2d370c`；文件内容／摘要和原生 sandbox 中的 Node 精确断言均通过，原生 queue、turn、消息标记已关联，单次 attempt 后写回 sequence 1 的进展检查点。未把父任务或原生 Goal 标记为完成。
 
@@ -59,7 +69,7 @@ main 到 v2 分支只改变 13 个 docs/evidence 文件，没有 src/test/runtim
 
 权威资料：[打包规范](https://developers.openai.com/plugins/build/plugins)、[技能规范](https://developers.openai.com/plugins/build/skills)、[官方解析器](https://github.com/openai/codex/blob/5009a99dfc07830ddf7464c26f310a2b8532b55d/codex-rs/core-plugins/src/agent_plugin_manifest.rs)、[原生子代理](https://learn.chatgpt.com/docs/agent-configuration/subagents)。
 
-## 验证与交付边界
+## 0.1.0 验证与交付边界（历史记录）
 
 具体检查结果写在同目录 `checks.json`。验证覆盖构建资源一致性、manifest/path/marketplace、四个技能元数据、本地 CLI 的迁移／重启／交接／拒绝路径，及完整 DSH 回归和 pack gate。ZIP 解包后以独立工程做 smoke，以确认不依赖 canonical 仓库的 package.json 或其他运行文件。
 
@@ -69,4 +79,4 @@ main 到 v2 分支只改变 13 个 docs/evidence 文件，没有 src/test/runtim
 
 DSH 市场发布以 [awesome-dsh-plugin 收录仓库](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin) 为另一个任务。核查 tree `a3c72b2913447cfaf6c69db5d39fb0cb06a0cf30` 无这两个 dsh-supervisor 项目条目。后续使用 `data/plugins/<owner>__<repo>.yml` 而非手改生成 README，并单独复核可见性、dsh.bundle、topic 和许可证。当前 private 仓库不能被视为已经公开发布。
 
-Codex 后续先完成桌面安装验收，再决定是否需要正式 MCP／hooks 产品及公共目录身份。找回原电脑修改时做独立 diff 和来源核查，不能直接覆盖 canonical 新实现。DSH v2 active Goal 双调度问题也应保持独立修复与运行验收。
+Codex 后续继续验收桌面自然刷新、其他受限宿主与自动触发，再决定是否需要正式 MCP／hooks 产品及公共目录身份。找回原电脑修改时做独立 diff 和来源核查，不能直接覆盖 canonical 新实现。DSH v2 active Goal 双调度问题也应保持独立修复与运行验收。

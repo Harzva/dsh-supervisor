@@ -136,12 +136,12 @@ async function runJobOwned(store, id, dependencies = {}) {
       const receipt = { ...(result.turnId ? { turnId: result.turnId } : {}), ...(result.threadId ? { threadId: result.threadId } : {}) }
       if (controller.signal.aborted || jobFrom(store.snapshot(), id).status === 'cancelling') {
         store.mutate(state => cancel(state, id))
-        update({ status: ['completed', 'failed', 'interrupted'].includes(result.status) ? 'cancelled' : 'uncertain', ...receipt, result: { status: result.status, reason: 'cancellation-requested', cancellationRequested: true } })
+        update({ status: ['completed', 'failed', 'interrupted'].includes(result.status) ? 'cancelled' : 'uncertain', ...receipt, result: { status: result.status, reason: 'cancellation-requested', cancellationRequested: true, ...(result.transport ? { transport: result.transport } : {}) } })
         return publicJob(jobFrom(store.snapshot(), id))
       }
       if (result.status !== 'completed') {
         const status = ['needs-user-action', 'uncertain'].includes(result.status) ? result.status : 'failed'
-        update({ status, ...receipt, result: { status: result.status, reason: 'native-execution-not-completed', ...(result.nativeError ? { nativeError: result.nativeError } : {}) } })
+        update({ status, ...receipt, result: { status: result.status, reason: 'native-execution-not-completed', ...(result.nativeError ? { nativeError: result.nativeError } : {}), ...(result.transport ? { transport: result.transport } : {}) } })
       } else {
         update({ status: 'verifying', ...receipt, result: { status: 'completed', ...(job.proposal.verification.some(check => check.kind === 'command') ? { verificationStarted: true } : {}) } })
         const checks = await verification(workspace, job.proposal.verification, { signal: controller.signal })
@@ -188,7 +188,7 @@ async function recoverJobOwned(store, id, dependencies = {}) {
     return publicJob(jobFrom(store.snapshot(), id))
   }
   if (!job.threadId) {
-    store.mutate(state => updateAttempt(state, { jobId: id, attemptId: attempt.id, status: 'uncertain', result: { reason: 'no-durable-native-thread' } }))
+    store.mutate(state => updateAttempt(state, { jobId: id, attemptId: attempt.id, status: 'uncertain', result: { ...attempt.result, reason: 'no-durable-native-thread' } }))
     return publicJob(jobFrom(store.snapshot(), id))
   }
   let observation
@@ -200,7 +200,7 @@ async function recoverJobOwned(store, id, dependencies = {}) {
   const cancellationRequested = job.status === 'cancelling' || job.attempts.at(-1).result?.cancellationRequested === true || dependencies.signal?.aborted
   if (cancellationRequested && reconciled && ['completed', 'failed', 'interrupted'].includes(observation.status)) {
     store.mutate(state => cancel(state, id))
-    store.mutate(state => updateAttempt(state, { jobId: id, attemptId: attempt.id, status: 'cancelled', turnId: observation.turnId, result: { status: observation.status, recovered: true, cancellationRequested: true } }))
+    store.mutate(state => updateAttempt(state, { jobId: id, attemptId: attempt.id, status: 'cancelled', turnId: observation.turnId, result: { ...attempt.result, status: observation.status, recovered: true, cancellationRequested: true } }))
   } else if (observation.status === 'completed' && reconciled) {
     const savedChecks = job.verification
     if (savedChecks) {
@@ -218,7 +218,7 @@ async function recoverJobOwned(store, id, dependencies = {}) {
         return publicJob(jobFrom(store.snapshot(), id))
       }
     }
-    store.mutate(state => updateAttempt(state, { jobId: id, attemptId: attempt.id, status: 'verifying', turnId: observation.turnId, result: { status: 'completed', recovered: true, ...(!savedChecks && job.proposal.verification.some(check => check.kind === 'command') ? { verificationStarted: true } : {}) } }))
+    store.mutate(state => updateAttempt(state, { jobId: id, attemptId: attempt.id, status: 'verifying', turnId: observation.turnId, result: { ...attempt.result, status: 'completed', recovered: true, ...(!savedChecks && job.proposal.verification.some(check => check.kind === 'command') ? { verificationStarted: true } : {}) } }))
     const controller = new AbortController()
     const relayAbort = () => controller.abort()
     dependencies.signal?.addEventListener('abort', relayAbort, { once: true })
@@ -232,12 +232,12 @@ async function recoverJobOwned(store, id, dependencies = {}) {
         store.mutate(state => cancel(state, id))
         store.mutate(state => {
           const unconfirmed = verificationUncertain(checks)
-          return updateAttempt(state, { jobId: id, attemptId: attempt.id, status: unconfirmed ? 'uncertain' : 'cancelled', verification: checks, result: { status: 'completed', recovered: true, cancellationRequested: true, ...(unconfirmed ? { verificationUncertain: true } : {}) } })
+          return updateAttempt(state, { jobId: id, attemptId: attempt.id, status: unconfirmed ? 'uncertain' : 'cancelled', verification: checks, result: { ...attempt.result, status: 'completed', recovered: true, cancellationRequested: true, ...(unconfirmed ? { verificationUncertain: true } : {}) } })
         })
       } else {
-        store.mutate(state => updateAttempt(state, { jobId: id, attemptId: attempt.id, status: 'verifying', verification: checks, result: { status: 'completed', recovered: true, verificationFinished: true, ...(verificationUncertain(checks) ? { verificationUncertain: true } : {}) } }))
+        store.mutate(state => updateAttempt(state, { jobId: id, attemptId: attempt.id, status: 'verifying', verification: checks, result: { ...attempt.result, status: 'completed', recovered: true, verificationFinished: true, ...(verificationUncertain(checks) ? { verificationUncertain: true } : {}) } }))
         const checkpointSequence = checks.passed ? saveVerifiedCheckpoint(store.snapshot().workspace, jobFrom(store.snapshot(), id), checks) : undefined
-        store.mutate(state => updateAttempt(state, { jobId: id, attemptId: attempt.id, status: verifiedStatus(checks), verification: checks, result: { status: 'completed', recovered: true, ...(verificationUncertain(checks) ? { verificationUncertain: true } : {}), ...(checkpointSequence === undefined ? {} : { checkpointSequence }) } }))
+        store.mutate(state => updateAttempt(state, { jobId: id, attemptId: attempt.id, status: verifiedStatus(checks), verification: checks, result: { ...attempt.result, status: 'completed', recovered: true, ...(verificationUncertain(checks) ? { verificationUncertain: true } : {}), ...(checkpointSequence === undefined ? {} : { checkpointSequence }) } }))
       }
     } catch {
       const current = jobFrom(store.snapshot(), id)
@@ -247,9 +247,9 @@ async function recoverJobOwned(store, id, dependencies = {}) {
       dependencies.signal?.removeEventListener('abort', relayAbort)
     }
   } else if (['failed', 'interrupted'].includes(observation.status) && reconciled) {
-    store.mutate(state => updateAttempt(state, { jobId: id, attemptId: attempt.id, status: 'failed', turnId: observation.turnId, result: { status: observation.status, recovered: true } }))
+    store.mutate(state => updateAttempt(state, { jobId: id, attemptId: attempt.id, status: 'failed', turnId: observation.turnId, result: { ...attempt.result, status: observation.status, recovered: true, ...(observation.nativeError ? { nativeError: observation.nativeError } : {}) } }))
   } else {
-    store.mutate(state => updateAttempt(state, { jobId: id, attemptId: attempt.id, status: 'uncertain', result: { reason: 'native-receipt-not-terminal-or-queue-pending', ...(cancellationRequested ? { cancellationRequested: true } : {}) } }))
+    store.mutate(state => updateAttempt(state, { jobId: id, attemptId: attempt.id, status: 'uncertain', result: { ...attempt.result, reason: 'native-receipt-not-terminal-or-queue-pending', ...(cancellationRequested ? { cancellationRequested: true } : {}) } }))
   }
   job = jobFrom(store.snapshot(), id)
   return publicJob(job)

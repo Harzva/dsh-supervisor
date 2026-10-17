@@ -1,7 +1,7 @@
 {
   "date": "2026-10-17",
   "timezone": "Asia/Shanghai",
-  "previousEvidence": "checks-0.1.0.json",
+  "previousEvidence": "checks-0.2.0.json",
   "baseline": {
     "repository": "Harzva/dsh-supervisor",
     "baseBranch": "feat/smart-supervision-v2",
@@ -12,7 +12,7 @@
   },
   "plugin": {
     "name": "harzva-supervisor",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "skills": [
       "setup",
       "supervise",
@@ -27,11 +27,11 @@
   "checks": {
     "npm run codex:check": {
       "passed": true,
-      "tests": 79
+      "tests": 91
     },
     "npm run verify:p0": {
       "passed": true,
-      "tests": 95,
+      "tests": 107,
       "dshBaselineTests": 16,
       "packFiles": 19,
       "publicScanFindings": 0
@@ -44,15 +44,11 @@
       "passed": true,
       "fileCount": 16,
       "allFileDigestsMatchSource": true,
-      "allExtractedFilesMatchSource": true,
-      "successfulJobRepeat": {
-        "status": "succeeded",
-        "attemptCount": 1,
-        "checkpointSequence": 1
-      }
+      "installedCacheMatchesPackage": true
     },
     "independentReview": {
       "passed": true,
+      "tests": 61,
       "findingsResolved": [
         "cancel acknowledgement races",
         "native model forwarding",
@@ -60,7 +56,9 @@
         "verifier abort and uncertain termination",
         "durable independent verifier intent",
         "stop later commands after unconfirmed receipts",
-        "stale declared artifact rejection on recovery"
+        "stale declared artifact rejection on recovery",
+        "acknowledged native thread startup history race",
+        "diagnostic preservation during inert recovery"
       ]
     },
     "gitDiffCheck": {
@@ -72,18 +70,27 @@
       "passed": true,
       "method": "plugin/read",
       "skills": 5,
-      "installed": false,
-      "enabled": false
+      "installed": true,
+      "enabled": true
     },
     "actualNativeQueue": {
       "passed": true,
-      "evidence": "native-execution.json",
+      "evidence": "local-installation.json",
       "attemptCount": 1,
       "checksPassed": 2,
       "progressCheckpointSequence": 1
     },
-    "nativeSkillInvocation": "not verified; plugin not installed",
-    "desktopInstallation": "pending"
+    "nativeSkillInvocation": {
+      "passed": true,
+      "names": [
+        "harzva-supervisor:setup",
+        "harzva-supervisor:execute"
+      ],
+      "source": "actual installed cache via explicit native skill inputs"
+    },
+    "desktopInstallation": "installed and enabled using supported local CLI",
+    "currentConversationRefresh": "not directly observed; natural restart may be needed",
+    "hostPermissionProfile": "same full-access environment as the current authorized local session; no persistent policy change"
   },
   "repositoryAudit": {
     "method": "GitHub GraphQL",
@@ -99,15 +106,15 @@
     "publicPluginDirectorySubmitted": false
   },
   "artifact": {
-    "archive": "harzva-supervisor-0.2.0.zip",
-    "sha256": "4dbba62797ef9104a19caafb731e67944dc69f80fa6149fc81c919cb40cd8fce",
+    "archive": "harzva-supervisor-0.2.1.zip",
+    "sha256": "0e095292214e3518cacca283063c8a35a39c4d0404db2672092120ce5e0e09de",
     "fileCount": 16
   },
   "sourceDigests": {
     "runtime/mentor-registry.mjs": "3b5766d88bab4e6bf94c27cb56b07b0460eb7b2d348dbe9bf4e9560ce405b3d5",
     "scripts/execution-store.mjs": "c26d8e12aa0e2cf3629830a22bcdcbf928342484ccbd2f044f88441cf9f20a30",
-    "scripts/execution.mjs": "32c40af0033554ccd10842bd8a6896928e1ced5f9b530025a3b309102d3d45fa",
-    "scripts/native-executor.mjs": "8d6c64d53e6807acdadff10b5491985129e81b9fa5bba254e7986a5905d465a4",
+    "scripts/execution.mjs": "53da3282292c134718f62f2c16c573cfc796e892295a07051065ee4c67aa0994",
+    "scripts/native-executor.mjs": "d865364869368352423779a68a466bcc84f061981e5d39d3da717e85bd86b485",
     "scripts/state.mjs": "4443655d3a13b501c239dcee012c9545c346fd265b2022127aa521d4ac46d03b",
     "scripts/supervisor.mjs": "d337eb8e4567e1a838e2c2d7a71e7d2d2657cdc95eab3cf73800911a7990a824",
     "scripts/verification.mjs": "728633d57c56fa578a2716230503378b93afb92f3f2dcb31cbf5cefb69938c95"

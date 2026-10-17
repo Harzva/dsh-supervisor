@@ -226,6 +226,40 @@ test('ambiguous dispatch never replays and completed recovery requires every cor
   assert.equal(f.roster().latestCheckpoint.data.outcome, 'progress')
 })
 
+test('acknowledged native transport diagnostics survive inconclusive and terminal recovery without replay', async (t) => {
+  const f = fixture(t)
+  await addJob(f)
+  const transport = { code: 'NATIVE_RPC', rpcMethod: 'thread/read', rpcCode: -32000 }
+  const nativeError = { type: 'httpConnectionFailed', httpStatusCode: 503 }
+  let dispatches = 0
+  const initial = await runJob(f.store, 'job', {
+    execute: async (options) => {
+      dispatches += 1
+      const receipt = await callbacks(options)
+      return { ...receipt, status: 'uncertain', transport, nativeError }
+    },
+    verify: async () => { assert.fail('an uncertain native response cannot run acceptance') },
+  })
+  assert.equal(initial.status, 'uncertain')
+  assert.deepEqual(initial.attempts[0].result.transport, transport)
+  assert.deepEqual(initial.attempts[0].result.nativeError, nativeError)
+  const restarted = new ExecutionStore(f.workspace)
+  const inconclusive = await recoverJob(restarted, 'job', {
+    inspect: async () => inspection(f, { state: 'uncertain', status: null }),
+    verify: async () => { assert.fail('inconclusive recovery cannot run acceptance') },
+  })
+  assert.equal(inconclusive.status, 'uncertain')
+  assert.deepEqual(inconclusive.attempts[0].result.transport, transport)
+  assert.deepEqual(inconclusive.attempts[0].result.nativeError, nativeError)
+  const terminalError = { type: 'sandboxError' }
+  const terminal = await recoverJob(restarted, 'job', { inspect: async () => inspection(f, { status: 'failed', nativeError: terminalError }) })
+  assert.equal(terminal.status, 'failed')
+  assert.deepEqual(terminal.attempts[0].result.transport, transport)
+  assert.deepEqual(terminal.attempts[0].result.nativeError, terminalError)
+  assert.equal(terminal.attempts.length, 1)
+  assert.equal(dispatches, 1)
+})
+
 test('missing durable thread and unresolved workspace work block recovery verification and new dispatch', async (t) => {
   const f = fixture(t)
   await addJob(f)

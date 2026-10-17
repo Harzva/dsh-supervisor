@@ -4,7 +4,7 @@ DSH Host + Client plugin for per-session supervision, role-aware Supervisors, du
 
 ## Codex edition
 
-The independent `harzva-supervisor@0.2.0` Codex development plugin lives in
+The independent `harzva-supervisor@0.2.1` Codex development plugin lives in
 [`plugins/codex-supervisor/`](plugins/codex-supervisor/README.md). It packages
 supervision, authorized execution, faculty review and handoff skills, reusing
 the canonical mentor rules. The execution chain binds an immutable proposal
@@ -20,7 +20,13 @@ human approvals. Only a confirmed failure can retry within the approved cap;
 uncertain dispatches stop for recovery. Native completion alone never marks
 the parent task complete. The native queue is the sole job scheduler; this
 edition does not scrape chats, install a watchdog or automatically map DSH
-model routes. The DSH package remains version `0.2.4`; Smart Supervision v2 and
+model routes. Version 0.2.1 allows native startup events and thread materialization
+to settle before bounded receipt reads; it never resubmits acknowledged work to
+repair a read error and retains safe transport diagnostics. The calling host must
+permit writes to the project's protected `.codex/supervisor/` directory and the
+native CLI's own cache/login state. A default workspace-write host may block those
+paths; the plugin does not change global permissions. The DSH package remains
+version `0.2.4`; Smart Supervision v2 and
 DSH marketplace publication retain their separate implementation tracks.
 See [`evidence/codex/README.md`](evidence/codex/README.md) for takeover findings
 and the verification boundary.

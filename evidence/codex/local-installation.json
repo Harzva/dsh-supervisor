@@ -1,0 +1,76 @@
+{
+  "date": "2026-10-17",
+  "pluginId": "harzva-supervisor@harzva-supervisor-dev",
+  "version": "0.2.1",
+  "installed": true,
+  "enabled": true,
+  "skillDiscovery": {
+    "enabledCount": 5,
+    "names": [
+      "harzva-supervisor:execute",
+      "harzva-supervisor:faculty-review",
+      "harzva-supervisor:handoff",
+      "harzva-supervisor:setup",
+      "harzva-supervisor:supervise"
+    ]
+  },
+  "explicitSkillInvocation": {
+    "names": [
+      "harzva-supervisor:setup",
+      "harzva-supervisor:execute"
+    ],
+    "passed": true,
+    "nativeQueueReceiptConfirmed": true,
+    "nativeTurnCompleted": true,
+    "cacheHelperCommands": 12,
+    "setupCalls": 5,
+    "executeCalls": 7,
+    "approvalRequests": 0,
+    "trialHostPolicy": "same full-access environment as the current authorized local session; no persistent policy change",
+    "audit": "The initial trial monitor counted only commandExecution notifications and missed custom exec tool calls. A readonly audit of this completed owned trial verified installed helper paths; no work was resubmitted."
+  },
+  "setupAcceptance": {
+    "workspaceBound": true,
+    "mentorCount": 5,
+    "gitIgnoreConfirmed": true,
+    "stateSha256": "e99bf765316e2e5acc1333f537570bf310673f82e313fa633f8ae2b262cb9323"
+  },
+  "executionAcceptance": {
+    "status": "succeeded",
+    "attemptCount": 1,
+    "nativeThreadConfirmed": true,
+    "nativeQueueConfirmed": true,
+    "nativeTurnConfirmed": true,
+    "verification": {
+      "checkedAt": 1792205936635,
+      "passed": true,
+      "checks": [
+        {
+          "index": 0,
+          "kind": "file",
+          "path": "trial-result.txt",
+          "passed": true,
+          "sha256": "7ab3e0155cb59c95383db86ede8c0167dce4109fb26454f6fc408c965ad93165",
+          "bytes": 23,
+          "reason": "matched"
+        },
+        {
+          "index": 1,
+          "kind": "command",
+          "passed": true,
+          "completionConfirmed": true,
+          "exitCode": 0,
+          "stdoutDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "outputBytes": 0,
+          "timedOut": false,
+          "needsUserAction": false
+        }
+      ]
+    },
+    "progressCheckpointSequence": 1,
+    "progressCheckpointOutcome": "progress",
+    "targetFileSha256": "7ab3e0155cb59c95383db86ede8c0167dce4109fb26454f6fc408c965ad93165"
+  },
+  "desktopCurrentConversationRefresh": "not directly observed; natural restart may be needed"
+}
