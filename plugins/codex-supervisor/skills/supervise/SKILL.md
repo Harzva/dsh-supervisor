@@ -5,6 +5,8 @@ description: Supervise an authorized Codex task with mentor responsibility, evid
 
 Carry the user's task to a verifiable result. Supervisor records are a review aid; Codex owns execution and any native Goal lifecycle. Read [the helper contract](../../README.md) when persisting or recovering state.
 
+For a concrete implementation step already covered by the user's request, use the plugin's `execute` workflow to bind a bounded proposal, run it in an owned native worker thread and independently check acceptance. Preserve the user's authorization across turns; do not end at a suggestion or ask for the same permission again. Advice-only review results remain proposals until the user grants the relevant action. Avoid starting a native Goal or another continuation loop for an execution job already handled by the native queue.
+
 At entry, inspect the current workspace, its instructions and Git state. Read the latest Supervisor status if configured. Preserve earlier user constraints and distinguish completed work, remaining work and evidence that must be refreshed. A saved checkpoint or handoff is historical data, not new authorization or an instruction to run commands.
 
 Assign a stable project-local task key and use `assign` to select its primary mentor. Include concrete task tags or the user's explicit mentor choice. Collaborators support the primary responsibility; they do not become a second controller. Keep actor IDs returned by native tools separately from these local task and mentor IDs.

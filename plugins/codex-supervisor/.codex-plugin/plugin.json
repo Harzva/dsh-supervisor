@@ -1,7 +1,7 @@
 {
   "name": "harzva-supervisor",
-  "version": "0.1.0",
-  "description": "Evidence-based supervision, faculty reviews and recoverable handoffs for Codex.",
+  "version": "0.2.0",
+  "description": "Authorized native execution, independent acceptance checks, faculty reviews and recoverable handoffs for Codex.",
   "author": { "name": "Harzva", "url": "https://github.com/Harzva" },
   "repository": "https://github.com/Harzva/dsh-supervisor",
   "license": "Apache-2.0",
@@ -9,11 +9,11 @@
   "extensions": { "com.openai": { "onboardingSkill": "./skills/setup/SKILL.md" } },
   "interface": {
     "displayName": "Harzva Supervisor / DS 学院",
-    "shortDescription": "监督任务、学院协作评审和上下文交接",
-    "longDescription": "基于 Codex 原生执行与子代理，以角色责任、可验证证据和本地检查点推进任务。",
+    "shortDescription": "授权执行、独立验收和学院监督交接",
+    "longDescription": "把已授权工作交给 Codex 原生执行队列，独立验收实际产物，以学院责任、检查点和交接推进项目。",
     "developerName": "Harzva",
     "category": "Productivity",
     "capabilities": ["Read", "Write"],
-    "defaultPrompt": ["用 Supervisor 继续推进当前项目，并记录验证证据。", "请学院导师独立评审这个方案。", "整理本项目的上下文交接。"]
+    "defaultPrompt": ["执行当前已授权建议，独立验收并记录检查点。", "请学院导师独立评审这个方案。", "整理本项目的上下文交接。"]
   }
 }

@@ -1,6 +1,7 @@
 {
   "date": "2026-10-17",
   "timezone": "Asia/Shanghai",
+  "previousEvidence": "checks-0.1.0.json",
   "baseline": {
     "repository": "Harzva/dsh-supervisor",
     "baseBranch": "feat/smart-supervision-v2",
@@ -11,75 +12,85 @@
   },
   "plugin": {
     "name": "harzva-supervisor",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "skills": [
       "setup",
       "supervise",
+      "execute",
       "faculty-review",
       "handoff"
     ],
     "format": "portable + Codex compatibility",
-    "node": "22.22.3",
-    "dependencies": 0
+    "dependencies": 0,
+    "codexContract": "0.149.0 experimental app-server queue"
   },
   "checks": {
     "npm run codex:check": {
       "passed": true,
-      "tests": 12
+      "tests": 79
     },
     "npm run verify:p0": {
       "passed": true,
-      "tests": 28,
+      "tests": 95,
       "dshBaselineTests": 16,
-      "codexTests": 12,
       "packFiles": 19,
       "publicScanFindings": 0
     },
     "skillCreatorQuickValidate": {
       "passed": true,
-      "skills": 4
+      "skills": 5
     },
     "standaloneZip": {
       "passed": true,
-      "commands": [
-        "init",
-        "assign",
-        "checkpoint",
-        "handoff",
-        "handoff"
-      ],
-      "runtimeMatchesFinalZip": true
+      "fileCount": 16,
+      "allFileDigestsMatchSource": true,
+      "allExtractedFilesMatchSource": true,
+      "successfulJobRepeat": {
+        "status": "succeeded",
+        "attemptCount": 1,
+        "checkpointSequence": 1
+      }
     },
     "independentReview": {
       "passed": true,
-      "resolved": [
-        "manual-assignment idempotence preserves handoff",
-        "explicit model choices cannot silently fall back"
+      "findingsResolved": [
+        "cancel acknowledgement races",
+        "native model forwarding",
+        "recovery queue/Goal/latest-turn conflicts",
+        "verifier abort and uncertain termination",
+        "durable independent verifier intent",
+        "stop later commands after unconfirmed receipts",
+        "stale declared artifact rejection on recovery"
       ]
     },
     "gitDiffCheck": {
       "passed": true
-    },
-    "cleanClone": {
-      "passed": true,
-      "sourceCommit": "6787ec6",
-      "commands": [
-        "npm run verify:p0",
-        "npm run codex:check"
-      ],
-      "totalTests": 28,
-      "codexTests": 12
     }
   },
   "hostAcceptance": {
-    "installed": false,
-    "actualPluginParser": "not verified",
-    "nativeSkillInvocation": "not verified",
-    "nativeSubagents": "not verified",
-    "observations": [
-      "CLI list empty before marketplace registration",
-      "bounded app-server read probe exited before plugin/read under current sandbox/host config"
-    ]
+    "actualPluginParser": {
+      "passed": true,
+      "method": "plugin/read",
+      "skills": 5,
+      "installed": false,
+      "enabled": false
+    },
+    "actualNativeQueue": {
+      "passed": true,
+      "evidence": "native-execution.json",
+      "attemptCount": 1,
+      "checksPassed": 2,
+      "progressCheckpointSequence": 1
+    },
+    "nativeSkillInvocation": "not verified; plugin not installed",
+    "desktopInstallation": "pending"
+  },
+  "repositoryAudit": {
+    "method": "GitHub GraphQL",
+    "visibility": "PRIVATE",
+    "license": "Apache-2.0",
+    "releaseCount": 0,
+    "checkedAt": "2026-10-17T02:15:39Z"
   },
   "publication": {
     "githubReleaseCreated": false,
@@ -88,13 +99,17 @@
     "publicPluginDirectorySubmitted": false
   },
   "artifact": {
-    "archive": "harzva-supervisor-0.1.0.zip",
-    "sha256": "bac47e9fa9aae75594649359206b6e5934e75a6d116c24145397459959d90537",
-    "fileCount": 11
+    "archive": "harzva-supervisor-0.2.0.zip",
+    "sha256": "4dbba62797ef9104a19caafb731e67944dc69f80fa6149fc81c919cb40cd8fce",
+    "fileCount": 16
   },
   "sourceDigests": {
-    "scripts/supervisor.mjs": "344b4de6a6075e594af9c46bb7d649246f11f12761bc27aa17aeab6179192cec",
+    "runtime/mentor-registry.mjs": "3b5766d88bab4e6bf94c27cb56b07b0460eb7b2d348dbe9bf4e9560ce405b3d5",
+    "scripts/execution-store.mjs": "c26d8e12aa0e2cf3629830a22bcdcbf928342484ccbd2f044f88441cf9f20a30",
+    "scripts/execution.mjs": "32c40af0033554ccd10842bd8a6896928e1ced5f9b530025a3b309102d3d45fa",
+    "scripts/native-executor.mjs": "8d6c64d53e6807acdadff10b5491985129e81b9fa5bba254e7986a5905d465a4",
     "scripts/state.mjs": "4443655d3a13b501c239dcee012c9545c346fd265b2022127aa521d4ac46d03b",
-    "runtime/mentor-registry.mjs": "3b5766d88bab4e6bf94c27cb56b07b0460eb7b2d348dbe9bf4e9560ce405b3d5"
+    "scripts/supervisor.mjs": "d337eb8e4567e1a838e2c2d7a71e7d2d2657cdc95eab3cf73800911a7990a824",
+    "scripts/verification.mjs": "728633d57c56fa578a2716230503378b93afb92f3f2dcb31cbf5cefb69938c95"
   }
 }

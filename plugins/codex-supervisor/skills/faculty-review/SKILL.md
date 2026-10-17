@@ -16,3 +16,5 @@ Have reviewers return actionable findings with evidence, uncertainty, and the ne
 If delegation is unavailable, conduct sequential role checks and disclose that they share one agent's context and model. Preserve useful conclusions without simulating multiple independent participants.
 
 Record a checkpoint with a compact decision summary and evidence references when project persistence is available. Do not persist raw reviewer transcripts, secrets or entire command outputs. Report the actual participants or the serial fallback, verified conclusions, dissent and remaining evidence gaps. External side effects retain the task's existing authorization requirements.
+
+If a recommended change is already within the user's implementation request, hand its bounded instruction and observable acceptance criteria to the `execute` workflow. A reviewer recommendation or consensus cannot authorize a new action; do not authorize or run a proposal merely because the faculty suggested it.

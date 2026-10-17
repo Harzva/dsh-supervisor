@@ -1,5 +1,21 @@
 # Codex 接手记录 · 2026-10-17
 
+## 0.2.0 执行链验收
+
+本轮在 0.1.0 本地迁移版上实现授权 proposal → Codex owned worker 原生 queue → 独立文件／命令验收 → Supervisor `progress` 检查点。旧验证原样保存在 `checks-0.1.0.json`；当前结果在 `checks.json`，真实原生执行证据在 `native-execution.json`。后续章节中的 0.1.0 行为是接手时的历史记录。
+
+使用实际安装的 Codex 0.149.0 完成了非模拟测试：worker 创建 26 字节目标文件，文件 SHA-256 为 `ba813dc8bcdeea5ef96ca5427035cd5744e0e631221f7fa5bbd748d12a2d370c`；文件内容／摘要和原生 sandbox 中的 Node 精确断言均通过，原生 queue、turn、消息标记已关联，单次 attempt 后写回 sequence 1 的进展检查点。未把父任务或原生 Goal 标记为完成。
+
+首次使用默认 CLI 配置遇到连接重试和不支持的桌面模型名称。读取原生 `model/list` 后明确选择其默认模型，再按本机已启用的 HTTP／HTTPS 静态代理发送原生模型请求。最终测试无需手工设置代理环境：适配器只把现有系统代理传给子进程，不更改个人配置、登录或系统网络设置。模型目录只读，显式模型必须原样保留，不映射 DSH route，不静默替换用户模型。
+
+同时完成原生 `plugin/read`：官方解析器识别 `harzva-supervisor` 和五个命名空间技能；结果 `installed=false, enabled=false`，只读解析通过不等于桌面安装或自动触发验收。没有安装、启用、发布或合并。
+
+执行持久化先于 dispatch-capable `queue/add`；队列是唯一调度器。入队标记用于关联，不是 exactly-once 幂等键。原生回合失败、用户审批、输入、超时、取消、重复标记、并发 runner 和进程丢失均有独立测试。不确定派发不会重投。独立验收命令也先保存持久意图；终止未确认时停止后续检查，且原生推理回合的完成不能清除独立命令的不确定性。验收回执先于普通检查点落盘，恢复可复用历史命令结果并重新检查指定文件摘要；未声明的依赖时效仍由恢复时的项目核查负责。
+
+恢复使用 inert `thread/read`、queue/list、Goal/get；不 resume 或投递工作。0.149.0 会在新 app-server 冷读时把仍未结束的持久化 turn 投影为 `interrupted`；`notLoaded` 不能证明另一原生进程已经结束，因此保留不确定状态。队列、Goal 或最新 turn 存在冲突时同样停止。
+
+权威依据：[app-server 文档](https://learn.chatgpt.com/docs/app-server)、[0.149.0 队列服务](https://github.com/openai/codex/blob/rust-v0.149.0/codex-rs/ext/queue/src/service.rs)、[0.149.0 thread/read 处理](https://github.com/openai/codex/blob/rust-v0.149.0/codex-rs/app-server/src/request_processors/thread_processor.rs)。独立审查发现的取消、模型保留、恢复冲突、验证进程丢失与历史文件变化问题已修复并覆盖回归。
+
 ## 真源与范围
 
 主仓库为 [Harzva/dsh-supervisor](https://github.com/Harzva/dsh-supervisor)，当前 GitHub 元数据为 private、非 fork、Apache-2.0，GitHub Release 列表为空。源码 package 为 `dsh-supervisor@0.2.4`。远端 main 为 `e27e9208dda5972916cdc0aee2cfaccf90d05cb1`，smart-supervision-v2 为 `5092a0905c8d41c88f25f6c06c6c27a9b05a15c5`，标签 `p0-0.2.4` 存在并指向 `910b12298386567f916a06dbdf0750904ed5b124`。可访问 Harzva 仓库名称／简介检索未发现独立公开的 Supervisor／学院发布仓库。npm Registry 对 `dsh-supervisor` 返回 E404，并记录 2026-08-20 的 unpublished 时间；当前没有该名字的可安装版本。这个同名 Registry 记录不能证明历史撤包属于 Harzva。

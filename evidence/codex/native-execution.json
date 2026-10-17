@@ -1,0 +1,46 @@
+{
+  "date": "2026-10-17",
+  "codexVersion": "0.149.0",
+  "status": "succeeded",
+  "model": "gpt-5.6-sol",
+  "attemptCount": 1,
+  "nativeReceipt": {
+    "threadConfirmed": true,
+    "queueConfirmed": true,
+    "turnConfirmed": true,
+    "completed": true
+  },
+  "verification": {
+    "checkedAt": 1792203296519,
+    "passed": true,
+    "checks": [
+      {
+        "index": 0,
+        "kind": "file",
+        "path": "result.txt",
+        "passed": true,
+        "sha256": "ba813dc8bcdeea5ef96ca5427035cd5744e0e631221f7fa5bbd748d12a2d370c",
+        "bytes": 26,
+        "reason": "matched"
+      },
+      {
+        "index": 1,
+        "kind": "command",
+        "passed": true,
+        "completionConfirmed": true,
+        "exitCode": 0,
+        "stdoutDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "outputBytes": 0,
+        "timedOut": false,
+        "needsUserAction": false
+      }
+    ]
+  },
+  "checkpoint": {
+    "sequence": 1,
+    "outcome": "progress"
+  },
+  "proxy": "inherited existing macOS static proxy in child only",
+  "source": "real installed Codex native queue; no mocked native execution"
+}

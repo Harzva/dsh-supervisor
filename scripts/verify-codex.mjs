@@ -23,7 +23,7 @@ for (const path of [extension.onboardingSkill, compatibility.skills]) {
   assert((await lstat(resolve(plugin, path))).isDirectory() || (await lstat(resolve(plugin, path))).isFile())
 }
 const skills = (await readdir(join(plugin, 'skills'))).sort()
-assert.deepEqual(skills, ['faculty-review', 'handoff', 'setup', 'supervise'])
+assert.deepEqual(skills, ['execute', 'faculty-review', 'handoff', 'setup', 'supervise'])
 for (const skill of skills) {
   const text = await readFile(join(plugin, 'skills', skill, 'SKILL.md'), 'utf8')
   const frontmatter = text.match(/^---\n([\s\S]*?)\n---\n/)
@@ -51,5 +51,9 @@ const allowedRoots = new Set(['plugin.json', '.codex-plugin', 'LICENSE', 'README
 for (const entry of await readdir(plugin, { withFileTypes: true })) {
   assert(allowedRoots.has(entry.name), `Unexpected bundled entry: ${entry.name}`)
   assert(!entry.isSymbolicLink(), `Symlink package entry: ${entry.name}`)
+}
+for (const script of ['execution.mjs', 'execution-store.mjs', 'native-executor.mjs', 'verification.mjs', 'state.mjs', 'supervisor.mjs']) {
+  const stat = await lstat(join(plugin, 'scripts', script))
+  assert(stat.isFile() && !stat.isSymbolicLink(), `Missing or unsafe runtime script: ${script}`)
 }
 process.stdout.write(JSON.stringify({ ok: true, name: manifest.name, version: manifest.version, skillCount: skills.length }) + '\n')

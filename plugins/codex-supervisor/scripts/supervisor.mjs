@@ -336,6 +336,26 @@ function parseArgs(argv) {
   return { command, options }
 }
 
+export function recordCheckpoint(workspace, taskId, input) {
+  identifier(taskId, 'Task id')
+  const paths = workspacePaths(workspace)
+  const data = validateCheckpoint(input)
+  return withStateLock(paths, () => {
+    const state = readState(paths, validateState)
+    const task = requiredTask(state, taskId)
+    if (JSON.stringify(task.checkpoints.at(-1)?.data) === JSON.stringify(data)) {
+      return { revision: state.revision, ...compactTask(taskId, task) }
+    }
+    task.checkpointSequence += 1
+    task.checkpoints.push({ sequence: task.checkpointSequence, recordedAt: Date.now(), data })
+    task.checkpoints = task.checkpoints.slice(-MAX_CHECKPOINTS)
+    task.handoff = null
+    state.revision += 1
+    writeState(paths, state, validateState)
+    return { revision: state.revision, ...compactTask(taskId, task) }
+  })
+}
+
 export function run(argv) {
   const { command, options } = parseArgs(argv)
   if (command === 'help') return HELP

@@ -1,0 +1,100 @@
+{
+  "date": "2026-10-17",
+  "timezone": "Asia/Shanghai",
+  "baseline": {
+    "repository": "Harzva/dsh-supervisor",
+    "baseBranch": "feat/smart-supervision-v2",
+    "commit": "5092a0905c8d41c88f25f6c06c6c27a9b05a15c5",
+    "dshVersion": "0.2.4",
+    "tag": "p0-0.2.4",
+    "tagCommit": "910b12298386567f916a06dbdf0750904ed5b124"
+  },
+  "plugin": {
+    "name": "harzva-supervisor",
+    "version": "0.1.0",
+    "skills": [
+      "setup",
+      "supervise",
+      "faculty-review",
+      "handoff"
+    ],
+    "format": "portable + Codex compatibility",
+    "node": "22.22.3",
+    "dependencies": 0
+  },
+  "checks": {
+    "npm run codex:check": {
+      "passed": true,
+      "tests": 12
+    },
+    "npm run verify:p0": {
+      "passed": true,
+      "tests": 28,
+      "dshBaselineTests": 16,
+      "codexTests": 12,
+      "packFiles": 19,
+      "publicScanFindings": 0
+    },
+    "skillCreatorQuickValidate": {
+      "passed": true,
+      "skills": 4
+    },
+    "standaloneZip": {
+      "passed": true,
+      "commands": [
+        "init",
+        "assign",
+        "checkpoint",
+        "handoff",
+        "handoff"
+      ],
+      "runtimeMatchesFinalZip": true
+    },
+    "independentReview": {
+      "passed": true,
+      "resolved": [
+        "manual-assignment idempotence preserves handoff",
+        "explicit model choices cannot silently fall back"
+      ]
+    },
+    "gitDiffCheck": {
+      "passed": true
+    },
+    "cleanClone": {
+      "passed": true,
+      "sourceCommit": "6787ec6",
+      "commands": [
+        "npm run verify:p0",
+        "npm run codex:check"
+      ],
+      "totalTests": 28,
+      "codexTests": 12
+    }
+  },
+  "hostAcceptance": {
+    "installed": false,
+    "actualPluginParser": "not verified",
+    "nativeSkillInvocation": "not verified",
+    "nativeSubagents": "not verified",
+    "observations": [
+      "CLI list empty before marketplace registration",
+      "bounded app-server read probe exited before plugin/read under current sandbox/host config"
+    ]
+  },
+  "publication": {
+    "githubReleaseCreated": false,
+    "npmPublished": false,
+    "dshMarketplaceSubmitted": false,
+    "publicPluginDirectorySubmitted": false
+  },
+  "artifact": {
+    "archive": "harzva-supervisor-0.1.0.zip",
+    "sha256": "bac47e9fa9aae75594649359206b6e5934e75a6d116c24145397459959d90537",
+    "fileCount": 11
+  },
+  "sourceDigests": {
+    "scripts/supervisor.mjs": "344b4de6a6075e594af9c46bb7d649246f11f12761bc27aa17aeab6179192cec",
+    "scripts/state.mjs": "4443655d3a13b501c239dcee012c9545c346fd265b2022127aa521d4ac46d03b",
+    "runtime/mentor-registry.mjs": "3b5766d88bab4e6bf94c27cb56b07b0460eb7b2d348dbe9bf4e9560ce405b3d5"
+  }
+}

@@ -4,17 +4,24 @@ DSH Host + Client plugin for per-session supervision, role-aware Supervisors, du
 
 ## Codex edition
 
-The independent `harzva-supervisor@0.1.0` Codex development plugin lives in
+The independent `harzva-supervisor@0.2.0` Codex development plugin lives in
 [`plugins/codex-supervisor/`](plugins/codex-supervisor/README.md). It packages
-supervision, faculty review and handoff skills with a bounded local record
-helper, reusing the canonical mentor rules. Run `npm run codex:check` to verify
-it and `npm run codex:pack` to build its portable ZIP. The repo marketplace is
+supervision, authorized execution, faculty review and handoff skills, reusing
+the canonical mentor rules. The execution chain binds an immutable proposal
+digest and user grant to one workspace, submits work to an owned Codex native
+queue, independently checks files or sandboxed commands, and records a
+progress checkpoint. Run `npm run codex:check` to verify it and
+`npm run codex:pack` to build its portable ZIP. The repo marketplace is
 `.agents/plugins/marketplace.json`.
 
-Codex owns execution, delegation, permissions and native Goals. This edition
-does not import DSH host events, start a watchdog or automatically map DSH
-model routes. The DSH package remains version `0.2.4`; Smart Supervision v2
-and DSH marketplace publication retain their separate implementation tracks.
+The adapter uses the installed Codex 0.149.0 experimental app-server queue
+contract and existing login. Defaults are one attempt, bounded execution and
+human approvals. Only a confirmed failure can retry within the approved cap;
+uncertain dispatches stop for recovery. Native completion alone never marks
+the parent task complete. The native queue is the sole job scheduler; this
+edition does not scrape chats, install a watchdog or automatically map DSH
+model routes. The DSH package remains version `0.2.4`; Smart Supervision v2 and
+DSH marketplace publication retain their separate implementation tracks.
 See [`evidence/codex/README.md`](evidence/codex/README.md) for takeover findings
 and the verification boundary.
 
