@@ -1,0 +1,32 @@
+{
+  "verifiedAt": "2026-10-17T18:37:59.630692+00:00",
+  "publicSiteCommit": "4022ab1dc06c47800f4bfb4a90d4ba4468ac6ea9",
+  "results": [
+    {
+      "url": "https://harzva.github.io/supervisor/review/",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 2782,
+      "sha256": "2bdb84ed73194d6b95cca8688c615100e70509ef43446962cdcf032982e28bd2",
+      "matchesCommittedSource": true
+    },
+    {
+      "url": "https://harzva.github.io/supervisor/review/review.css",
+      "status": 200,
+      "contentType": "text/css; charset=utf-8",
+      "bytes": 87,
+      "sha256": "6846aff41b181a4010f0cb4c8de687336b35c15898dd02d6429dd7ce3e4ee643",
+      "matchesCommittedSource": true
+    },
+    {
+      "url": "https://harzva.github.io/supervisor/review/ui-fixture-walkthrough.webm",
+      "status": 200,
+      "contentType": "video/webm",
+      "bytes": 911931,
+      "sha256": "88f433af3652d1ed0067bc4fc86767f03056ea6ae84200cfc687fa9c6e16a669",
+      "matchesCommittedSource": true
+    }
+  ],
+  "recordingScope": "SDK AppBridge test host, synthetic data, no model inference; not a production Codex desktop recording",
+  "officialSubmissionOrApprovalConfirmed": false
+}
