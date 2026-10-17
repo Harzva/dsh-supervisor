@@ -10,6 +10,7 @@ import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js'
 import { createPanelServer, PANEL_URI, PANEL_MIME } from '../plugins/codex-supervisor/server/panel-server.mjs'
 import { ExecutionStore, propose, authorize, beginAttempt, updateAttempt } from '../plugins/codex-supervisor/scripts/execution-store.mjs'
 import { run as supervisor } from '../plugins/codex-supervisor/scripts/supervisor.mjs'
+import { runJob } from '../plugins/codex-supervisor/scripts/execution.mjs'
 
 const serverModule = new URL('../plugins/codex-supervisor/server/panel-server.mjs', import.meta.url).href
 
@@ -53,11 +54,121 @@ function failure(result, code) {
   assert.deepEqual(JSON.parse(result.content[0].text), { error: { code } })
 }
 
+const modelCatalog = { configuredModel: 'different-configured-model', configuredReasoningEffort: 'high', models: [
+  { id: 'alpha', model: 'alpha', displayName: 'Alpha', isDefault: true, defaultReasoningEffort: 'medium', supportedReasoningEfforts: [{ reasoningEffort: 'medium', description: 'Balanced' }, { reasoningEffort: 'high', description: 'Detailed' }] },
+] }
+
+test('model catalog reads are inert; saved defaults are revision checked and model/effort errors are explicit', async t => {
+  const f = fixture(t)
+  let reads = 0
+  const client = await connect(t, { ...f.options, modelReader: async ({ workspace }) => { assert.equal(workspace, f.workspace); reads++; return modelCatalog } })
+  const owner = randomUUID()
+  const bound = success(await call(client, 'supervisor_bind_workspace', { workspace: f.workspace }, owner)).binding
+  assert.equal(bound.conversationModelAvailable, false)
+  assert.equal(bound.executionSettings.configured, false)
+  assert.equal(reads, 0)
+  const read = success(await call(client, 'supervisor_models', { bindingId: bound.id }, owner)).binding
+  assert.deepEqual(read.catalog, modelCatalog)
+  assert.deepEqual(fs.readdirSync(f.workspace), [])
+  const input = { bindingId: bound.id, mode: 'custom', model: 'alpha', reasoningEffort: 'high', expectedRevision: 0 }
+  const saved = success(await call(client, 'supervisor_set_execution', input, owner)).binding
+  assert.deepEqual(saved.executionSettings, { mode: 'custom', model: 'alpha', reasoningEffort: 'high', revision: 1, configured: true })
+  failure(await call(client, 'supervisor_set_execution', input, owner), 'STALE_SETTINGS')
+  failure(await call(client, 'supervisor_set_execution', { ...input, model: 'missing', expectedRevision: 1 }, owner), 'MODEL_UNAVAILABLE')
+  failure(await call(client, 'supervisor_set_execution', { ...input, reasoningEffort: 'low', expectedRevision: 1 }, owner), 'REASONING_UNAVAILABLE')
+  failure(await call(client, 'supervisor_set_execution', { ...input, mode: 'conversation', expectedRevision: 1 }, owner), 'INVALID_ARGUMENTS')
+  failure(await call(client, 'supervisor_models', { bindingId: bound.id }, randomUUID()), 'UNKNOWN_BINDING')
+  failure(await call(client, 'supervisor_set_execution', { ...input, expectedRevision: 1 }, randomUUID()), 'UNKNOWN_BINDING')
+  assert.deepEqual(fs.readdirSync(path.join(f.workspace, '.codex/supervisor')), ['settings.v1.json'])
+  const broken = await connect(t, { ...f.options, modelReader: async () => { throw Error('PRIVATE_CATALOG_SOURCE') } })
+  failure(await call(broken, 'supervisor_models', { bindingId: bound.id }, owner), 'MODEL_CATALOG_UNAVAILABLE')
+})
+
+test('stop is available with stale settings, closes the gate, interrupts live work and cancels waiting jobs without deleting proposals', async t => {
+  const f = fixture(t)
+  supervisor(['init', '--workspace', f.workspace])
+  supervisor(['assign', '--workspace', f.workspace, '--task', 'work'])
+  const store = new ExecutionStore(f.workspace)
+  const makeJob = id => store.mutate(state => propose(state, { jobId: id, taskId: 'work', proposal: { instruction: 'Write a report.', successCriteria: ['Report is ready.'], verification: [{ kind: 'file', path: 'report.txt' }] } }))
+  for (const id of ['active', 'waiting', 'suggestion']) {
+    const job = makeJob(id)
+    if (id !== 'suggestion') store.mutate(state => authorize(state, { jobId: id, digest: job.digest }))
+  }
+  const client = await connect(t, f.options)
+  const owner = randomUUID()
+  const binding = success(await call(client, 'supervisor_bind_workspace', { workspace: f.workspace }, owner)).binding
+  failure(await call(client, 'supervisor_stop', { bindingId: binding.id }, randomUUID()), 'UNKNOWN_BINDING')
+  assert.equal(store.snapshot().jobs.waiting.status, 'authorized')
+  let started
+  const ready = new Promise(resolve => { started = resolve })
+  let aborted = false
+  const selection = { model: 'alpha', reasoningEffort: 'medium' }
+  const running = runJob(store, 'active', { execute: async options => {
+    await options.onThread({ threadId: 'owned-thread' })
+    await options.onDispatch({ threadId: 'owned-thread', marker: options.marker, selection })
+    await options.onQueued({ threadId: 'owned-thread', queuedSubmissionId: 'owned-queue' })
+    await options.onStarted({ threadId: 'owned-thread', turnId: 'owned-turn' })
+    started()
+    return new Promise(resolve => options.signal.addEventListener('abort', () => { aborted = true; resolve({ status: 'interrupted', threadId: 'owned-thread', turnId: 'owned-turn', selection }) }, { once: true }))
+  }, verify: async () => { throw Error('A cancelled worker must not start verification') } })
+  await ready
+  const stopping = success(await call(client, 'supervisor_stop', { bindingId: binding.id }, owner)).binding
+  assert.equal(stopping.control.enabled, false)
+  assert.equal(stopping.jobs.find(job => job.id === 'active').status, 'cancelling')
+  assert.equal(stopping.jobs.find(job => job.id === 'waiting').status, 'cancelled')
+  assert.equal(stopping.jobs.find(job => job.id === 'suggestion').status, 'proposed')
+  const done = await running
+  assert.equal(aborted, true)
+  assert.equal(done.status, 'cancelled')
+  const stopped = success(await call(client, 'supervisor_status', { bindingId: binding.id }, owner)).binding
+  assert.equal(stopped.jobs.find(job => job.id === 'active').actualModel, 'alpha')
+  assert.equal(stopped.jobs.find(job => job.id === 'active').actualReasoningEffort, 'medium')
+  assert.equal(stopped.jobs.find(job => job.id === 'active').status, 'cancelled')
+  assert.equal(success(await call(client, 'supervisor_stop', { bindingId: binding.id }, owner)).binding.control.enabled, false)
+})
+
+test('stop preserves uncertain orphan work as cancelling rather than claiming termination', async t => {
+  const f = fixture(t)
+  supervisor(['init', '--workspace', f.workspace])
+  const store = new ExecutionStore(f.workspace)
+  const job = store.mutate(state => propose(state, { jobId: 'orphan', taskId: 'work', proposal: { instruction: 'Write a report.', successCriteria: ['Ready'], verification: [{ kind: 'file', path: 'report.txt' }] } }))
+  store.mutate(state => authorize(state, { jobId: job.id, digest: job.digest }))
+  const attempt = store.mutate(state => beginAttempt(state, job.id))
+  store.mutate(state => updateAttempt(state, { jobId: job.id, attemptId: attempt.id, status: 'uncertain' }))
+  const client = await connect(t, f.options)
+  const owner = randomUUID()
+  const binding = success(await call(client, 'supervisor_bind_workspace', { workspace: f.workspace }, owner)).binding
+  const stopping = success(await call(client, 'supervisor_stop', { bindingId: binding.id }, owner)).binding
+  assert.equal(stopping.control.enabled, false)
+  assert.equal(stopping.jobs[0].status, 'cancelling')
+  assert.notEqual(stopping.jobs[0].status, 'cancelled')
+})
+
+test('model discovery revalidates a rebound workspace before reading state or saving settings', async t => {
+  for (const tool of ['supervisor_models', 'supervisor_set_execution']) {
+    const f = fixture(t)
+    const foreign = path.join(f.root, 'foreign-project')
+    const preserved = path.join(f.root, 'preserved-project')
+    fs.mkdirSync(foreign)
+    const client = await connect(t, { ...f.options, modelReader: async () => {
+      fs.renameSync(f.workspace, preserved)
+      fs.symlinkSync(foreign, f.workspace)
+      return modelCatalog
+    } })
+    const owner = randomUUID()
+    const binding = success(await call(client, 'supervisor_bind_workspace', { workspace: f.workspace }, owner)).binding
+    const input = tool === 'supervisor_models' ? { bindingId: binding.id } : { bindingId: binding.id, mode: 'custom', model: 'alpha', reasoningEffort: 'medium', expectedRevision: 0 }
+    failure(await call(client, tool, input, owner), 'UNSAFE_PATH')
+    assert.deepEqual(fs.readdirSync(foreign), [])
+    assert.deepEqual(fs.readdirSync(preserved), [])
+  }
+})
+
 test('official SDK protocol advertises one thread entrypoint and app-only strictly typed controls without writing', async t => {
   const f = fixture(t)
   const client = await connect(t, f.options)
   const { tools } = await client.listTools()
-  assert.deepEqual(tools.map(tool => tool.name), ['supervisor_panel', 'supervisor_bind_workspace', 'supervisor_status', 'supervisor_set_enabled'])
+  assert.deepEqual(tools.map(tool => tool.name).sort(), ['supervisor_panel', 'supervisor_bind_workspace', 'supervisor_status', 'supervisor_set_enabled', 'supervisor_models', 'supervisor_set_execution', 'supervisor_stop'].sort())
   assert.deepEqual(tools[0]._meta['openai/ui'].entrypoints, [{ type: 'thread' }])
   assert.equal(tools[0]._meta.ui.resourceUri, PANEL_URI)
   for (const tool of tools) {
@@ -225,7 +336,7 @@ test('status projects only public job counts and control, never private prompts,
   const status = success(await call(client, 'supervisor_status', { bindingId: bound.binding.id }, owner))
   assert.equal(status.binding.initialized, true)
   assert.equal(status.binding.mentorCount, 1)
-  assert.deepEqual(status.binding.jobs, [{ id: 'job-one', status: 'failed', authorized: true, attemptCount: 1, checkpointSequence: 4 }])
+  assert.deepEqual(status.binding.jobs, [{ id: 'job-one', status: 'failed', authorized: true, attemptCount: 1, checkpointSequence: 4, requestedModel: null, requestedReasoningEffort: null, actualModel: null, actualReasoningEffort: null }])
   assert.doesNotMatch(JSON.stringify(status), /PRIVATE_|legacy-provider|proposal|digest|approvedAt|ownerThreadId|domainPrompt/)
   assert.deepEqual(fs.readFileSync(file), before)
 })

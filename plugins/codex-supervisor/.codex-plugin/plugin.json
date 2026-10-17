@@ -1,6 +1,6 @@
 {
   "name": "harzva-supervisor",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Authorized native execution, independent acceptance checks, faculty reviews and recoverable handoffs for Codex.",
   "author": {
     "name": "Harzva",
@@ -9,11 +9,6 @@
   "repository": "https://github.com/Harzva/dsh-supervisor",
   "license": "Apache-2.0",
   "skills": "./skills/",
-  "extensions": {
-    "com.openai": {
-      "onboardingSkill": "./skills/setup/SKILL.md"
-    }
-  },
   "interface": {
     "displayName": "Harzva Supervisor / DS 学院",
     "shortDescription": "授权执行、独立验收和学院监督交接",

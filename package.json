@@ -42,7 +42,7 @@
     "verify:p0": "npm run check && npm run scan:public && npm run pack:check",
     "prepack": "npm run build && npm run preflight && npm run scan:public",
     "codex:build": "node scripts/build-codex.mjs",
-    "codex:check": "node scripts/build-codex.mjs --check && node scripts/verify-codex.mjs && node --test test/codex-supervisor.test.js test/execution-store.test.js test/native-executor.test.js test/execution-chain.test.js test/supervisor-control.test.js test/panel-server.test.js",
+    "codex:check": "node scripts/build-codex.mjs --check && node scripts/verify-codex.mjs && node --test test/codex-supervisor.test.js test/execution-store.test.js test/native-executor.test.js test/execution-chain.test.js test/supervisor-control.test.js test/panel-server.test.js test/execution-settings.test.js",
     "codex:pack": "node scripts/pack-codex.mjs"
   },
   "dsh": {

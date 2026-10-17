@@ -5351,8 +5351,8 @@ var require_raw_body = __commonJS({
         });
       }
     }
-    function getRawBody(stream, options, callback) {
-      var done = callback;
+    function getRawBody(stream, options, callback2) {
+      var done = callback2;
       var opts = options || {};
       if (stream === void 0) {
         throw new TypeError("argument stream is required");
@@ -5393,7 +5393,7 @@ var require_raw_body = __commonJS({
         stream.pause();
       }
     }
-    function readStream(stream, encoding, length, limit, callback) {
+    function readStream(stream, encoding, length, limit, callback2) {
       var complete = false;
       var sync = true;
       if (limit !== null && length !== null && length > limit) {
@@ -5445,7 +5445,7 @@ var require_raw_body = __commonJS({
           if (args[0]) {
             halt(stream);
           }
-          callback.apply(null, args);
+          callback2.apply(null, args);
         }
       }
       function onAborted() {
@@ -5538,7 +5538,7 @@ var require_ee_first = __commonJS({
         var ee = arr[0];
         for (var j = 1; j < arr.length; j++) {
           var event = arr[j];
-          var fn = listener(event, callback);
+          var fn = listener(event, callback2);
           ee.on(event, fn);
           cleanups.push({
             ee,
@@ -5547,7 +5547,7 @@ var require_ee_first = __commonJS({
           });
         }
       }
-      function callback() {
+      function callback2() {
         cleanup();
         done.apply(null, arguments);
       }
@@ -5613,7 +5613,7 @@ var require_on_finished = __commonJS({
       }
       return void 0;
     }
-    function attachFinishedListener(msg, callback) {
+    function attachFinishedListener(msg, callback2) {
       var eeMsg;
       var eeSocket;
       var finished = false;
@@ -5621,7 +5621,7 @@ var require_on_finished = __commonJS({
         eeMsg.cancel();
         eeSocket.cancel();
         finished = true;
-        callback(error);
+        callback2(error);
       }
       eeMsg = eeSocket = first([[msg, "end", "finish"]], onFinish);
       function onSocket(socket) {
@@ -5660,12 +5660,12 @@ var require_on_finished = __commonJS({
       listener.queue = [];
       return listener;
     }
-    function patchAssignSocket(res, callback) {
+    function patchAssignSocket(res, callback2) {
       var assignSocket = res.assignSocket;
       if (typeof assignSocket !== "function") return;
       res.assignSocket = function _assignSocket(socket) {
         assignSocket.call(this, socket);
-        callback(socket);
+        callback2(socket);
       };
     }
     function tryRequireAsyncHooks() {
@@ -15300,11 +15300,11 @@ var require_mime_types = __commonJS({
       }
       return exts[0];
     }
-    function lookup(path7) {
-      if (!path7 || typeof path7 !== "string") {
+    function lookup(path9) {
+      if (!path9 || typeof path9 !== "string") {
         return false;
       }
-      var extension2 = extname("x." + path7).toLowerCase().slice(1);
+      var extension2 = extname("x." + path9).toLowerCase().slice(1);
       if (!extension2) {
         return false;
       }
@@ -15863,11 +15863,11 @@ var require_read = __commonJS({
           });
       }
     }
-    function dump(req, callback) {
+    function dump(req, callback2) {
       if (onFinished.isFinished(req)) {
-        callback(null);
+        callback2(null);
       } else {
-        onFinished(req, callback);
+        onFinished(req, callback2);
         req.resume();
       }
     }
@@ -16165,7 +16165,7 @@ var require_object_inspect = __commonJS({
       } else if (indexOf(seen, obj) >= 0) {
         return "[Circular]";
       }
-      function inspect(value, from, noIndent) {
+      function inspect2(value, from, noIndent) {
         if (from) {
           seen = $arrSlice.call(seen);
           seen.push(from);
@@ -16183,7 +16183,7 @@ var require_object_inspect = __commonJS({
       }
       if (typeof obj === "function" && !isRegExp(obj)) {
         var name = nameOf(obj);
-        var keys = arrObjKeys(obj, inspect);
+        var keys = arrObjKeys(obj, inspect2);
         return "[Function" + (name ? ": " + name : " (anonymous)") + "]" + (keys.length > 0 ? " { " + $join.call(keys, ", ") + " }" : "");
       }
       if (isSymbol(obj)) {
@@ -16207,16 +16207,16 @@ var require_object_inspect = __commonJS({
         if (obj.length === 0) {
           return "[]";
         }
-        var xs = arrObjKeys(obj, inspect);
+        var xs = arrObjKeys(obj, inspect2);
         if (indent && !singleLineValues(xs)) {
           return "[" + indentedJoin(xs, indent) + "]";
         }
         return "[ " + $join.call(xs, ", ") + " ]";
       }
       if (isError(obj)) {
-        var parts = arrObjKeys(obj, inspect);
+        var parts = arrObjKeys(obj, inspect2);
         if (!("cause" in Error.prototype) && "cause" in obj && !isEnumerable.call(obj, "cause")) {
-          return "{ [" + String(obj) + "] " + $join.call($concat.call("[cause]: " + inspect(obj.cause), parts), ", ") + " }";
+          return "{ [" + String(obj) + "] " + $join.call($concat.call("[cause]: " + inspect2(obj.cause), parts), ", ") + " }";
         }
         if (parts.length === 0) {
           return "[" + String(obj) + "]";
@@ -16234,7 +16234,7 @@ var require_object_inspect = __commonJS({
         var mapParts = [];
         if (mapForEach) {
           mapForEach.call(obj, function(value, key) {
-            mapParts.push(inspect(key, obj, true) + " => " + inspect(value, obj));
+            mapParts.push(inspect2(key, obj, true) + " => " + inspect2(value, obj));
           });
         }
         return collectionOf("Map", mapSize.call(obj), mapParts, indent);
@@ -16243,7 +16243,7 @@ var require_object_inspect = __commonJS({
         var setParts = [];
         if (setForEach) {
           setForEach.call(obj, function(value) {
-            setParts.push(inspect(value, obj));
+            setParts.push(inspect2(value, obj));
           });
         }
         return collectionOf("Set", setSize.call(obj), setParts, indent);
@@ -16258,16 +16258,16 @@ var require_object_inspect = __commonJS({
         return weakCollectionOf("WeakRef");
       }
       if (isNumber(obj)) {
-        return markBoxed(inspect(Number(obj)));
+        return markBoxed(inspect2(Number(obj)));
       }
       if (isBigInt(obj)) {
-        return markBoxed(inspect(bigIntValueOf.call(obj)));
+        return markBoxed(inspect2(bigIntValueOf.call(obj)));
       }
       if (isBoolean(obj)) {
         return markBoxed(booleanValueOf.call(obj));
       }
       if (isString(obj)) {
-        return markBoxed(inspect(String(obj)));
+        return markBoxed(inspect2(String(obj)));
       }
       if (typeof window !== "undefined" && obj === window) {
         return "{ [object Window] }";
@@ -16276,7 +16276,7 @@ var require_object_inspect = __commonJS({
         return "{ [object globalThis] }";
       }
       if (!isDate(obj) && !isRegExp(obj)) {
-        var ys = arrObjKeys(obj, inspect);
+        var ys = arrObjKeys(obj, inspect2);
         var isPlainObject3 = gPO ? gPO(obj) === Object.prototype : obj instanceof Object || obj.constructor === Object;
         var protoTag = obj instanceof Object ? "" : "null prototype";
         var stringTag = !isPlainObject3 && toStringTag && Object(obj) === obj && toStringTag in obj ? $slice.call(toStr(obj), 8, -1) : protoTag ? "Object" : "";
@@ -16530,13 +16530,13 @@ var require_object_inspect = __commonJS({
       var lineJoiner = "\n" + indent.prev + indent.base;
       return lineJoiner + $join.call(xs, "," + lineJoiner) + "\n" + indent.prev;
     }
-    function arrObjKeys(obj, inspect) {
+    function arrObjKeys(obj, inspect2) {
       var isArr = isArray(obj);
       var xs = [];
       if (isArr) {
         xs.length = obj.length;
         for (var i = 0; i < obj.length; i++) {
-          xs[i] = has(obj, i) ? inspect(obj[i], obj) : "";
+          xs[i] = has(obj, i) ? inspect2(obj[i], obj) : "";
         }
       }
       var syms = typeof gOPS === "function" ? gOPS(obj) : [];
@@ -16557,15 +16557,15 @@ var require_object_inspect = __commonJS({
         if (hasShammedSymbols && symMap["$" + key] instanceof Symbol) {
           continue;
         } else if ($test.call(/[^\w$]/, key)) {
-          xs.push(inspect(key, obj) + ": " + inspect(obj[key], obj));
+          xs.push(inspect2(key, obj) + ": " + inspect2(obj[key], obj));
         } else {
-          xs.push(key + ": " + inspect(obj[key], obj));
+          xs.push(key + ": " + inspect2(obj[key], obj));
         }
       }
       if (typeof gOPS === "function") {
         for (var j = 0; j < syms.length; j++) {
           if (isEnumerable.call(obj, syms[j])) {
-            xs.push("[" + inspect(syms[j]) + "]: " + inspect(obj[syms[j]], obj));
+            xs.push("[" + inspect2(syms[j]) + "]: " + inspect2(obj[syms[j]], obj));
           }
         }
       }
@@ -16578,7 +16578,7 @@ var require_object_inspect = __commonJS({
 var require_side_channel_list = __commonJS({
   "node_modules/side-channel-list/index.js"(exports, module) {
     "use strict";
-    var inspect = require_object_inspect();
+    var inspect2 = require_object_inspect();
     var $TypeError = require_type();
     var listGetNode = function(list2, key, isDelete) {
       var prev = list2;
@@ -16632,7 +16632,7 @@ var require_side_channel_list = __commonJS({
       var channel = {
         assert: function(key) {
           if (!channel.has(key)) {
-            throw new $TypeError("Side channel does not contain " + inspect(key));
+            throw new $TypeError("Side channel does not contain " + inspect2(key));
           }
         },
         "delete": function(key) {
@@ -17491,7 +17491,7 @@ var require_side_channel_map = __commonJS({
     "use strict";
     var GetIntrinsic = require_get_intrinsic();
     var callBound = require_call_bound();
-    var inspect = require_object_inspect();
+    var inspect2 = require_object_inspect();
     var $TypeError = require_type();
     var $Map = GetIntrinsic("%Map%", true);
     var $mapGet = callBound("Map.prototype.get", true);
@@ -17505,7 +17505,7 @@ var require_side_channel_map = __commonJS({
       var channel = {
         assert: function(key) {
           if (!channel.has(key)) {
-            throw new $TypeError("Side channel does not contain " + inspect(key));
+            throw new $TypeError("Side channel does not contain " + inspect2(key));
           }
         },
         "delete": function(key) {
@@ -17547,7 +17547,7 @@ var require_side_channel_weakmap = __commonJS({
     "use strict";
     var GetIntrinsic = require_get_intrinsic();
     var callBound = require_call_bound();
-    var inspect = require_object_inspect();
+    var inspect2 = require_object_inspect();
     var getSideChannelMap = require_side_channel_map();
     var $TypeError = require_type();
     var $WeakMap = GetIntrinsic("%WeakMap%", true);
@@ -17563,7 +17563,7 @@ var require_side_channel_weakmap = __commonJS({
         var channel = {
           assert: function(key) {
             if (!channel.has(key)) {
-              throw new $TypeError("Side channel does not contain " + inspect(key));
+              throw new $TypeError("Side channel does not contain " + inspect2(key));
             }
           },
           "delete": function(key) {
@@ -17619,7 +17619,7 @@ var require_side_channel = __commonJS({
   "node_modules/side-channel/index.js"(exports, module) {
     "use strict";
     var $TypeError = require_type();
-    var inspect = require_object_inspect();
+    var inspect2 = require_object_inspect();
     var getSideChannelList = require_side_channel_list();
     var getSideChannelMap = require_side_channel_map();
     var getSideChannelWeakMap = require_side_channel_weakmap();
@@ -17629,7 +17629,7 @@ var require_side_channel = __commonJS({
       var channel = {
         assert: function(key) {
           if (!channel.has(key)) {
-            var keyDesc = key && Object(key) === key ? "the given object key" : inspect(key);
+            var keyDesc = key && Object(key) === key ? "the given object key" : inspect2(key);
             throw new $TypeError("Side channel does not contain " + keyDesc);
           }
         },
@@ -19240,13 +19240,13 @@ var require_view = __commonJS({
      * MIT Licensed
      */
     var debug = require_src()("express:view");
-    var path7 = __require("node:path");
-    var fs6 = __require("node:fs");
-    var dirname = path7.dirname;
-    var basename = path7.basename;
-    var extname = path7.extname;
-    var join = path7.join;
-    var resolve = path7.resolve;
+    var path9 = __require("node:path");
+    var fs8 = __require("node:fs");
+    var dirname = path9.dirname;
+    var basename = path9.basename;
+    var extname = path9.extname;
+    var join = path9.join;
+    var resolve = path9.resolve;
     module.exports = View;
     function View(name, options) {
       var opts = options || {};
@@ -19275,24 +19275,24 @@ var require_view = __commonJS({
       this.path = this.lookup(fileName);
     }
     View.prototype.lookup = function lookup(name) {
-      var path8;
+      var path10;
       var roots = [].concat(this.root);
       debug('lookup "%s"', name);
-      for (var i = 0; i < roots.length && !path8; i++) {
+      for (var i = 0; i < roots.length && !path10; i++) {
         var root = roots[i];
         var loc = resolve(root, name);
         var dir = dirname(loc);
         var file = basename(loc);
-        path8 = this.resolve(dir, file);
+        path10 = this.resolve(dir, file);
       }
-      return path8;
+      return path10;
     };
-    View.prototype.render = function render(options, callback) {
+    View.prototype.render = function render(options, callback2) {
       var sync = true;
       debug('render "%s"', this.path);
       this.engine(this.path, options, function onRender() {
         if (!sync) {
-          return callback.apply(this, arguments);
+          return callback2.apply(this, arguments);
         }
         var args = new Array(arguments.length);
         var cntx = this;
@@ -19300,28 +19300,28 @@ var require_view = __commonJS({
           args[i] = arguments[i];
         }
         return process.nextTick(function renderTick() {
-          return callback.apply(cntx, args);
+          return callback2.apply(cntx, args);
         });
       });
       sync = false;
     };
     View.prototype.resolve = function resolve2(dir, file) {
       var ext = this.ext;
-      var path8 = join(dir, file);
-      var stat = tryStat(path8);
+      var path10 = join(dir, file);
+      var stat = tryStat(path10);
       if (stat && stat.isFile()) {
-        return path8;
+        return path10;
       }
-      path8 = join(dir, basename(file, ext), "index" + ext);
-      stat = tryStat(path8);
+      path10 = join(dir, basename(file, ext), "index" + ext);
+      stat = tryStat(path10);
       if (stat && stat.isFile()) {
-        return path8;
+        return path10;
       }
     };
-    function tryStat(path8) {
-      debug('stat "%s"', path8);
+    function tryStat(path10) {
+      debug('stat "%s"', path10);
       try {
-        return fs6.statSync(path8);
+        return fs8.statSync(path10);
       } catch (e) {
         return void 0;
       }
@@ -20638,15 +20638,15 @@ var require_dist4 = __commonJS({
       let index = 0;
       function consumeUntil(end) {
         const output = [];
-        let path7 = "";
+        let path9 = "";
         function writePath() {
-          if (!path7)
+          if (!path9)
             return;
           output.push({
             type: "text",
-            value: encodePath(path7)
+            value: encodePath(path9)
           });
-          path7 = "";
+          path9 = "";
         }
         while (index < chars.length) {
           const value = chars[index++];
@@ -20658,7 +20658,7 @@ var require_dist4 = __commonJS({
             if (index === chars.length) {
               throw new PathError(`Unexpected end after \\ at index ${index}`, str);
             }
-            path7 += chars[index++];
+            path9 += chars[index++];
             continue;
           }
           if (value === ":" || value === "*") {
@@ -20702,7 +20702,7 @@ var require_dist4 = __commonJS({
           if (value === "}" || value === "(" || value === ")" || value === "[" || value === "]" || value === "+" || value === "?" || value === "!") {
             throw new PathError(`Unexpected ${value} at index ${index - 1}`, str);
           }
-          path7 += value;
+          path9 += value;
         }
         if (end) {
           throw new PathError(`Unexpected end at index ${index}, expected ${end}`, str);
@@ -20712,17 +20712,17 @@ var require_dist4 = __commonJS({
       }
       return new TokenData(consumeUntil(""), str);
     }
-    function compile(path7, options = {}) {
+    function compile(path9, options = {}) {
       const { encode = encodeURIComponent, delimiter = DEFAULT_DELIMITER } = options;
-      const data = typeof path7 === "object" ? path7 : parse3(path7, options);
+      const data = typeof path9 === "object" ? path9 : parse3(path9, options);
       const fn = tokensToFunction(data.tokens, delimiter, encode);
-      return function path8(params = {}) {
+      return function path10(params = {}) {
         const missing = [];
-        const path9 = fn(params, missing);
+        const path11 = fn(params, missing);
         if (missing.length) {
           throw new TypeError(`Missing parameters: ${missing.join(", ")}`);
         }
-        return path9;
+        return path11;
       };
     }
     function tokensToFunction(tokens, delimiter, encode) {
@@ -20784,9 +20784,9 @@ var require_dist4 = __commonJS({
         return encodeValue(value);
       };
     }
-    function match(path7, options = {}) {
+    function match(path9, options = {}) {
       const { decode = decodeURIComponent, delimiter = DEFAULT_DELIMITER } = options;
-      const { regexp, keys } = pathToRegexp(path7, options);
+      const { regexp, keys } = pathToRegexp(path9, options);
       const decoders = keys.map((key) => {
         if (decode === false)
           return NOOP_VALUE;
@@ -20798,7 +20798,7 @@ var require_dist4 = __commonJS({
         const m = regexp.exec(input);
         if (!m)
           return false;
-        const path8 = m[0];
+        const path10 = m[0];
         const params = /* @__PURE__ */ Object.create(null);
         for (let i = 1; i < m.length; i++) {
           if (m[i] === void 0)
@@ -20807,21 +20807,21 @@ var require_dist4 = __commonJS({
           const decoder = decoders[i - 1];
           params[key.name] = decoder(m[i]);
         }
-        return { path: path8, params };
+        return { path: path10, params };
       };
     }
-    function pathToRegexp(path7, options = {}) {
+    function pathToRegexp(path9, options = {}) {
       const { delimiter = DEFAULT_DELIMITER, end = true, sensitive = false, trailing = true } = options;
       const keys = [];
       let source = "";
       let combinations = 0;
-      function process3(path8) {
-        if (Array.isArray(path8)) {
-          for (const p of path8)
+      function process3(path10) {
+        if (Array.isArray(path10)) {
+          for (const p of path10)
             process3(p);
           return;
         }
-        const data = typeof path8 === "object" ? path8 : parse3(path8, options);
+        const data = typeof path10 === "object" ? path10 : parse3(path10, options);
         flatten(data.tokens, 0, [], (tokens) => {
           if (combinations >= 256) {
             throw new PathError("Too many path combinations", data.originalPath);
@@ -20832,25 +20832,25 @@ var require_dist4 = __commonJS({
           combinations++;
         });
       }
-      process3(path7);
+      process3(path9);
       let pattern = `^(?:${source})`;
       if (trailing)
         pattern += "(?:" + escape2(delimiter) + "$)?";
       pattern += end ? "$" : "(?=" + escape2(delimiter) + "|$)";
       return { regexp: new RegExp(pattern, sensitive ? "" : "i"), keys };
     }
-    function flatten(tokens, index, result2, callback) {
+    function flatten(tokens, index, result2, callback2) {
       while (index < tokens.length) {
         const token = tokens[index++];
         if (token.type === "group") {
           const len = result2.length;
-          flatten(token.tokens, 0, result2, (seq) => flatten(tokens, index, seq, callback));
+          flatten(token.tokens, 0, result2, (seq) => flatten(tokens, index, seq, callback2));
           result2.length = len;
           continue;
         }
         result2.push(token);
       }
-      callback(result2);
+      callback2(result2);
     }
     function toRegExpSource(tokens, delimiter, keys, originalPath) {
       let result2 = "";
@@ -20978,18 +20978,18 @@ var require_layer = __commonJS({
     var TRAILING_SLASH_REGEXP = /\/+$/;
     var MATCHING_GROUP_REGEXP = /\((?:\?<(.*?)>)?(?!\?)/g;
     module.exports = Layer;
-    function Layer(path7, options, fn) {
+    function Layer(path9, options, fn) {
       if (!(this instanceof Layer)) {
-        return new Layer(path7, options, fn);
+        return new Layer(path9, options, fn);
       }
-      debug("new %o", path7);
+      debug("new %o", path9);
       const opts = options || {};
       this.handle = fn;
       this.keys = [];
       this.name = fn.name || "<anonymous>";
       this.params = void 0;
       this.path = void 0;
-      this.slash = path7 === "/" && opts.end === false;
+      this.slash = path9 === "/" && opts.end === false;
       function matcher(_path) {
         if (_path instanceof RegExp) {
           const keys = [];
@@ -21028,7 +21028,7 @@ var require_layer = __commonJS({
           decode: decodeParam
         });
       }
-      this.matchers = Array.isArray(path7) ? path7.map(matcher) : [matcher(path7)];
+      this.matchers = Array.isArray(path9) ? path9.map(matcher) : [matcher(path9)];
     }
     Layer.prototype.handleError = function handleError(error, req, res, next) {
       const fn = this.handle;
@@ -21068,9 +21068,9 @@ var require_layer = __commonJS({
         next(err);
       }
     };
-    Layer.prototype.match = function match(path7) {
+    Layer.prototype.match = function match(path9) {
       let match2;
-      if (path7 != null) {
+      if (path9 != null) {
         if (this.slash) {
           this.params = {};
           this.path = "";
@@ -21078,7 +21078,7 @@ var require_layer = __commonJS({
         }
         let i = 0;
         while (!match2 && i < this.matchers.length) {
-          match2 = this.matchers[i](path7);
+          match2 = this.matchers[i](path9);
           i++;
         }
       }
@@ -21106,13 +21106,13 @@ var require_layer = __commonJS({
         throw err;
       }
     }
-    function loosen(path7) {
-      if (path7 instanceof RegExp || path7 === "/") {
-        return path7;
+    function loosen(path9) {
+      if (path9 instanceof RegExp || path9 === "/") {
+        return path9;
       }
-      return Array.isArray(path7) ? path7.map(function(p) {
+      return Array.isArray(path9) ? path9.map(function(p) {
         return loosen(p);
-      }) : String(path7).replace(TRAILING_SLASH_REGEXP, "");
+      }) : String(path9).replace(TRAILING_SLASH_REGEXP, "");
     }
   }
 });
@@ -21134,9 +21134,9 @@ var require_route = __commonJS({
     var flatten = Array.prototype.flat;
     var methods = METHODS.map((method) => method.toLowerCase());
     module.exports = Route;
-    function Route(path7) {
-      debug("new %o", path7);
-      this.path = path7;
+    function Route(path9) {
+      debug("new %o", path9);
+      this.path = path9;
       this.stack = [];
       this.methods = /* @__PURE__ */ Object.create(null);
     }
@@ -21303,8 +21303,8 @@ var require_router = __commonJS({
       params.push(fn);
       return this;
     };
-    Router.prototype.handle = function handle(req, res, callback) {
-      if (!callback) {
+    Router.prototype.handle = function handle(req, res, callback2) {
+      if (!callback2) {
         throw new TypeError("argument callback is required");
       }
       debug("dispatching %s %s", req.method, req.url);
@@ -21319,7 +21319,7 @@ var require_router = __commonJS({
       const stack = this.stack;
       const parentParams = req.params;
       const parentUrl = req.baseUrl || "";
-      let done = restore(callback, req, "baseUrl", "next", "params");
+      let done = restore(callback2, req, "baseUrl", "next", "params");
       req.next = next;
       if (req.method === "OPTIONS") {
         methods2 = [];
@@ -21350,8 +21350,8 @@ var require_router = __commonJS({
         if (++sync > 100) {
           return setImmediate(next, err);
         }
-        const path7 = getPathname(req);
-        if (path7 == null) {
+        const path9 = getPathname(req);
+        if (path9 == null) {
           return done(layerError);
         }
         let layer;
@@ -21359,7 +21359,7 @@ var require_router = __commonJS({
         let route;
         while (match !== true && idx < stack.length) {
           layer = stack[idx++];
-          match = matchLayer(layer, path7);
+          match = matchLayer(layer, path9);
           route = layer.route;
           if (typeof match !== "boolean") {
             layerError = layerError || match;
@@ -21397,18 +21397,18 @@ var require_router = __commonJS({
           } else if (route) {
             layer.handleRequest(req, res, next);
           } else {
-            trimPrefix(layer, layerError, layerPath, path7);
+            trimPrefix(layer, layerError, layerPath, path9);
           }
           sync = 0;
         });
       }
-      function trimPrefix(layer, layerError, layerPath, path7) {
+      function trimPrefix(layer, layerError, layerPath, path9) {
         if (layerPath.length !== 0) {
-          if (layerPath !== path7.substring(0, layerPath.length)) {
+          if (layerPath !== path9.substring(0, layerPath.length)) {
             next(layerError);
             return;
           }
-          const c = path7[layerPath.length];
+          const c = path9[layerPath.length];
           if (c && c !== "/") {
             next(layerError);
             return;
@@ -21432,7 +21432,7 @@ var require_router = __commonJS({
     };
     Router.prototype.use = function use(handler) {
       let offset = 0;
-      let path7 = "/";
+      let path9 = "/";
       if (typeof handler !== "function") {
         let arg = handler;
         while (Array.isArray(arg) && arg.length !== 0) {
@@ -21440,7 +21440,7 @@ var require_router = __commonJS({
         }
         if (typeof arg !== "function") {
           offset = 1;
-          path7 = handler;
+          path9 = handler;
         }
       }
       const callbacks = flatten.call(slice.call(arguments, offset), Infinity);
@@ -21452,8 +21452,8 @@ var require_router = __commonJS({
         if (typeof fn !== "function") {
           throw new TypeError("argument handler must be a function");
         }
-        debug("use %o %s", path7, fn.name || "<anonymous>");
-        const layer = new Layer(path7, {
+        debug("use %o %s", path9, fn.name || "<anonymous>");
+        const layer = new Layer(path9, {
           sensitive: this.caseSensitive,
           strict: false,
           end: false
@@ -21463,9 +21463,9 @@ var require_router = __commonJS({
       }
       return this;
     };
-    Router.prototype.route = function route(path7) {
-      const route2 = new Route(path7);
-      const layer = new Layer(path7, {
+    Router.prototype.route = function route(path9) {
+      const route2 = new Route(path9);
+      const layer = new Layer(path9, {
         sensitive: this.caseSensitive,
         strict: this.strict,
         end: true
@@ -21478,8 +21478,8 @@ var require_router = __commonJS({
       return route2;
     };
     methods.concat("all").forEach(function(method) {
-      Router.prototype[method] = function(path7) {
-        const route = this.route(path7);
+      Router.prototype[method] = function(path9) {
+        const route = this.route(path9);
         route[method].apply(route, slice.call(arguments, 1));
         return this;
       };
@@ -21508,9 +21508,9 @@ var require_router = __commonJS({
       const fqdnIndex = url.substring(0, pathLength).indexOf("://");
       return fqdnIndex !== -1 ? url.substring(0, url.indexOf("/", 3 + fqdnIndex)) : void 0;
     }
-    function matchLayer(layer, path7) {
+    function matchLayer(layer, path9) {
       try {
-        return layer.match(path7);
+        return layer.match(path9);
       } catch (err) {
         return err;
       }
@@ -21726,8 +21726,8 @@ var require_application = __commonJS({
         this.enable("view cache");
       }
     };
-    app.handle = function handle(req, res, callback) {
-      var done = callback || finalhandler(req, res, {
+    app.handle = function handle(req, res, callback2) {
+      var done = callback2 || finalhandler(req, res, {
         env: this.get("env"),
         onerror: logerror.bind(this)
       });
@@ -21745,7 +21745,7 @@ var require_application = __commonJS({
     };
     app.use = function use(fn) {
       var offset = 0;
-      var path7 = "/";
+      var path9 = "/";
       if (typeof fn !== "function") {
         var arg = fn;
         while (Array.isArray(arg) && arg.length !== 0) {
@@ -21753,7 +21753,7 @@ var require_application = __commonJS({
         }
         if (typeof arg !== "function") {
           offset = 1;
-          path7 = fn;
+          path9 = fn;
         }
       }
       var fns = flatten.call(slice.call(arguments, offset), Infinity);
@@ -21763,12 +21763,12 @@ var require_application = __commonJS({
       var router = this.router;
       fns.forEach(function(fn2) {
         if (!fn2 || !fn2.handle || !fn2.set) {
-          return router.use(path7, fn2);
+          return router.use(path9, fn2);
         }
-        debug(".use app under %s", path7);
-        fn2.mountpath = path7;
+        debug(".use app under %s", path9);
+        fn2.mountpath = path9;
         fn2.parent = this;
-        router.use(path7, function mounted_app(req, res, next) {
+        router.use(path9, function mounted_app(req, res, next) {
           var orig = req.app;
           fn2.handle(req, res, function(err) {
             Object.setPrototypeOf(req, orig.request);
@@ -21780,8 +21780,8 @@ var require_application = __commonJS({
       }, this);
       return this;
     };
-    app.route = function route(path7) {
-      return this.router.route(path7);
+    app.route = function route(path9) {
+      return this.router.route(path9);
     };
     app.engine = function engine(ext, fn) {
       if (typeof fn !== "function") {
@@ -21824,7 +21824,7 @@ var require_application = __commonJS({
       }
       return this;
     };
-    app.path = function path7() {
+    app.path = function path9() {
       return this.parent ? this.parent.path() + this.mountpath : "";
     };
     app.enabled = function enabled(setting) {
@@ -21840,26 +21840,26 @@ var require_application = __commonJS({
       return this.set(setting, false);
     };
     methods.forEach(function(method) {
-      app[method] = function(path7) {
+      app[method] = function(path9) {
         if (method === "get" && arguments.length === 1) {
-          return this.set(path7);
+          return this.set(path9);
         }
-        var route = this.route(path7);
+        var route = this.route(path9);
         route[method].apply(route, slice.call(arguments, 1));
         return this;
       };
     });
-    app.all = function all(path7) {
-      var route = this.route(path7);
+    app.all = function all(path9) {
+      var route = this.route(path9);
       var args = slice.call(arguments, 1);
       for (var i = 0; i < methods.length; i++) {
         route[methods[i]].apply(route, args);
       }
       return this;
     };
-    app.render = function render(name, options, callback) {
+    app.render = function render(name, options, callback2) {
       var cache = this.cache;
-      var done = callback;
+      var done = callback2;
       var engines = this.engines;
       var opts = options || {};
       var view;
@@ -21905,11 +21905,11 @@ var require_application = __commonJS({
     function logerror(err) {
       if (this.get("env") !== "test") console.error(err);
     }
-    function tryRender(view, options, callback) {
+    function tryRender(view, options, callback2) {
       try {
-        view.render(options, callback);
+        view.render(options, callback2);
       } catch (err) {
-        callback(err);
+        callback2(err);
       }
     }
   }
@@ -22784,7 +22784,7 @@ var require_request = __commonJS({
      * MIT Licensed
      */
     var accepts = require_accepts();
-    var isIP = __require("node:net").isIP;
+    var isIP2 = __require("node:net").isIP;
     var typeis = require_type_is();
     var http = __require("node:http");
     var fresh = require_fresh();
@@ -22874,10 +22874,10 @@ var require_request = __commonJS({
       var hostname2 = this.hostname;
       if (!hostname2) return [];
       var offset = this.app.get("subdomain offset");
-      var subdomains2 = !isIP(hostname2) ? hostname2.split(".").reverse() : [hostname2];
+      var subdomains2 = !isIP2(hostname2) ? hostname2.split(".").reverse() : [hostname2];
       return subdomains2.slice(offset);
     });
-    defineGetter(req, "path", function path7() {
+    defineGetter(req, "path", function path9() {
       return parse3(this).pathname;
     });
     defineGetter(req, "host", function host() {
@@ -23427,32 +23427,32 @@ var require_send = __commonJS({
     var escapeHtml = require_escape_html();
     var etag = require_etag();
     var fresh = require_fresh();
-    var fs6 = __require("fs");
+    var fs8 = __require("fs");
     var mime = require_mime_types();
     var ms = require_ms();
     var onFinished = require_on_finished();
     var parseRange = require_range_parser();
-    var path7 = __require("path");
+    var path9 = __require("path");
     var statuses = require_statuses();
     var Stream = __require("stream");
     var util = __require("util");
-    var extname = path7.extname;
-    var join = path7.join;
-    var normalize = path7.normalize;
-    var resolve = path7.resolve;
-    var sep = path7.sep;
+    var extname = path9.extname;
+    var join = path9.join;
+    var normalize = path9.normalize;
+    var resolve = path9.resolve;
+    var sep = path9.sep;
     var BYTES_RANGE_REGEXP = /^ *bytes=/;
     var MAX_MAXAGE = 60 * 60 * 24 * 365 * 1e3;
     var UP_PATH_REGEXP = /(?:^|[\\/])\.\.(?:[\\/]|$)/;
     module.exports = send;
-    function send(req, path8, options) {
-      return new SendStream(req, path8, options);
+    function send(req, path10, options) {
+      return new SendStream(req, path10, options);
     }
-    function SendStream(req, path8, options) {
+    function SendStream(req, path10, options) {
       Stream.call(this);
       var opts = options || {};
       this.options = opts;
-      this.path = path8;
+      this.path = path10;
       this.req = req;
       this._acceptRanges = opts.acceptRanges !== void 0 ? Boolean(opts.acceptRanges) : true;
       this._cacheControl = opts.cacheControl !== void 0 ? Boolean(opts.cacheControl) : true;
@@ -23566,10 +23566,10 @@ var require_send = __commonJS({
       var lastModified = this.res.getHeader("Last-Modified");
       return parseHttpDate(lastModified) <= parseHttpDate(ifRange);
     };
-    SendStream.prototype.redirect = function redirect(path8) {
+    SendStream.prototype.redirect = function redirect(path10) {
       var res = this.res;
       if (hasListeners(this, "directory")) {
-        this.emit("directory", res, path8);
+        this.emit("directory", res, path10);
         return;
       }
       if (this.hasTrailingSlash()) {
@@ -23589,38 +23589,38 @@ var require_send = __commonJS({
     SendStream.prototype.pipe = function pipe2(res) {
       var root = this._root;
       this.res = res;
-      var path8 = decode(this.path);
-      if (path8 === -1) {
+      var path10 = decode(this.path);
+      if (path10 === -1) {
         this.error(400);
         return res;
       }
-      if (~path8.indexOf("\0")) {
+      if (~path10.indexOf("\0")) {
         this.error(400);
         return res;
       }
       var parts;
       if (root !== null) {
-        if (path8) {
-          path8 = normalize("." + sep + path8);
+        if (path10) {
+          path10 = normalize("." + sep + path10);
         }
-        if (UP_PATH_REGEXP.test(path8)) {
-          debug('malicious path "%s"', path8);
+        if (UP_PATH_REGEXP.test(path10)) {
+          debug('malicious path "%s"', path10);
           this.error(403);
           return res;
         }
-        parts = path8.split(sep);
-        path8 = normalize(join(root, path8));
+        parts = path10.split(sep);
+        path10 = normalize(join(root, path10));
       } else {
-        if (UP_PATH_REGEXP.test(path8)) {
-          debug('malicious path "%s"', path8);
+        if (UP_PATH_REGEXP.test(path10)) {
+          debug('malicious path "%s"', path10);
           this.error(403);
           return res;
         }
-        parts = normalize(path8).split(sep);
-        path8 = resolve(path8);
+        parts = normalize(path10).split(sep);
+        path10 = resolve(path10);
       }
       if (containsDotFile(parts)) {
-        debug('%s dotfile "%s"', this._dotfiles, path8);
+        debug('%s dotfile "%s"', this._dotfiles, path10);
         switch (this._dotfiles) {
           case "allow":
             break;
@@ -23634,13 +23634,13 @@ var require_send = __commonJS({
         }
       }
       if (this._index.length && this.hasTrailingSlash()) {
-        this.sendIndex(path8);
+        this.sendIndex(path10);
         return res;
       }
-      this.sendFile(path8);
+      this.sendFile(path10);
       return res;
     };
-    SendStream.prototype.send = function send2(path8, stat) {
+    SendStream.prototype.send = function send2(path10, stat) {
       var len = stat.size;
       var options = this.options;
       var opts = {};
@@ -23652,9 +23652,9 @@ var require_send = __commonJS({
         this.headersAlreadySent();
         return;
       }
-      debug('pipe "%s"', path8);
-      this.setHeader(path8, stat);
-      this.type(path8);
+      debug('pipe "%s"', path10);
+      this.setHeader(path10, stat);
+      this.type(path10);
       if (this.isConditionalGET()) {
         if (this.isPreconditionFailure()) {
           this.error(412);
@@ -23703,30 +23703,30 @@ var require_send = __commonJS({
         res.end();
         return;
       }
-      this.stream(path8, opts);
+      this.stream(path10, opts);
     };
-    SendStream.prototype.sendFile = function sendFile(path8) {
+    SendStream.prototype.sendFile = function sendFile(path10) {
       var i = 0;
       var self = this;
-      debug('stat "%s"', path8);
-      fs6.stat(path8, function onstat(err, stat) {
-        var pathEndsWithSep = path8[path8.length - 1] === sep;
-        if (err && err.code === "ENOENT" && !extname(path8) && !pathEndsWithSep) {
+      debug('stat "%s"', path10);
+      fs8.stat(path10, function onstat(err, stat) {
+        var pathEndsWithSep = path10[path10.length - 1] === sep;
+        if (err && err.code === "ENOENT" && !extname(path10) && !pathEndsWithSep) {
           return next(err);
         }
         if (err) return self.onStatError(err);
-        if (stat.isDirectory()) return self.redirect(path8);
+        if (stat.isDirectory()) return self.redirect(path10);
         if (pathEndsWithSep) return self.error(404);
-        self.emit("file", path8, stat);
-        self.send(path8, stat);
+        self.emit("file", path10, stat);
+        self.send(path10, stat);
       });
       function next(err) {
         if (self._extensions.length <= i) {
           return err ? self.onStatError(err) : self.error(404);
         }
-        var p = path8 + "." + self._extensions[i++];
+        var p = path10 + "." + self._extensions[i++];
         debug('stat "%s"', p);
-        fs6.stat(p, function(err2, stat) {
+        fs8.stat(p, function(err2, stat) {
           if (err2) return next(err2);
           if (stat.isDirectory()) return next();
           self.emit("file", p, stat);
@@ -23734,7 +23734,7 @@ var require_send = __commonJS({
         });
       }
     };
-    SendStream.prototype.sendIndex = function sendIndex(path8) {
+    SendStream.prototype.sendIndex = function sendIndex(path10) {
       var i = -1;
       var self = this;
       function next(err) {
@@ -23742,9 +23742,9 @@ var require_send = __commonJS({
           if (err) return self.onStatError(err);
           return self.error(404);
         }
-        var p = join(path8, self._index[i]);
+        var p = join(path10, self._index[i]);
         debug('stat "%s"', p);
-        fs6.stat(p, function(err2, stat) {
+        fs8.stat(p, function(err2, stat) {
           if (err2) return next(err2);
           if (stat.isDirectory()) return next();
           self.emit("file", p, stat);
@@ -23753,10 +23753,10 @@ var require_send = __commonJS({
       }
       next();
     };
-    SendStream.prototype.stream = function stream(path8, options) {
+    SendStream.prototype.stream = function stream(path10, options) {
       var self = this;
       var res = this.res;
-      var stream2 = fs6.createReadStream(path8, options);
+      var stream2 = fs8.createReadStream(path10, options);
       this.emit("stream", stream2);
       stream2.pipe(res);
       function cleanup() {
@@ -23771,17 +23771,17 @@ var require_send = __commonJS({
         self.emit("end");
       });
     };
-    SendStream.prototype.type = function type(path8) {
+    SendStream.prototype.type = function type(path10) {
       var res = this.res;
       if (res.getHeader("Content-Type")) return;
-      var ext = extname(path8);
+      var ext = extname(path10);
       var type2 = mime.contentType(ext) || "application/octet-stream";
       debug("content-type %s", type2);
       res.setHeader("Content-Type", type2);
     };
-    SendStream.prototype.setHeader = function setHeader(path8, stat) {
+    SendStream.prototype.setHeader = function setHeader(path10, stat) {
       var res = this.res;
-      this.emit("headers", res, path8, stat);
+      this.emit("headers", res, path10, stat);
       if (this._acceptRanges && !res.getHeader("Accept-Ranges")) {
         debug("accept ranges");
         res.setHeader("Accept-Ranges", "bytes");
@@ -23839,9 +23839,9 @@ var require_send = __commonJS({
       }
       return err instanceof Error ? createError(status, err, { expose: false }) : createError(status, err);
     }
-    function decode(path8) {
+    function decode(path10) {
       try {
-        return decodeURIComponent(path8);
+        return decodeURIComponent(path10);
       } catch (err) {
         return -1;
       }
@@ -23996,7 +23996,7 @@ var require_response = __commonJS({
     var http = __require("node:http");
     var onFinished = require_on_finished();
     var mime = require_mime_types();
-    var path7 = __require("node:path");
+    var path9 = __require("node:path");
     var pathIsAbsolute = __require("node:path").isAbsolute;
     var statuses = require_statuses();
     var sign = require_cookie_signature().sign;
@@ -24005,9 +24005,9 @@ var require_response = __commonJS({
     var setCharset = require_utils3().setCharset;
     var cookie = require_cookie();
     var send = require_send();
-    var extname = path7.extname;
-    var resolve = path7.resolve;
-    var basename = path7.basename;
+    var extname = path9.extname;
+    var resolve = path9.resolve;
+    var basename = path9.basename;
     var vary = require_vary();
     var { Buffer: Buffer2 } = __require("node:buffer");
     var res = Object.create(http.ServerResponse.prototype);
@@ -24124,24 +24124,24 @@ var require_response = __commonJS({
       var replacer = app.get("json replacer");
       var spaces = app.get("json spaces");
       var body = stringify(obj, replacer, spaces, escape2);
-      var callback = this.req.query[app.get("jsonp callback name")];
+      var callback2 = this.req.query[app.get("jsonp callback name")];
       if (!this.get("Content-Type")) {
         this.set("X-Content-Type-Options", "nosniff");
         this.set("Content-Type", "application/json");
       }
-      if (Array.isArray(callback)) {
-        callback = callback[0];
+      if (Array.isArray(callback2)) {
+        callback2 = callback2[0];
       }
-      if (typeof callback === "string" && callback.length !== 0) {
+      if (typeof callback2 === "string" && callback2.length !== 0) {
         this.set("X-Content-Type-Options", "nosniff");
         this.set("Content-Type", "text/javascript");
-        callback = callback.replace(/[^\[\]\w$.]/g, "");
+        callback2 = callback2.replace(/[^\[\]\w$.]/g, "");
         if (body === void 0) {
           body = "";
         } else if (typeof body === "string") {
           body = body.replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029");
         }
-        body = "/**/ typeof " + callback + " === 'function' && " + callback + "(" + body + ");";
+        body = "/**/ typeof " + callback2 + " === 'function' && " + callback2 + "(" + body + ");";
       }
       return this.send(body);
     };
@@ -24151,26 +24151,26 @@ var require_response = __commonJS({
       this.type("txt");
       return this.send(body);
     };
-    res.sendFile = function sendFile(path8, options, callback) {
-      var done = callback;
+    res.sendFile = function sendFile(path10, options, callback2) {
+      var done = callback2;
       var req = this.req;
       var res2 = this;
       var next = req.next;
       var opts = options || {};
-      if (!path8) {
+      if (!path10) {
         throw new TypeError("path argument is required to res.sendFile");
       }
-      if (typeof path8 !== "string") {
+      if (typeof path10 !== "string") {
         throw new TypeError("path must be a string to res.sendFile");
       }
       if (typeof options === "function") {
         done = options;
         opts = {};
       }
-      if (!opts.root && !pathIsAbsolute(path8)) {
+      if (!opts.root && !pathIsAbsolute(path10)) {
         throw new TypeError("path must be absolute or specify root to res.sendFile");
       }
-      var pathname = encodeURI(path8);
+      var pathname = encodeURI(path10);
       opts.etag = this.app.enabled("etag");
       var file = send(req, pathname, opts);
       sendfile(res2, file, opts, function(err) {
@@ -24181,8 +24181,8 @@ var require_response = __commonJS({
         }
       });
     };
-    res.download = function download(path8, filename, options, callback) {
-      var done = callback;
+    res.download = function download(path10, filename, options, callback2) {
+      var done = callback2;
       var name = filename;
       var opts = options || null;
       if (typeof filename === "function") {
@@ -24198,7 +24198,7 @@ var require_response = __commonJS({
         opts = filename;
       }
       var headers = {
-        "Content-Disposition": contentDisposition.create(basename(name || path8))
+        "Content-Disposition": contentDisposition.create(basename(name || path10))
       };
       if (opts && opts.headers) {
         var keys = Object.keys(opts.headers);
@@ -24211,7 +24211,7 @@ var require_response = __commonJS({
       }
       opts = Object.create(opts);
       opts.headers = headers;
-      var fullPath = !opts.root ? resolve(path8) : path8;
+      var fullPath = !opts.root ? resolve(path10) : path10;
       return this.sendFile(fullPath, opts, done);
     };
     res.contentType = res.type = function contentType(type) {
@@ -24350,9 +24350,9 @@ var require_response = __commonJS({
       vary(this, field);
       return this;
     };
-    res.render = function render(view, options, callback) {
+    res.render = function render(view, options, callback2) {
       var app = this.req.app;
-      var done = callback;
+      var done = callback2;
       var opts = options || {};
       var req = this.req;
       var self = this;
@@ -24367,7 +24367,7 @@ var require_response = __commonJS({
       };
       app.render(view, opts, done);
     };
-    function sendfile(res2, file, options, callback) {
+    function sendfile(res2, file, options, callback2) {
       var done = false;
       var streaming;
       function onaborted() {
@@ -24375,24 +24375,24 @@ var require_response = __commonJS({
         done = true;
         var err = new Error("Request aborted");
         err.code = "ECONNABORTED";
-        callback(err);
+        callback2(err);
       }
       function ondirectory() {
         if (done) return;
         done = true;
         var err = new Error("EISDIR, read");
         err.code = "EISDIR";
-        callback(err);
+        callback2(err);
       }
       function onerror(err) {
         if (done) return;
         done = true;
-        callback(err);
+        callback2(err);
       }
       function onend() {
         if (done) return;
         done = true;
-        callback();
+        callback2();
       }
       function onfile() {
         streaming = false;
@@ -24408,7 +24408,7 @@ var require_response = __commonJS({
           }
           if (done) return;
           done = true;
-          callback();
+          callback2();
         });
       }
       function onstream() {
@@ -24502,11 +24502,11 @@ var require_serve_static = __commonJS({
         }
         var forwardError = !fallthrough;
         var originalUrl = parseUrl.original(req);
-        var path7 = parseUrl(req).pathname;
-        if (path7 === "/" && originalUrl.pathname.substr(-1) !== "/") {
-          path7 = "";
+        var path9 = parseUrl(req).pathname;
+        if (path9 === "/" && originalUrl.pathname.substr(-1) !== "/") {
+          path9 = "";
         }
-        var stream = send(req, path7, opts);
+        var stream = send(req, path9, opts);
         stream.on("directory", onDirectory);
         if (setHeaders) {
           stream.on("headers", setHeaders);
@@ -26464,8 +26464,8 @@ var require_keyword = __commonJS({
       var _a;
       const { gen, keyword, schema, parentSchema, $data, it } = cxt;
       checkAsyncKeyword(it, def);
-      const validate2 = !$data && def.compile ? def.compile.call(it.self, schema, parentSchema, it) : def.validate;
-      const validateRef = useKeyword(gen, keyword, validate2);
+      const validate3 = !$data && def.compile ? def.compile.call(it.self, schema, parentSchema, it) : def.validate;
+      const validateRef = useKeyword(gen, keyword, validate3);
       const valid = gen.let("valid");
       cxt.block$data(valid, validateKeyword);
       cxt.ok((_a = def.valid) !== null && _a !== void 0 ? _a : valid);
@@ -27538,28 +27538,28 @@ var require_compile = __commonJS({
         if (this.opts.code.process)
           sourceCode = this.opts.code.process(sourceCode, sch);
         const makeValidate = new Function(`${names_1.default.self}`, `${names_1.default.scope}`, sourceCode);
-        const validate2 = makeValidate(this, this.scope.get());
-        this.scope.value(validateName, { ref: validate2 });
-        validate2.errors = null;
-        validate2.schema = sch.schema;
-        validate2.schemaEnv = sch;
+        const validate3 = makeValidate(this, this.scope.get());
+        this.scope.value(validateName, { ref: validate3 });
+        validate3.errors = null;
+        validate3.schema = sch.schema;
+        validate3.schemaEnv = sch;
         if (sch.$async)
-          validate2.$async = true;
+          validate3.$async = true;
         if (this.opts.code.source === true) {
-          validate2.source = { validateName, validateCode, scopeValues: gen._values };
+          validate3.source = { validateName, validateCode, scopeValues: gen._values };
         }
         if (this.opts.unevaluated) {
           const { props, items } = schemaCxt;
-          validate2.evaluated = {
+          validate3.evaluated = {
             props: props instanceof codegen_1.Name ? void 0 : props,
             items: items instanceof codegen_1.Name ? void 0 : items,
             dynamicProps: props instanceof codegen_1.Name,
             dynamicItems: items instanceof codegen_1.Name
           };
-          if (validate2.source)
-            validate2.source.evaluated = (0, codegen_1.stringify)(validate2.evaluated);
+          if (validate3.source)
+            validate3.source.evaluated = (0, codegen_1.stringify)(validate3.evaluated);
         }
-        sch.validate = validate2;
+        sch.validate = validate3;
         return sch;
       } catch (e) {
         delete sch.validate;
@@ -27856,8 +27856,8 @@ var require_utils4 = __commonJS({
       }
       return ind;
     }
-    function removeDotSegments(path7) {
-      let input = path7;
+    function removeDotSegments(path9) {
+      let input = path9;
       const output = [];
       let nextSlash = -1;
       let len = 0;
@@ -27934,8 +27934,8 @@ var require_utils4 = __commonJS({
     var HOST_DELIMS = { "@": "%40", "/": "%2F", "?": "%3F", "#": "%23", ":": "%3A" };
     var HOST_DELIM_RE = /[@/?#:]/g;
     var HOST_DELIM_NO_COLON_RE = /[@/?#]/g;
-    function reescapeHostDelimiters(host, isIP) {
-      const re = isIP ? HOST_DELIM_NO_COLON_RE : HOST_DELIM_RE;
+    function reescapeHostDelimiters(host, isIP2) {
+      const re = isIP2 ? HOST_DELIM_NO_COLON_RE : HOST_DELIM_RE;
       re.lastIndex = 0;
       return host.replace(re, (ch) => HOST_DELIMS[ch]);
     }
@@ -28266,8 +28266,8 @@ var require_schemes = __commonJS({
       }
       if (wsComponent.resourceName) {
         const queryIndex = wsComponent.resourceName.indexOf("?");
-        const path7 = queryIndex === -1 ? wsComponent.resourceName : wsComponent.resourceName.slice(0, queryIndex);
-        wsComponent.path = path7 && path7 !== "/" ? path7 : void 0;
+        const path9 = queryIndex === -1 ? wsComponent.resourceName : wsComponent.resourceName.slice(0, queryIndex);
+        wsComponent.path = path9 && path9 !== "/" ? path9 : void 0;
         wsComponent.query = queryIndex === -1 ? void 0 : wsComponent.resourceName.slice(queryIndex + 1);
         wsComponent.resourceName = void 0;
       }
@@ -28624,8 +28624,8 @@ var require_fast_uri = __commonJS({
       const host = matches[4];
       return hasMalformedPercentEncoding(matches[3]) || host !== void 0 && !isIPLiteral(host) && hasMalformedPercentEncoding(host) || hasMalformedPercentEncoding(matches[6]) || hasMalformedPercentEncoding(matches[7]) || hasMalformedPercentEncoding(matches[8]);
     }
-    function canonicalizeHost(parsed, options, schemeHandler, isIP) {
-      if (!options.unicodeSupport && (!schemeHandler || !schemeHandler.unicodeSupport) && parsed.host && !isIPLiteral(parsed.host) && (options.domainHost || schemeHandler && schemeHandler.domainHost) && isIP === false && nonSimpleDomain(parsed.host)) {
+    function canonicalizeHost(parsed, options, schemeHandler, isIP2) {
+      if (!options.unicodeSupport && (!schemeHandler || !schemeHandler.unicodeSupport) && parsed.host && !isIPLiteral(parsed.host) && (options.domainHost || schemeHandler && schemeHandler.domainHost) && isIP2 === false && nonSimpleDomain(parsed.host)) {
         try {
           parsed.host = new URL("http://" + parsed.host).hostname;
         } catch (e) {
@@ -28652,7 +28652,7 @@ var require_fast_uri = __commonJS({
       let malformedHost = false;
       let malformedIPLiteral = false;
       let malformedScheme = false;
-      let isIP = false;
+      let isIP2 = false;
       if (options.reference === "suffix") {
         if (options.scheme) {
           uri = options.scheme + ":" + uri;
@@ -28715,15 +28715,15 @@ var require_fast_uri = __commonJS({
             const bracketedIPLiteral = isIPLiteral(parsed.host);
             const hasIPLiteralBracket = parsed.host.indexOf("[") !== -1 || parsed.host.indexOf("]") !== -1;
             const ipv6result = normalizeIPv6(parsed.host);
-            isIP = ipv6result.isIPV6 || ipv6result.isIPVFuture === true;
+            isIP2 = ipv6result.isIPV6 || ipv6result.isIPVFuture === true;
             malformedIPLiteral = hasIPLiteralBracket && (!bracketedIPLiteral || ipv6result.error === true);
-            parsed.host = isIP ? ipv6result.host : ipv6result.host.toLowerCase();
+            parsed.host = isIP2 ? ipv6result.host : ipv6result.host.toLowerCase();
             if (malformedIPLiteral) {
               parsed.error = parsed.error || "URI host is malformed.";
               malformedAuthorityOrPort = true;
             }
           } else {
-            isIP = true;
+            isIP2 = true;
           }
         }
         if (parsed.scheme === void 0 && parsed.userinfo === void 0 && parsed.host === void 0 && parsed.port === void 0 && parsed.query === void 0 && !parsed.path) {
@@ -28740,14 +28740,14 @@ var require_fast_uri = __commonJS({
         }
         const schemeHandler = getSchemeHandler(options.scheme || parsed.scheme);
         if (!malformedIPLiteral) {
-          malformedHost = canonicalizeHost(parsed, options, schemeHandler, isIP);
+          malformedHost = canonicalizeHost(parsed, options, schemeHandler, isIP2);
         }
         if (uri.indexOf("%") !== -1 && parsed.host !== void 0 && !malformedIPLiteral) {
-          let host = isIP ? parsed.host : normalizePercentEncoding(parsed.host, true);
-          if (!isIP) {
+          let host = isIP2 ? parsed.host : normalizePercentEncoding(parsed.host, true);
+          if (!isIP2) {
             host = normalizePercentEncoding(host.toLowerCase());
           }
-          parsed.host = reescapeHostDelimiters(host, isIP);
+          parsed.host = reescapeHostDelimiters(host, isIP2);
         }
         if (!schemeHandler || schemeHandler && !schemeHandler.skipNormalize) {
           if (parsed.path) {
@@ -31482,8 +31482,8 @@ var require_formats2 = __commonJS({
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.formatNames = exports.fastFormats = exports.fullFormats = void 0;
-    function fmtDef(validate2, compare) {
-      return { validate: validate2, compare };
+    function fmtDef(validate3, compare) {
+      return { validate: validate3, compare };
     }
     exports.fullFormats = {
       // date: http://tools.ietf.org/html/rfc3339#section-5.6
@@ -31780,12 +31780,12 @@ var require_dist7 = __commonJS({
         throw new Error(`Unknown format "${name}"`);
       return f;
     };
-    function addFormats(ajv, list2, fs6, exportName) {
+    function addFormats(ajv, list2, fs8, exportName) {
       var _a;
       var _b;
       (_a = (_b = ajv.opts.code).formats) !== null && _a !== void 0 ? _a : _b.formats = (0, codegen_1._)`require("ajv-formats/dist/formats").${exportName}`;
       for (const f of list2)
-        ajv.addFormat(f, fs6[f]);
+        ajv.addFormat(f, fs8[f]);
     }
     module.exports = exports = formatsPlugin;
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -31794,9 +31794,9 @@ var require_dist7 = __commonJS({
 });
 
 // plugins/codex-supervisor/server/panel-server.mjs
-import fs5 from "node:fs";
-import path6 from "node:path";
-import { fileURLToPath, pathToFileURL as pathToFileURL2 } from "node:url";
+import fs7 from "node:fs";
+import path8 from "node:path";
+import { fileURLToPath, pathToFileURL as pathToFileURL3 } from "node:url";
 
 // node_modules/@modelcontextprotocol/sdk/dist/esm/server/index.js
 var import_express = __toESM(require_express2(), 1);
@@ -31997,10 +31997,10 @@ function assignProp(target, prop, value) {
     configurable: true
   });
 }
-function getElementAtPath(obj, path7) {
-  if (!path7)
+function getElementAtPath(obj, path9) {
+  if (!path9)
     return obj;
-  return path7.reduce((acc, key) => acc?.[key], obj);
+  return path9.reduce((acc, key) => acc?.[key], obj);
 }
 function promiseAllObject(promisesObj) {
   const keys = Object.keys(promisesObj);
@@ -32320,11 +32320,11 @@ function aborted(x, startIndex = 0) {
   }
   return false;
 }
-function prefixIssues(path7, issues) {
+function prefixIssues(path9, issues) {
   return issues.map((iss) => {
     var _a;
     (_a = iss).path ?? (_a.path = []);
-    iss.path.unshift(path7);
+    iss.path.unshift(path9);
     return iss;
   });
 }
@@ -37472,7 +37472,7 @@ var Protocol = class {
           }
         };
       }
-      const cancel = (reason) => {
+      const cancel2 = (reason) => {
         var _a2;
         this._responseHandlers.delete(messageId);
         this._progressHandlers.delete(messageId);
@@ -37509,10 +37509,10 @@ var Protocol = class {
       });
       (_e = options === null || options === void 0 ? void 0 : options.signal) === null || _e === void 0 ? void 0 : _e.addEventListener("abort", () => {
         var _a2;
-        cancel((_a2 = options === null || options === void 0 ? void 0 : options.signal) === null || _a2 === void 0 ? void 0 : _a2.reason);
+        cancel2((_a2 = options === null || options === void 0 ? void 0 : options.signal) === null || _a2 === void 0 ? void 0 : _a2.reason);
       });
       const timeout = (_f = options === null || options === void 0 ? void 0 : options.timeout) !== null && _f !== void 0 ? _f : DEFAULT_REQUEST_TIMEOUT_MSEC;
-      const timeoutHandler = () => cancel(McpError.fromError(ErrorCode.RequestTimeout, "Request timed out", { timeout }));
+      const timeoutHandler = () => cancel2(McpError.fromError(ErrorCode.RequestTimeout, "Request timed out", { timeout }));
       this._setupTimeout(messageId, timeout, options === null || options === void 0 ? void 0 : options.maxTotalTimeout, timeoutHandler, (_g = options === null || options === void 0 ? void 0 : options.resetTimeoutOnProgress) !== null && _g !== void 0 ? _g : false);
       const relatedTaskId = relatedTask === null || relatedTask === void 0 ? void 0 : relatedTask.taskId;
       if (relatedTaskId) {
@@ -38629,7 +38629,7 @@ function parseJSON(source, kind) {
 function readInput(file) {
   return parseJSON(readRegularFile(path.resolve(file), MAX_INPUT_BYTES, "Input"), "Input");
 }
-function readState(paths, validate2, missingAllowed = false) {
+function readState(paths, validate3, missingAllowed = false) {
   workspacePaths(paths.workspace);
   const source = readRegularFile(paths.state, MAX_STATE_BYTES, "State", true);
   if (source === null) {
@@ -38637,7 +38637,7 @@ function readState(paths, validate2, missingAllowed = false) {
     fail("NOT_INITIALIZED", "Run init for this workspace first.");
   }
   const state = parseJSON(source, "State");
-  validate2(state, paths.workspace);
+  validate3(state, paths.workspace);
   return state;
 }
 function withStateLock(paths, action) {
@@ -38658,9 +38658,9 @@ function withStateLock(paths, action) {
     fs.unlinkSync(paths.lock);
   }
 }
-function writeState(paths, state, validate2) {
+function writeState(paths, state, validate3) {
   workspacePaths(paths.workspace);
-  validate2(state, paths.workspace);
+  validate3(state, paths.workspace);
   const source = `${JSON.stringify(state, null, 2)}
 `;
   if (Buffer.byteLength(source) > MAX_STATE_BYTES) fail("SIZE_LIMIT", "State exceeds its size limit; preserve the current state and start a separate workspace.");
@@ -38788,13 +38788,780 @@ function setControl(workspace, input) {
 }
 
 // plugins/codex-supervisor/scripts/execution-store.mjs
+import fs4 from "node:fs";
+import path4 from "node:path";
+import { createHash as createHash2, randomUUID as randomUUID3 } from "node:crypto";
+
+// plugins/codex-supervisor/scripts/native-executor.mjs
 import fs3 from "node:fs";
 import path3 from "node:path";
+import { spawn, execFileSync } from "node:child_process";
 import { createHash, randomUUID as randomUUID2 } from "node:crypto";
+import { isIP } from "node:net";
+var MAX_LINE_BYTES = 2 * 1024 * 1024;
+var MAX_READ_BYTES = 16 * 1024 * 1024;
+var MAX_EVENTS = 2e4;
+var MAX_OUTPUT_BYTES = 64 * 1024;
+var REASONING_EFFORTS = Object.freeze(["none", "minimal", "low", "medium", "high", "xhigh", "max", "ultra"]);
+var TERMINAL = /* @__PURE__ */ new Set(["completed", "failed", "interrupted"]);
+var RPC_METHODS = /* @__PURE__ */ new Set(["initialize", "config/read", "model/list", "thread/start", "thread/resume", "thread/read", "thread/queue/add", "thread/queue/list", "thread/queue/delete", "thread/goal/get", "turn/interrupt", "command/exec", "command/exec/terminate"]);
+var RPC_CODES = /* @__PURE__ */ new Set([-32700, -32600, -32601, -32602, -32603]);
+var TRANSPORT_CODES = /* @__PURE__ */ new Set(["INVALID_INPUT", "NATIVE_PROTOCOL", "NATIVE_WORKSPACE", "NATIVE_PERMISSIONS", "NATIVE_OWNERSHIP", "NATIVE_START", "NATIVE_LIMIT", "NATIVE_IO", "NATIVE_EXIT", "NATIVE_RPC", "NATIVE_TIMEOUT", "NATIVE_CLOSED", "NATIVE_DUPLICATE", "NATIVE_CORRELATION", "NATIVE_RECEIPT", "NATIVE_CANCELLED", "NATIVE_MODEL", "NATIVE_REASONING"]);
+var STARTUP_READ_GRACE_MS = 2e3;
+var MATERIALIZATION_READ_RETRIES = 3;
+var SIMPLE_NATIVE_ERRORS = /* @__PURE__ */ new Set(["contextWindowExceeded", "sessionBudgetExceeded", "usageLimitExceeded", "serverOverloaded", "cyberPolicy", "misalignmentPolicyViolation", "internalServerError", "unauthorized", "badRequest", "threadRollbackFailed", "sandboxError", "other"]);
+var HTTP_NATIVE_ERRORS = /* @__PURE__ */ new Set(["httpConnectionFailed", "responseStreamConnectionFailed", "responseStreamDisconnected", "responseTooManyFailedAttempts"]);
+var DEFAULT_ARGS = [
+  "app-server",
+  "--listen",
+  "stdio://",
+  "-c",
+  'approval_policy="on-request"',
+  "-c",
+  'approvals_reviewer="user"',
+  "-c",
+  'sandbox_mode="workspace-write"',
+  "-c",
+  "sandbox_workspace_write.writable_roots=[]",
+  "-c",
+  "sandbox_workspace_write.network_access=false",
+  "-c",
+  "sandbox_workspace_write.exclude_slash_tmp=true",
+  "-c",
+  "sandbox_workspace_write.exclude_tmpdir_env_var=true"
+];
+var NativeExecutorError = class extends Error {
+  constructor(code, message) {
+    super(message);
+    this.name = "NativeExecutorError";
+    this.code = code;
+  }
+};
+function fail2(code, message) {
+  throw new NativeExecutorError(code, message);
+}
+function validId(value, name) {
+  if (typeof value !== "string" || !/^[a-zA-Z0-9][a-zA-Z0-9_.:-]{0,159}$/.test(value)) fail2("INVALID_INPUT", `Invalid ${name}.`);
+  return value;
+}
+function modelId(value) {
+  if (typeof value !== "string" || !/^[a-zA-Z0-9][a-zA-Z0-9_.:/-]{0,199}$/.test(value)) fail2("INVALID_INPUT", "Invalid native model identifier.");
+  return value;
+}
+function reasoningEffort(value, code = "INVALID_INPUT") {
+  if (!REASONING_EFFORTS.includes(value)) fail2(code, "Unsupported native reasoning effort.");
+  return value;
+}
+function publicLabel(value, maximum, label) {
+  if (typeof value !== "string" || !value.trim() || value.length > maximum || /[\u0000-\u001f\u007f]/.test(value)) fail2("NATIVE_PROTOCOL", `Codex returned an invalid public ${label}.`);
+  return value;
+}
+function workspacePath(value) {
+  if (typeof value !== "string" || !path3.isAbsolute(value)) fail2("INVALID_INPUT", "Workspace must be an absolute directory.");
+  try {
+    const real = fs3.realpathSync(value);
+    if (!fs3.statSync(real).isDirectory()) fail2("INVALID_INPUT", "Workspace must be an existing directory.");
+    return real;
+  } catch {
+    fail2("INVALID_INPUT", "Workspace must be an existing directory.");
+  }
+}
+function timeoutValue(value = 12e4) {
+  if (!Number.isSafeInteger(value) || value < 1 || value > 36e5) fail2("INVALID_INPUT", "Timeout must be between 1 and 3600000 milliseconds.");
+  return value;
+}
+function callback(value, name) {
+  if (value !== void 0 && typeof value !== "function") fail2("INVALID_INPUT", `${name} must be a function.`);
+  return value;
+}
+function rpcFailure(pending, body) {
+  const error = new NativeExecutorError("NATIVE_RPC", "Codex rejected a native protocol request.");
+  if (RPC_METHODS.has(pending.method)) error.rpcMethod = pending.method;
+  if (RPC_CODES.has(body?.code)) error.rpcCode = body.code;
+  const threadId = pending.params?.threadId;
+  if (pending.method === "thread/read" && pending.params?.includeTurns === true && body?.code === -32600 && typeof threadId === "string" && body.message === `thread ${threadId} is not materialized yet; includeTurns is unavailable before first user message`) error.materializationThreadId = threadId;
+  return error;
+}
+function transportReceipt(error) {
+  if (!(error instanceof NativeExecutorError) || !TRANSPORT_CODES.has(error.code)) return { code: "NATIVE_PROTOCOL" };
+  return { code: error.code, ...RPC_METHODS.has(error.rpcMethod) ? { rpcMethod: error.rpcMethod } : {}, ...RPC_CODES.has(error.rpcCode) ? { rpcCode: error.rpcCode } : {} };
+}
+function nativeErrorReceipt(error) {
+  const info = error?.codexErrorInfo;
+  if (typeof info === "string" && SIMPLE_NATIVE_ERRORS.has(info)) return { type: info };
+  if (!info || typeof info !== "object" || Array.isArray(info)) return null;
+  const keys = Object.keys(info);
+  if (keys.length !== 1) return null;
+  const type = keys[0];
+  if (HTTP_NATIVE_ERRORS.has(type)) {
+    const status = info[type]?.httpStatusCode;
+    return { type, ...Number.isSafeInteger(status) && status >= 100 && status <= 599 ? { httpStatusCode: status } : {} };
+  }
+  if (type === "activeTurnNotSteerable") return { type };
+  return null;
+}
+function normalizeTurn(turn) {
+  if (!turn || typeof turn !== "object" || !["inProgress", ...TERMINAL].includes(turn.status)) fail2("NATIVE_PROTOCOL", "Codex returned an invalid turn receipt.");
+  const nativeError = nativeErrorReceipt(turn.error);
+  return { id: validId(turn.id, "native turn ID"), status: turn.status, ...nativeError ? { nativeError } : {} };
+}
+function readMacProxy() {
+  return execFileSync("/usr/sbin/scutil", ["--proxy"], { encoding: "utf8", timeout: 1e3, maxBuffer: 16 * 1024, stdio: ["ignore", "pipe", "ignore"] });
+}
+function systemProxyEnvironment({ platform = process.platform, env = process.env, readProxy = readMacProxy } = {}) {
+  if (platform !== "darwin" || ["HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "http_proxy", "https_proxy", "all_proxy"].some((key) => Object.hasOwn(env, key))) return void 0;
+  let source;
+  try {
+    source = readProxy();
+  } catch {
+    return void 0;
+  }
+  if (typeof source !== "string" || Buffer.byteLength(source) > 16 * 1024) return void 0;
+  const values = /* @__PURE__ */ new Map();
+  let depth = 0;
+  let opened = false;
+  for (const rawLine of source.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (line === "}") {
+      if (--depth < 0) return void 0;
+      continue;
+    }
+    if (!opened) {
+      if (line !== "<dictionary> {") return void 0;
+      opened = true;
+      depth = 1;
+      continue;
+    }
+    if (depth === 0) {
+      if (line) return void 0;
+      continue;
+    }
+    if (depth === 1) {
+      const field = line.match(/^(HTTPEnable|HTTPProxy|HTTPPort|HTTPSEnable|HTTPSProxy|HTTPSPort|ProxyAutoConfigEnable|ProxyAutoDiscoveryEnable)\s*:\s*(.*?)\s*$/);
+      if (field) {
+        if (values.has(field[1])) return void 0;
+        values.set(field[1], field[2]);
+      }
+    }
+    if (line.endsWith("{")) depth += 1;
+  }
+  if (!opened || depth !== 0) return void 0;
+  for (const key of ["HTTPEnable", "HTTPSEnable", "ProxyAutoConfigEnable", "ProxyAutoDiscoveryEnable"]) {
+    if (values.has(key) && !["0", "1"].includes(values.get(key))) return void 0;
+  }
+  if (values.get("ProxyAutoConfigEnable") === "1" || values.get("ProxyAutoDiscoveryEnable") === "1") return void 0;
+  const overrides = {};
+  for (const [prefix, variable] of [["HTTP", "HTTP_PROXY"], ["HTTPS", "HTTPS_PROXY"]]) {
+    if (values.get(`${prefix}Enable`) !== "1") continue;
+    const host = values.get(`${prefix}Proxy`);
+    const port = values.get(`${prefix}Port`);
+    if (!host || !port || !/^\d{1,5}$/.test(port) || Number(port) < 1 || Number(port) > 65535) return void 0;
+    const ip = isIP(host);
+    if (!ip && (/^[\d.]+$/.test(host) || host.length > 253 || host.split(".").some((label) => !/^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/.test(label)))) return void 0;
+    overrides[variable] = `http://${ip === 6 ? `[${host}]` : host}:${Number(port)}`;
+  }
+  return Object.keys(overrides).length ? { ...env, ...overrides } : void 0;
+}
+function checkThread(thread, workspace, expectedId) {
+  if (!thread || typeof thread !== "object") fail2("NATIVE_PROTOCOL", "Codex returned an invalid thread receipt.");
+  const id2 = validId(thread.id, "native thread ID");
+  if (expectedId && id2 !== expectedId) fail2("NATIVE_PROTOCOL", "Codex returned a different thread.");
+  if (thread.cwd !== workspace) fail2("NATIVE_WORKSPACE", "Native thread workspace does not match the authorized workspace.");
+  if (!["idle", "active", "notLoaded", "systemError"].includes(thread.status?.type)) fail2("NATIVE_PROTOCOL", "Codex returned an invalid thread status.");
+  return thread;
+}
+function checkPermissions(response, workspace) {
+  const policy = response.sandbox;
+  if (response.cwd !== workspace || response.approvalPolicy !== "on-request" || response.approvalsReviewer !== "user" || policy?.type !== "workspaceWrite" || policy.networkAccess === true) {
+    fail2("NATIVE_PERMISSIONS", "Codex did not retain the requested workspace sandbox and human approval policy.");
+  }
+  if (!Array.isArray(policy.writableRoots) || policy.writableRoots.some((root) => root !== workspace)) fail2("NATIVE_PERMISSIONS", "Codex returned writable roots outside the authorized workspace.");
+  if (policy.excludeSlashTmp !== true || policy.excludeTmpdirEnvVar !== true) fail2("NATIVE_PERMISSIONS", "Codex did not retain the bounded workspace write policy.");
+  if (response.thread.canAcceptDirectInput === false) fail2("NATIVE_OWNERSHIP", "Native thread does not accept independent execution.");
+}
+var RpcSession = class {
+  constructor({ spawnImpl, serverCommand, serverArgs, platform, env, readProxy }, workspace, onMessage) {
+    this.nextId = 0;
+    this.pending = /* @__PURE__ */ new Map();
+    this.waiters = /* @__PURE__ */ new Set();
+    this.revision = 0;
+    this.bytes = 0;
+    this.stderrBytes = 0;
+    this.events = 0;
+    this.buffer = Buffer.alloc(0);
+    this.failure = null;
+    this.closed = false;
+    this.onMessage = onMessage;
+    try {
+      const childEnv = systemProxyEnvironment({ platform, env, readProxy });
+      this.child = spawnImpl(serverCommand, [...serverArgs], { cwd: workspace, stdio: ["pipe", "pipe", "pipe"], windowsHide: true, ...childEnv ? { env: childEnv } : {} });
+    } catch {
+      fail2("NATIVE_START", "Cannot start the installed Codex app-server.");
+    }
+    this.child.stdout.on("data", (chunk) => this.read(chunk));
+    this.child.stderr.on("data", (chunk) => {
+      this.stderrBytes += Buffer.byteLength(chunk);
+      if (this.stderrBytes > MAX_READ_BYTES) this.stop(new NativeExecutorError("NATIVE_LIMIT", "Codex exceeded the bounded log budget."));
+    });
+    this.child.stdin.on("error", () => this.stop(new NativeExecutorError("NATIVE_IO", "Cannot send a native protocol request.")));
+    this.child.on("error", () => this.stop(new NativeExecutorError("NATIVE_START", "Cannot start the installed Codex app-server.")));
+    this.child.on("close", () => {
+      this.closed = true;
+      this.stop(new NativeExecutorError("NATIVE_EXIT", "Codex app-server stopped before a confirmed result."));
+    });
+  }
+  pulse() {
+    this.revision += 1;
+    for (const resolve of this.waiters) resolve();
+    this.waiters.clear();
+  }
+  stop(error) {
+    if (this.failure) return;
+    this.failure = error;
+    for (const pending of this.pending.values()) {
+      clearTimeout(pending.timer);
+      pending.reject(error);
+    }
+    this.pending.clear();
+    this.pulse();
+  }
+  read(chunk) {
+    if (this.failure) return;
+    this.bytes += chunk.length;
+    if (this.bytes > MAX_READ_BYTES) return this.stop(new NativeExecutorError("NATIVE_LIMIT", "Codex exceeded the bounded protocol budget."));
+    this.buffer = Buffer.concat([this.buffer, Buffer.from(chunk)]);
+    let newline;
+    while ((newline = this.buffer.indexOf(10)) >= 0) {
+      if (newline > MAX_LINE_BYTES) return this.stop(new NativeExecutorError("NATIVE_LIMIT", "Codex exceeded the bounded protocol line size."));
+      const line = this.buffer.subarray(0, newline).toString("utf8").trim();
+      this.buffer = this.buffer.subarray(newline + 1);
+      if (!line) continue;
+      if (++this.events > MAX_EVENTS) return this.stop(new NativeExecutorError("NATIVE_LIMIT", "Codex exceeded the bounded event budget."));
+      let message;
+      try {
+        message = JSON.parse(line);
+      } catch {
+        return this.stop(new NativeExecutorError("NATIVE_PROTOCOL", "Codex emitted invalid protocol JSON."));
+      }
+      if (!message || typeof message !== "object" || Array.isArray(message)) return this.stop(new NativeExecutorError("NATIVE_PROTOCOL", "Codex emitted an invalid protocol message."));
+      if (Object.hasOwn(message, "id") && !message.method) {
+        const pending = this.pending.get(message.id);
+        if (pending) {
+          this.pending.delete(message.id);
+          clearTimeout(pending.timer);
+          if (message.error) pending.reject(rpcFailure(pending, message.error));
+          else if (Object.hasOwn(message, "result")) pending.resolve(message.result);
+          else pending.reject(new NativeExecutorError("NATIVE_PROTOCOL", "Codex emitted an invalid protocol response."));
+        }
+      } else {
+        try {
+          this.onMessage?.(message, this);
+        } catch (error) {
+          return this.stop(error instanceof NativeExecutorError ? error : new NativeExecutorError("NATIVE_PROTOCOL", "Cannot process a native protocol event."));
+        }
+      }
+      this.pulse();
+      if (this.failure) return;
+    }
+    if (this.buffer.length > MAX_LINE_BYTES) this.stop(new NativeExecutorError("NATIVE_LIMIT", "Codex exceeded the bounded protocol line size."));
+  }
+  send(message) {
+    if (this.failure || this.closed) throw this.failure || new NativeExecutorError("NATIVE_EXIT", "Codex app-server is unavailable.");
+    const line = `${JSON.stringify(message)}
+`;
+    if (Buffer.byteLength(line) > MAX_LINE_BYTES) fail2("INVALID_INPUT", "Native request exceeds its size limit.");
+    this.child.stdin.write(line);
+  }
+  request(method, params, timeoutMs = 1e4) {
+    return new Promise((resolve, reject2) => {
+      const id2 = ++this.nextId;
+      const timer = setTimeout(() => {
+        this.pending.delete(id2);
+        reject2(new NativeExecutorError("NATIVE_TIMEOUT", "Native protocol request timed out."));
+      }, timeoutMs);
+      this.pending.set(id2, { resolve, reject: reject2, timer, method, params: method === "thread/read" ? { threadId: params?.threadId, includeTurns: params?.includeTurns } : void 0 });
+      try {
+        this.send({ id: id2, method, params });
+      } catch (error) {
+        clearTimeout(timer);
+        this.pending.delete(id2);
+        reject2(error);
+      }
+    });
+  }
+  wait(revision, timeoutMs = 1e3) {
+    if (this.failure) return Promise.reject(this.failure);
+    if (this.revision !== revision) return Promise.resolve();
+    return new Promise((resolve) => {
+      const done = () => {
+        clearTimeout(timer);
+        this.waiters.delete(done);
+        resolve();
+      };
+      const timer = setTimeout(done, timeoutMs);
+      this.waiters.add(done);
+    });
+  }
+  async initialize() {
+    await this.request("initialize", { clientInfo: { name: "harzva_supervisor", title: "Harzva Supervisor", version: "0.2.1" }, capabilities: { experimentalApi: true } });
+    this.send({ method: "initialized", params: {} });
+  }
+  async close() {
+    if (this.closed) return;
+    this.child.stdin.end();
+    await new Promise((resolve) => {
+      const timer = setTimeout(() => {
+        this.child.kill("SIGTERM");
+        resolve();
+      }, 300);
+      this.child.once("close", () => {
+        clearTimeout(timer);
+        resolve();
+      });
+    });
+    if (!this.closed) {
+      this.child.kill("SIGKILL");
+      await new Promise((resolve) => {
+        const timer = setTimeout(resolve, 300);
+        this.child.once("close", () => {
+          clearTimeout(timer);
+          resolve();
+        });
+      });
+    }
+    this.stop(new NativeExecutorError("NATIVE_CLOSED", "Native protocol session closed."));
+  }
+};
+function rejectServerRequest(message, rpc) {
+  if (!Object.hasOwn(message, "id")) return;
+  if (message.method === "currentTime/read") rpc.send({ id: message.id, result: { currentTimeAt: Math.floor(Date.now() / 1e3) } });
+  else rpc.send({ id: message.id, error: { code: -32601, message: "Unattended native request is unsupported." } });
+}
+async function readQueue(rpc, threadId, requestTimeoutMs = 1e4) {
+  let cursor = null;
+  const queued = [];
+  for (let page = 0; page < 10; page += 1) {
+    const result2 = await rpc.request("thread/queue/list", { threadId, limit: 100, ...cursor ? { cursor } : {} }, requestTimeoutMs);
+    if (!Array.isArray(result2.data)) fail2("NATIVE_PROTOCOL", "Codex returned invalid queued receipts.");
+    for (const entry of result2.data) queued.push({ id: validId(entry.id, "queued submission ID"), marker: validId(entry.clientUserMessageId, "client message ID") });
+    cursor = result2.nextCursor;
+    if (!cursor) break;
+    if (page === 9 || typeof cursor !== "string" || cursor.length > 4096) fail2("NATIVE_LIMIT", "Native queue exceeds the bounded inspection limit.");
+  }
+  return queued;
+}
+async function readSnapshot(rpc, workspace, threadId, marker, turnId, requestTimeoutMs = 1e4) {
+  const read = await rpc.request("thread/read", { threadId, includeTurns: true }, requestTimeoutMs);
+  const thread = checkThread(read.thread, workspace, threadId);
+  if (!Array.isArray(thread.turns)) fail2("NATIVE_PROTOCOL", "Codex returned invalid native history.");
+  const queued = await readQueue(rpc, threadId, requestTimeoutMs);
+  const goalRead = await rpc.request("thread/goal/get", { threadId }, requestTimeoutMs);
+  const activeGoal = goalRead.goal && goalRead.goal.status === "active";
+  const turns = thread.turns.map((turn) => ({ ...normalizeTurn(turn), markerMatch: !!marker && Array.isArray(turn.items) && turn.items.some((item) => item.type === "userMessage" && item.clientId === marker) }));
+  const matching = turns.filter((turn) => turnId ? turn.id === turnId : turn.markerMatch);
+  if (matching.length > 1) fail2("NATIVE_DUPLICATE", "Multiple native turns contain the same dispatch marker.");
+  const matched = matching[0] || null;
+  if (turnId && marker && matched && !matched.markerMatch) fail2("NATIVE_CORRELATION", "Native turn does not contain the saved dispatch marker.");
+  const latest = turns.at(-1) || null;
+  const busy = thread.status.type === "active" || turns.some((turn) => turn.status === "inProgress");
+  return { thread, turns, latest, matched, queued, activeGoal: !!activeGoal, busy };
+}
+function snapshotView(snapshot4, marker) {
+  return {
+    threadId: snapshot4.thread.id,
+    state: ["systemError", "notLoaded"].includes(snapshot4.thread.status.type) ? "uncertain" : snapshot4.busy ? "busy" : "idle",
+    busy: snapshot4.busy,
+    nativeThreadStatus: snapshot4.thread.status.type,
+    // A fresh server's stored read is evidence, not proof that another native
+    // process no longer owns this thread. The parent must not auto retry an
+    // uncertain dispatch using this view.
+    statusSource: "native-thread-read",
+    turnId: snapshot4.matched?.id || null,
+    status: snapshot4.matched?.status || null,
+    latestTurnId: snapshot4.latest?.id || null,
+    latestTurnStatus: snapshot4.latest?.status || null,
+    marker: marker || null,
+    queuedSubmissionIds: snapshot4.queued.filter((entry) => !marker || entry.marker === marker).map((entry) => entry.id),
+    queuedCount: snapshot4.queued.length,
+    activeGoal: snapshot4.activeGoal,
+    summary: snapshot4.matched ? `Native turn ${snapshot4.matched.status}; acceptance requires separate verification.` : "No matching native turn was found.",
+    ...snapshot4.matched?.nativeError ? { nativeError: snapshot4.matched.nativeError } : {}
+  };
+}
+function createNativeExecutor({ spawnImpl = spawn, serverCommand = "codex", serverArgs = DEFAULT_ARGS, platform = process.platform, env = process.env, readProxy = readMacProxy } = {}) {
+  if (typeof spawnImpl !== "function" || typeof serverCommand !== "string" || !Array.isArray(serverArgs) || serverArgs.some((arg) => typeof arg !== "string")) fail2("INVALID_INPUT", "Invalid native adapter dependency injection.");
+  if (typeof platform !== "string" || !env || typeof env !== "object" || Array.isArray(env) || typeof readProxy !== "function") fail2("INVALID_INPUT", "Invalid native environment dependency injection.");
+  const dependencies = { spawnImpl, serverCommand, serverArgs: [...serverArgs], platform, env, readProxy };
+  async function models2({ workspace } = {}) {
+    workspace = workspacePath(workspace);
+    const rpc = new RpcSession(dependencies, workspace, rejectServerRequest);
+    try {
+      await rpc.initialize();
+      const config2 = await rpc.request("config/read", { cwd: workspace, includeLayers: false });
+      const configured = config2?.config?.model;
+      const configuredModel = configured === null || configured === void 0 ? null : modelId(configured);
+      const configuredEffort = config2?.config?.model_reasoning_effort;
+      const configuredReasoningEffort = configuredEffort === null || configuredEffort === void 0 ? null : reasoningEffort(configuredEffort, "NATIVE_PROTOCOL");
+      const catalog = [];
+      const ids = /* @__PURE__ */ new Set();
+      const cursors = /* @__PURE__ */ new Set();
+      let cursor = null;
+      for (let page = 0; page < 10; page += 1) {
+        const response = await rpc.request("model/list", { limit: 100, includeHidden: false, ...cursor ? { cursor } : {} });
+        if (!Array.isArray(response?.data) || response.data.length > 100) fail2("NATIVE_PROTOCOL", "Codex returned an invalid model catalog.");
+        for (const entry of response.data) {
+          if (typeof entry?.isDefault !== "boolean") fail2("NATIVE_PROTOCOL", "Codex returned an invalid public model label.");
+          const displayName = publicLabel(entry.displayName, 256, "model label");
+          const id2 = modelId(entry.id);
+          const model = modelId(entry.model);
+          if (ids.has(id2)) fail2("NATIVE_PROTOCOL", "Codex returned duplicate model catalog IDs.");
+          ids.add(id2);
+          if (!Array.isArray(entry.supportedReasoningEfforts) || !entry.supportedReasoningEfforts.length || entry.supportedReasoningEfforts.length > REASONING_EFFORTS.length) fail2("NATIVE_PROTOCOL", "Codex returned an invalid reasoning effort catalog.");
+          const efforts = /* @__PURE__ */ new Set();
+          const supportedReasoningEfforts = entry.supportedReasoningEfforts.map((option) => {
+            const effort = reasoningEffort(option?.reasoningEffort, "NATIVE_PROTOCOL");
+            if (efforts.has(effort)) fail2("NATIVE_PROTOCOL", "Codex returned duplicate reasoning effort options.");
+            efforts.add(effort);
+            return { reasoningEffort: effort, description: publicLabel(option.description, 1024, "reasoning description") };
+          });
+          const defaultReasoningEffort = reasoningEffort(entry.defaultReasoningEffort, "NATIVE_PROTOCOL");
+          if (!efforts.has(defaultReasoningEffort)) fail2("NATIVE_PROTOCOL", "Codex returned a reasoning default outside its supported options.");
+          catalog.push({ id: id2, model, isDefault: entry.isDefault, displayName, supportedReasoningEfforts, defaultReasoningEffort });
+        }
+        cursor = response.nextCursor;
+        if (!cursor) return { configuredModel, configuredReasoningEffort, models: catalog };
+        if (typeof cursor !== "string" || cursor.length > 4096 || cursors.has(cursor)) fail2("NATIVE_PROTOCOL", "Codex returned an invalid model catalog cursor.");
+        cursors.add(cursor);
+      }
+      fail2("NATIVE_LIMIT", "Native model catalog exceeds the bounded inspection limit.");
+    } finally {
+      await rpc.close();
+    }
+  }
+  async function inspect2({ workspace, threadId, turnId, marker } = {}) {
+    workspace = workspacePath(workspace);
+    validId(threadId, "native thread ID");
+    if (turnId !== void 0 && turnId !== null) validId(turnId, "native turn ID");
+    if (marker !== void 0 && marker !== null) validId(marker, "dispatch marker");
+    const rpc = new RpcSession(dependencies, workspace, rejectServerRequest);
+    try {
+      await rpc.initialize();
+      return snapshotView(await readSnapshot(rpc, workspace, threadId, marker, turnId), marker);
+    } finally {
+      await rpc.close();
+    }
+  }
+  async function execute2({ workspace, prompt, model, reasoningEffort: requestedEffort, threadId, marker = randomUUID2(), expectedPreviousTurnId, timeoutMs = 12e4, onThread, onDispatch, onQueued, onStarted, signal } = {}) {
+    workspace = workspacePath(workspace);
+    timeoutMs = timeoutValue(timeoutMs);
+    if (typeof prompt !== "string" || !prompt.trim() || Buffer.byteLength(prompt) > 256 * 1024) fail2("INVALID_INPUT", "Prompt must be nonempty and at most 256 KiB.");
+    if (model !== void 0) modelId(model);
+    if (requestedEffort !== void 0) reasoningEffort(requestedEffort);
+    validId(marker, "dispatch marker");
+    if (threadId !== void 0 && threadId !== null) validId(threadId, "native thread ID");
+    if (expectedPreviousTurnId !== void 0 && expectedPreviousTurnId !== null) validId(expectedPreviousTurnId, "previous native turn ID");
+    for (const [name, handler] of Object.entries({ onThread, onDispatch, onQueued, onStarted })) callback(handler, name);
+    if (signal && typeof signal.addEventListener !== "function") fail2("INVALID_INPUT", "Invalid abort signal.");
+    const state = { threadId: threadId || null, turnId: null, queuedSubmissionId: null, dispatched: false, needsAction: false, persistenceFailed: false, starts: /* @__PURE__ */ new Map(), terminals: /* @__PURE__ */ new Map(), errors: /* @__PURE__ */ new Map(), requests: [], startedSaved: false, transport: null, selection: null };
+    const deadline = Date.now() + timeoutMs;
+    let stopReason = null;
+    let stopResolve;
+    const stopped = new Promise((resolve) => {
+      stopResolve = resolve;
+    });
+    const stop = (reason) => {
+      if (!stopReason) {
+        stopReason = reason;
+        stopResolve();
+      }
+    };
+    const abort = () => stop("cancelled");
+    const timer = setTimeout(() => stop("timeout"), timeoutMs);
+    if (signal?.aborted) abort();
+    signal?.addEventListener("abort", abort, { once: true });
+    const guarded = (promise) => Promise.race([promise, stopped.then(() => {
+      throw new NativeExecutorError(stopReason === "timeout" ? "NATIVE_TIMEOUT" : "NATIVE_CANCELLED", "Native execution stopped before a confirmed result.");
+    })]);
+    const persist = async (handler, value) => {
+      if (!handler) return;
+      try {
+        await guarded(Promise.resolve().then(() => handler(value)));
+      } catch (error) {
+        if (stopReason) throw error;
+        state.persistenceFailed = true;
+        fail2("NATIVE_RECEIPT", "Cannot persist a native execution receipt.");
+      }
+    };
+    const cancelRequests = (rpc2) => {
+      for (const request of state.requests) {
+        if (request.handled || request.params?.threadId !== state.threadId || request.params?.turnId !== state.turnId || !state.turnId) continue;
+        request.handled = true;
+        state.needsAction = true;
+        if (["item/commandExecution/requestApproval", "item/fileChange/requestApproval"].includes(request.method)) rpc2.send({ id: request.id, result: { decision: "cancel" } });
+        else if (["execCommandApproval", "applyPatchApproval"].includes(request.method)) rpc2.send({ id: request.id, result: { decision: "abort" } });
+        else if (request.method === "item/permissions/requestApproval") rpc2.send({ id: request.id, result: { permissions: {}, scope: "turn" } });
+        else if (request.method === "item/tool/requestUserInput") rpc2.send({ id: request.id, result: { answers: {} } });
+        else if (request.method === "mcpServer/elicitation/request") rpc2.send({ id: request.id, result: { action: "cancel" } });
+        else rpc2.send({ id: request.id, error: { code: -32601, message: "Unattended native request is unsupported." } });
+      }
+    };
+    const correlate = (turnId, rpc2) => {
+      validId(turnId, "native turn ID");
+      if (state.turnId && state.turnId !== turnId) fail2("NATIVE_DUPLICATE", "Multiple native turns contain the same dispatch marker.");
+      state.turnId = turnId;
+      cancelRequests(rpc2);
+    };
+    const rpc = new RpcSession(dependencies, workspace, (message, session) => {
+      if (Object.hasOwn(message, "id")) {
+        if (message.method === "currentTime/read") return rejectServerRequest(message, session);
+        if (message.params?.threadId === state.threadId && state.dispatched) {
+          if (state.requests.length >= 32) fail2("NATIVE_LIMIT", "Codex exceeded the bounded request limit.");
+          state.requests.push({ id: message.id, method: message.method, params: { threadId: message.params.threadId, turnId: message.params.turnId }, handled: false });
+          cancelRequests(session);
+        } else rejectServerRequest(message, session);
+        return;
+      }
+      const params = message.params;
+      if (!params || params.threadId !== state.threadId || !state.dispatched) return;
+      if (message.method === "error") {
+        const nativeError = nativeErrorReceipt(params.error);
+        if (nativeError && state.errors.size < 32) state.errors.set(validId(params.turnId, "native turn ID"), nativeError);
+      }
+      if (["item/started", "item/completed"].includes(message.method) && params.item?.type === "userMessage" && params.item.clientId === marker) correlate(params.turnId, session);
+      if (["turn/started", "turn/completed"].includes(message.method)) {
+        const turn = normalizeTurn(params.turn);
+        if (state.starts.size >= 32 && !state.starts.has(turn.id)) fail2("NATIVE_LIMIT", "Codex exceeded the bounded turn limit.");
+        state.starts.set(turn.id, turn.status);
+        if (turn.nativeError) state.errors.set(turn.id, turn.nativeError);
+        if (TERMINAL.has(turn.status)) state.terminals.set(turn.id, turn.status);
+        if (Array.isArray(params.turn.items) && params.turn.items.some((item) => item.type === "userMessage" && item.clientId === marker)) correlate(turn.id, session);
+      }
+    });
+    const result2 = (status, summary) => ({ threadId: state.threadId, turnId: state.turnId, marker, queuedSubmissionId: state.queuedSubmissionId, status, summary, ...state.selection ? { selection: state.selection } : {}, ...state.turnId && state.errors.has(state.turnId) ? { nativeError: state.errors.get(state.turnId) } : {}, ...state.transport ? { transport: state.transport } : {} });
+    const ownMaterializationRace = (error) => state.dispatched && state.queuedSubmissionId && state.threadId && error instanceof NativeExecutorError && error.materializationThreadId === state.threadId && error.rpcMethod === "thread/read" && error.rpcCode === -32600;
+    async function reconcileLocal(requestTimeoutMs) {
+      const snapshot4 = await readSnapshot(rpc, workspace, state.threadId, marker, state.turnId, requestTimeoutMs);
+      if (snapshot4.matched) {
+        correlate(snapshot4.matched.id, rpc);
+        if (snapshot4.matched.nativeError) state.errors.set(snapshot4.matched.id, snapshot4.matched.nativeError);
+        if (TERMINAL.has(snapshot4.matched.status)) state.terminals.set(snapshot4.matched.id, snapshot4.matched.status);
+      }
+      return snapshot4;
+    }
+    async function stopOwnedWorkInner() {
+      if (!state.dispatched || !state.threadId || rpc.failure) return null;
+      try {
+        const snapshot4 = await reconcileLocal(1e3);
+        const matches = snapshot4.queued.filter((entry) => entry.marker === marker && (!state.queuedSubmissionId || entry.id === state.queuedSubmissionId));
+        if (matches.length > 1) return null;
+        for (const entry of matches) await rpc.request("thread/queue/delete", { threadId: state.threadId, queuedSubmissionId: entry.id }, 1500);
+        if (!state.turnId) return null;
+        const known = state.terminals.get(state.turnId);
+        if (known) return known;
+        await rpc.request("turn/interrupt", { threadId: state.threadId, turnId: state.turnId }, 1500);
+        const deadline2 = Date.now() + 1500;
+        while (Date.now() < deadline2) {
+          if (state.terminals.has(state.turnId)) return state.terminals.get(state.turnId);
+          const revision = rpc.revision;
+          await rpc.wait(revision, 100);
+        }
+        return (await reconcileLocal(1e3)).matched?.status || null;
+      } catch (error) {
+        if (!ownMaterializationRace(error) || rpc.failure) return null;
+        try {
+          const queued = await readQueue(rpc, state.threadId, 1e3);
+          const matches = queued.filter((entry) => entry.marker === marker && entry.id === state.queuedSubmissionId);
+          if (matches.length > 1) return null;
+          for (const entry of matches) await rpc.request("thread/queue/delete", { threadId: state.threadId, queuedSubmissionId: entry.id }, 1500);
+          if (!state.turnId) return null;
+          if (state.terminals.has(state.turnId)) return state.terminals.get(state.turnId);
+          await rpc.request("turn/interrupt", { threadId: state.threadId, turnId: state.turnId }, 1500);
+          const end = Date.now() + 1500;
+          while (Date.now() < end) {
+            if (state.terminals.has(state.turnId)) return state.terminals.get(state.turnId);
+            await rpc.wait(rpc.revision, 100);
+          }
+        } catch {
+        }
+        return null;
+      }
+    }
+    async function stopOwnedWork() {
+      let timer2;
+      try {
+        return await Promise.race([stopOwnedWorkInner(), new Promise((resolve) => {
+          timer2 = setTimeout(() => resolve(null), 5e3);
+        })]);
+      } finally {
+        clearTimeout(timer2);
+      }
+    }
+    try {
+      if (stopReason) return result2("interrupted", "Native execution cancelled before dispatch.");
+      await guarded(rpc.initialize());
+      if (state.threadId) {
+        const previous = await guarded(readSnapshot(rpc, workspace, state.threadId, marker));
+        if (previous.matched || previous.queued.length || previous.busy || previous.activeGoal || previous.thread.status.type === "systemError") return result2("needs-user-action", "Native thread has existing work; manual reconciliation is required before dispatch.");
+        if (expectedPreviousTurnId && previous.latest?.id !== expectedPreviousTurnId || previous.latest && (!expectedPreviousTurnId || !TERMINAL.has(previous.latest.status))) return result2("needs-user-action", "Native thread changed after the saved execution receipt.");
+      }
+      const controls = { cwd: workspace, runtimeWorkspaceRoots: [workspace], approvalPolicy: "on-request", approvalsReviewer: "user", sandbox: "workspace-write", allowProviderModelFallback: false, ...model === void 0 ? {} : { model }, ...requestedEffort === void 0 ? {} : { config: { model_reasoning_effort: requestedEffort } } };
+      const response = await guarded(rpc.request(state.threadId ? "thread/resume" : "thread/start", state.threadId ? { ...controls, threadId: state.threadId, excludeTurns: true } : { ...controls, ephemeral: false }));
+      const thread = checkThread(response.thread, workspace, state.threadId);
+      state.threadId = thread.id;
+      await persist(onThread, { threadId: state.threadId });
+      checkPermissions(response, workspace);
+      const actualModel = modelId(response.model);
+      if (model !== void 0 && response.model !== model) fail2("NATIVE_MODEL", "Codex did not retain the explicitly selected model.");
+      const actualEffort = response.reasoningEffort === null || response.reasoningEffort === void 0 ? null : reasoningEffort(response.reasoningEffort, "NATIVE_PROTOCOL");
+      if (requestedEffort !== void 0 && actualEffort !== requestedEffort) fail2("NATIVE_REASONING", "Codex did not retain the explicitly selected reasoning effort.");
+      state.selection = { model: actualModel, reasoningEffort: actualEffort };
+      if (thread.status.type !== "idle") return result2("needs-user-action", "Native thread is not idle before dispatch.");
+      await persist(onDispatch, { threadId: state.threadId, marker, selection: state.selection });
+      state.dispatched = true;
+      const added = await guarded(rpc.request("thread/queue/add", { threadId: state.threadId, clientUserMessageId: marker, input: [{ type: "text", text: prompt }] }));
+      if (!added?.queuedSubmission || added.queuedSubmission.clientUserMessageId !== marker) fail2("NATIVE_CORRELATION", "Codex returned a different queued dispatch receipt.");
+      state.queuedSubmissionId = validId(added.queuedSubmission.id, "queued submission ID");
+      await persist(onQueued, { threadId: state.threadId, marker, queuedSubmissionId: state.queuedSubmissionId });
+      let nextRead = Date.now() + STARTUP_READ_GRACE_MS;
+      let materializationRetries = 0;
+      while (true) {
+        if (rpc.failure) throw rpc.failure;
+        if (stopReason) throw new NativeExecutorError(stopReason === "timeout" ? "NATIVE_TIMEOUT" : "NATIVE_CANCELLED", "Native execution stopped before a confirmed result.");
+        if (state.turnId && !state.startedSaved) {
+          await persist(onStarted, { threadId: state.threadId, turnId: state.turnId });
+          state.startedSaved = true;
+        }
+        if (state.needsAction) {
+          await stopOwnedWork();
+          return result2("needs-user-action", "Native execution requires human approval or input; the request was cancelled without granting permissions.");
+        }
+        const terminal = state.turnId && state.terminals.get(state.turnId);
+        if (terminal) return result2(terminal, `Native turn ${terminal}; acceptance requires separate verification.`);
+        if (Date.now() >= nextRead) {
+          try {
+            await guarded(reconcileLocal());
+          } catch (error) {
+            if (ownMaterializationRace(error) && materializationRetries < MATERIALIZATION_READ_RETRIES && !stopReason && Date.now() < deadline) {
+              materializationRetries += 1;
+              nextRead = Math.min(Date.now() + 500, deadline);
+              continue;
+            }
+            throw error;
+          }
+          nextRead = Date.now() + 1e3;
+          continue;
+        }
+        const revision = rpc.revision;
+        await guarded(rpc.wait(revision, Math.min(1e3, nextRead - Date.now())));
+      }
+    } catch (error) {
+      state.transport = transportReceipt(error);
+      const stoppedStatus = await stopOwnedWork();
+      if (state.needsAction) return result2("needs-user-action", "Native execution requires human approval or input; no approval was granted.");
+      if (state.persistenceFailed) return result2(state.dispatched ? "uncertain" : "failed", "Native receipt persistence failed; manual recovery is required.");
+      if (state.dispatched) {
+        if (stopReason && TERMINAL.has(stoppedStatus)) return result2(stoppedStatus, `Native turn ${stoppedStatus} after ${stopReason}; acceptance requires separate verification.`);
+        return result2("uncertain", "Native dispatch may have run; inspect the saved marker before any further execution.");
+      }
+      return result2(stopReason ? "interrupted" : "failed", stopReason ? "Native execution stopped before dispatch." : "Native execution could not start with the requested protocol and permissions.");
+    } finally {
+      clearTimeout(timer);
+      signal?.removeEventListener("abort", abort);
+      await rpc.close();
+    }
+  }
+  async function verifyCommand2({ workspace, argv, timeoutMs = 12e4, signal } = {}) {
+    workspace = workspacePath(workspace);
+    timeoutMs = timeoutValue(timeoutMs);
+    if (!Array.isArray(argv) || !argv.length || argv.length > 64 || argv[0] === "" || argv.some((arg) => typeof arg !== "string" || arg.includes("\0") || Buffer.byteLength(arg) > 8192) || Buffer.byteLength(JSON.stringify(argv)) > 65536) fail2("INVALID_INPUT", "Verification requires a bounded, trusted argv vector.");
+    if (signal && typeof signal.addEventListener !== "function") fail2("INVALID_INPUT", "Invalid abort signal.");
+    let needsAction = false;
+    let stopReason = null;
+    let stopResolve;
+    let commandSent = false;
+    const processId = `supervisor-verify-${randomUUID2()}`;
+    const stopped = new Promise((resolve) => {
+      stopResolve = resolve;
+    });
+    const stop = (reason) => {
+      if (!stopReason) {
+        stopReason = reason;
+        stopResolve();
+      }
+    };
+    const abort = () => stop("cancelled");
+    const timer = setTimeout(() => stop("timeout"), timeoutMs);
+    signal?.addEventListener("abort", abort, { once: true });
+    if (signal?.aborted) abort();
+    const guarded = (promise) => Promise.race([promise, stopped.then(() => {
+      throw new NativeExecutorError("NATIVE_CANCELLED", "Native verification stopped before a confirmed result.");
+    })]);
+    const rpc = new RpcSession(dependencies, workspace, (message, session) => {
+      if (!Object.hasOwn(message, "id")) return;
+      if (message.method !== "currentTime/read") needsAction = true;
+      rejectServerRequest(message, session);
+    });
+    const stoppedReceipt = () => ({ status: commandSent ? "uncertain" : "interrupted", completionConfirmed: !commandSent, needsUserAction: commandSent, exitCode: null, outputBytes: 0, timedOut: stopReason === "timeout", cancelled: stopReason === "cancelled" });
+    async function stopCommand(execution) {
+      let completed = false;
+      execution.then(() => {
+        completed = true;
+      }, () => {
+      });
+      const deadline = Date.now() + 3e3;
+      while (!completed && !rpc.failure && Date.now() < deadline) {
+        try {
+          await rpc.request("command/exec/terminate", { processId }, Math.min(500, deadline - Date.now()));
+        } catch {
+        }
+        if (completed || rpc.failure) break;
+        await rpc.wait(rpc.revision, Math.min(50, Math.max(1, deadline - Date.now())));
+      }
+      return { ...stoppedReceipt(), status: completed ? "interrupted" : "uncertain", completionConfirmed: completed, needsUserAction: !completed };
+    }
+    try {
+      if (stopReason) return stoppedReceipt();
+      await guarded(rpc.initialize());
+      commandSent = true;
+      const execution = rpc.request("command/exec", { command: argv, processId, cwd: workspace, sandboxPolicy: { type: "workspaceWrite", writableRoots: [workspace], networkAccess: false, excludeSlashTmp: true, excludeTmpdirEnvVar: true }, timeoutMs, outputBytesCap: MAX_OUTPUT_BYTES }, timeoutMs + 5e3);
+      let executed;
+      try {
+        executed = await guarded(execution);
+      } catch (error) {
+        if (!stopReason) throw error;
+        return await stopCommand(execution);
+      }
+      if (stopReason || signal?.aborted) {
+        if (!stopReason) stop("cancelled");
+        return await stopCommand(execution);
+      }
+      if (needsAction) return { status: "needs-user-action", completionConfirmed: true, needsUserAction: true, exitCode: null, outputBytes: 0 };
+      if (!Number.isSafeInteger(executed?.exitCode) || typeof executed.stdout !== "string" || typeof executed.stderr !== "string" || Buffer.byteLength(executed.stdout) > MAX_OUTPUT_BYTES || Buffer.byteLength(executed.stderr) > MAX_OUTPUT_BYTES) fail2("NATIVE_PROTOCOL", "Codex returned an invalid verification receipt.");
+      const stdoutBytes = Buffer.byteLength(executed.stdout);
+      const stderrBytes = Buffer.byteLength(executed.stderr);
+      return { completionConfirmed: true, needsUserAction: false, exitCode: executed.exitCode, stdoutDigest: createHash("sha256").update(executed.stdout).digest("hex"), stderrDigest: createHash("sha256").update(executed.stderr).digest("hex"), outputBytes: stdoutBytes + stderrBytes, outputMayBeTruncated: stdoutBytes === MAX_OUTPUT_BYTES || stderrBytes === MAX_OUTPUT_BYTES, timedOut: executed.exitCode === 124 };
+    } catch (error) {
+      if (stopReason) return stoppedReceipt();
+      throw error;
+    } finally {
+      clearTimeout(timer);
+      signal?.removeEventListener("abort", abort);
+      await rpc.close();
+    }
+  }
+  return { execute: execute2, inspect: inspect2, verifyCommand: verifyCommand2, models: models2 };
+}
+var installedExecutor = createNativeExecutor();
+var execute = installedExecutor.execute;
+var inspect = installedExecutor.inspect;
+var verifyCommand = installedExecutor.verifyCommand;
+var models = installedExecutor.models;
+
+// plugins/codex-supervisor/scripts/execution-store.mjs
 var ID = /^[a-z0-9][a-z0-9_-]{0,63}$/i;
 var STATUSES = ["proposed", "authorized", "dispatching", "running", "verifying", "succeeded", "failed", "needs-user-action", "uncertain", "cancelling", "cancelled"];
 var ATTEMPT_STATUSES = STATUSES.filter((status) => !["proposed", "authorized"].includes(status));
-var TERMINAL = /* @__PURE__ */ new Set(["succeeded", "failed", "cancelled"]);
+var TERMINAL2 = /* @__PURE__ */ new Set(["succeeded", "failed", "cancelled"]);
 var TRANSITIONS = {
   proposed: ["authorized", "cancelled"],
   authorized: ["dispatching", "needs-user-action", "cancelled"],
@@ -38846,7 +39613,7 @@ function realWorkspace(workspace) {
 function relativeFileSegments(relativePath) {
   string3(relativePath, "Verification path", 512);
   const segments = relativePath.split("/");
-  if (path3.isAbsolute(relativePath) || /^[A-Za-z]:/.test(relativePath) || relativePath.includes("\\") || segments.some((part) => !part || part === "." || part === "..")) fail("UNSAFE_PATH", "Verification paths must be relative, without traversal.");
+  if (path4.isAbsolute(relativePath) || /^[A-Za-z]:/.test(relativePath) || relativePath.includes("\\") || segments.some((part) => !part || part === "." || part === "..")) fail("UNSAFE_PATH", "Verification paths must be relative, without traversal.");
   return segments;
 }
 function resolveWorkspaceFile(workspace, relativePath) {
@@ -38854,10 +39621,10 @@ function resolveWorkspaceFile(workspace, relativePath) {
   const segments = relativeFileSegments(relativePath);
   let target = root;
   for (let index = 0; index < segments.length; index += 1) {
-    target = path3.join(target, segments[index]);
+    target = path4.join(target, segments[index]);
     let stat;
     try {
-      stat = fs3.lstatSync(target);
+      stat = fs4.lstatSync(target);
     } catch (error) {
       if (error.code === "ENOENT") continue;
       fail("PATH_ACCESS", "Cannot inspect a verification path.");
@@ -38869,7 +39636,7 @@ function resolveWorkspaceFile(workspace, relativePath) {
   return target;
 }
 function validateProposal(input, workspace, { inspectPaths = true } = {}) {
-  object3(input, "Execution proposal", ["instruction", "successCriteria", "verification", "timeoutMs", "maxAttempts", "model"]);
+  object3(input, "Execution proposal", ["instruction", "successCriteria", "verification", "timeoutMs", "maxAttempts", "model", "reasoningEffort"]);
   const proposal = {
     instruction: string3(input.instruction, "Instruction", 8e3, { multiline: true }),
     successCriteria: strings(input.successCriteria, "Success criteria", 8, 800, 1),
@@ -38900,6 +39667,10 @@ function validateProposal(input, workspace, { inspectPaths = true } = {}) {
     } else fail("INVALID_EXECUTION", "Verification kind is unsupported.");
   }
   if (input.model !== void 0) proposal.model = string3(input.model, "Explicit model", 128);
+  if (input.reasoningEffort !== void 0) {
+    if (!REASONING_EFFORTS.includes(input.reasoningEffort)) fail("INVALID_EXECUTION", "Explicit reasoning effort is unsupported.");
+    proposal.reasoningEffort = input.reasoningEffort;
+  }
   if (Buffer.byteLength(JSON.stringify(proposal)) > 256 * 1024) fail("SIZE_LIMIT", "Execution proposal exceeds its size limit.");
   return proposal;
 }
@@ -38909,7 +39680,7 @@ function canonical(value) {
   return value;
 }
 function digestProposal(proposal) {
-  return createHash("sha256").update(JSON.stringify(canonical(proposal))).digest("hex");
+  return createHash2("sha256").update(JSON.stringify(canonical(proposal))).digest("hex");
 }
 function metadata(value, label) {
   if (!value || typeof value !== "object") fail("INVALID_EXECUTION", `${label} must be structured metadata.`);
@@ -38995,7 +39766,16 @@ function validateExecutionState(state, workspace) {
       previousTime = attempt.intentAt;
       receiptId(attempt.queuedSubmissionId, "Queued submission id");
       receiptId(attempt.turnId, "Turn id");
-      if (attempt.result !== void 0) metadata(attempt.result, "Attempt result");
+      if (attempt.result !== void 0) {
+        metadata(attempt.result, "Attempt result");
+        if (attempt.result.selection !== void 0) {
+          const selection = object3(attempt.result.selection, "Native selection receipt", ["model", "reasoningEffort"]);
+          string3(selection.model, "Confirmed native model", 200);
+          if (!/^[a-zA-Z0-9][a-zA-Z0-9_.:/-]{0,199}$/.test(selection.model)) fail("INVALID_EXECUTION", "Confirmed native model identifier is invalid.");
+          if (selection.reasoningEffort !== null && !REASONING_EFFORTS.includes(selection.reasoningEffort)) fail("INVALID_EXECUTION", "Confirmed native reasoning effort is unsupported.");
+          if (!Object.hasOwn(selection, "reasoningEffort") || job.proposal.model !== void 0 && selection.model !== job.proposal.model || job.proposal.reasoningEffort !== void 0 && selection.reasoningEffort !== job.proposal.reasoningEffort) fail("RECEIPT_CONFLICT", "Confirmed native selection differs from the authorized proposal.");
+        }
+      }
       if (index < job.attempts.length - 1 && attempt.status !== "failed") fail("INVALID_EXECUTION", "Only a failed attempt may precede another attempt.");
     }
     if (job.attempts.length && job.status !== job.attempts.at(-1).status && !(job.status === "cancelled" && job.attempts.at(-1).status === "failed")) fail("INVALID_EXECUTION", "Job status differs from its latest attempt receipt.");
@@ -39009,8 +39789,27 @@ function validateExecutionState(state, workspace) {
     }
   }
 }
+function jobById(state, jobId) {
+  id(jobId, "Job id");
+  if (!Object.hasOwn(state.jobs, jobId)) fail("MISSING_JOB", "Execution job does not exist.");
+  return state.jobs[jobId];
+}
+function touch(job) {
+  job.updatedAt = Math.max(Date.now(), job.updatedAt);
+}
 function transition(from, to) {
   if (from !== to && !TRANSITIONS[from]?.includes(to)) fail("JOB_STATUS", "Execution status transition is not allowed.");
+}
+function cancel(state, jobId) {
+  const job = jobById(state, jobId);
+  if (["cancelling", "cancelled"].includes(job.status)) return job;
+  const active = job.attempts.length && !TERMINAL2.has(job.attempts.at(-1).status);
+  const nextStatus = active ? "cancelling" : "cancelled";
+  transition(job.status, nextStatus);
+  job.status = nextStatus;
+  if (active) job.attempts.at(-1).status = nextStatus;
+  touch(job);
+  return job;
 }
 function validateChanges(before, after) {
   if (before.schemaVersion !== after.schemaVersion || before.workspace !== after.workspace || before.revision !== after.revision) fail("EXECUTION_IMMUTABLE", "Transaction cannot change the state schema, workspace or revision directly.");
@@ -39030,7 +39829,7 @@ function validateChanges(before, after) {
     }
     if (previous.authorization !== null && JSON.stringify(previous.authorization) !== JSON.stringify(next.authorization)) fail("AUTHORIZATION_IMMUTABLE", "An execution grant cannot be replaced or reset.");
     if (previous.threadId !== null && next.threadId !== previous.threadId) fail("RECEIPT_CONFLICT", "Execution thread identity cannot be replaced.");
-    if (TERMINAL.has(previous.status) && !(previous.status === "failed" && next.status === "dispatching") && JSON.stringify(previous.verification) !== JSON.stringify(next.verification)) fail("RECEIPT_IMMUTABLE", "Terminal verification receipts cannot be replaced.");
+    if (TERMINAL2.has(previous.status) && !(previous.status === "failed" && next.status === "dispatching") && JSON.stringify(previous.verification) !== JSON.stringify(next.verification)) fail("RECEIPT_IMMUTABLE", "Terminal verification receipts cannot be replaced.");
     if (next.attempts.length < previous.attempts.length) fail("RECEIPT_IMMUTABLE", "Attempt history cannot be removed.");
     transition(previous.status, next.status);
     for (let index = 0; index < previous.attempts.length; index += 1) {
@@ -39038,8 +39837,9 @@ function validateChanges(before, after) {
       const newAttempt = next.attempts[index];
       if (newAttempt.status === "cancelled" && !["cancelling", "cancelled"].includes(oldAttempt.status)) fail("JOB_STATUS", "Active cancellation requires prior cancelling intent.");
       for (const key of ["id", "number", "intentAt"]) if (oldAttempt[key] !== newAttempt[key]) fail("RECEIPT_IMMUTABLE", "Attempt identity and intent cannot be replaced.");
-      if (TERMINAL.has(oldAttempt.status) && JSON.stringify(oldAttempt) !== JSON.stringify(newAttempt)) fail("RECEIPT_IMMUTABLE", "Terminal attempt receipts cannot be replaced.");
+      if (TERMINAL2.has(oldAttempt.status) && JSON.stringify(oldAttempt) !== JSON.stringify(newAttempt)) fail("RECEIPT_IMMUTABLE", "Terminal attempt receipts cannot be replaced.");
       for (const key of ["queuedSubmissionId", "turnId"]) if (oldAttempt[key] !== null && newAttempt[key] !== oldAttempt[key]) fail("RECEIPT_CONFLICT", "Submission and turn identities cannot be replaced.");
+      if (oldAttempt.result?.selection && JSON.stringify(canonical(oldAttempt.result.selection)) !== JSON.stringify(canonical(newAttempt.result?.selection))) fail("RECEIPT_CONFLICT", "Confirmed native model and reasoning receipts cannot be replaced.");
       transition(oldAttempt.status, newAttempt.status);
     }
     if (next.updatedAt < previous.updatedAt) fail("INVALID_EXECUTION", "Job update timestamp cannot move backwards.");
@@ -39055,14 +39855,14 @@ var ExecutionStore = class {
   constructor(workspace) {
     this.workspace = realWorkspace(workspace);
     const paths = workspacePaths(this.workspace);
-    this.paths = { ...paths, state: path3.join(paths.root, "execution.v1.json"), lock: path3.join(paths.root, ".execution.lock") };
+    this.paths = { ...paths, state: path4.join(paths.root, "execution.v1.json"), lock: path4.join(paths.root, ".execution.lock") };
     this.checkPaths();
   }
   checkPaths(create = false) {
     workspacePaths(this.workspace, create);
     for (const file of [this.paths.state, this.paths.lock]) {
       try {
-        const stat = fs3.lstatSync(file);
+        const stat = fs4.lstatSync(file);
         if (stat.isSymbolicLink() || !stat.isFile()) fail("UNSAFE_PATH", "Execution files must be regular files, without symlinks.");
       } catch (error) {
         if (error instanceof SupervisorError) throw error;
@@ -39101,10 +39901,118 @@ var ExecutionStore = class {
   }
 };
 
-// plugins/codex-supervisor/scripts/supervisor.mjs
-import { createHash as createHash2 } from "node:crypto";
-import path4 from "node:path";
+// plugins/codex-supervisor/scripts/settings.mjs
+import fs5 from "node:fs";
+import path5 from "node:path";
 import { pathToFileURL } from "node:url";
+var MAX_BYTES = 4096;
+var EFFORTS = /* @__PURE__ */ new Set(["none", "minimal", "low", "medium", "high", "xhigh", "max", "ultra"]);
+var FIELDS2 = ["schemaVersion", "workspace", "revision", "mode", "model", "reasoningEffort", "updatedAt"];
+function pathsFor2(workspace, create = false) {
+  const paths = workspacePaths(workspace, create);
+  const result2 = { ...paths, state: path5.join(paths.root, "settings.v1.json"), lock: path5.join(paths.root, ".settings.lock") };
+  for (const target of [result2.state, result2.lock]) {
+    try {
+      const stat = fs5.lstatSync(target);
+      if (stat.isSymbolicLink() || !stat.isFile()) fail("UNSAFE_PATH", "Execution settings paths must be regular files, without symlinks.");
+    } catch (error) {
+      if (error instanceof SupervisorError) throw error;
+      if (error.code !== "ENOENT") fail("PATH_ACCESS", "Cannot inspect execution settings.");
+    }
+  }
+  return result2;
+}
+function validateSelection(input) {
+  if (!["default", "custom"].includes(input.mode)) fail("INVALID_SETTINGS", "Unsupported execution model mode.");
+  if (input.mode === "default") {
+    if (input.model !== null || input.reasoningEffort !== null) fail("INVALID_SETTINGS", "Default mode resolves the model and effort from the native catalog.");
+  } else {
+    if (typeof input.model !== "string" || !/^[a-zA-Z0-9][a-zA-Z0-9_.:/-]{0,127}$/.test(input.model)) fail("INVALID_SETTINGS", "An explicit native model is required.");
+    if (input.reasoningEffort !== null && !EFFORTS.has(input.reasoningEffort)) fail("INVALID_SETTINGS", "Unsupported reasoning effort.");
+  }
+}
+function validate2(state, workspace) {
+  if (!state || typeof state !== "object" || Array.isArray(state) || Object.keys(state).some((key) => !FIELDS2.includes(key))) fail("INVALID_SETTINGS", "Execution settings contain unknown fields.");
+  if (state.schemaVersion !== 1) fail("UNKNOWN_SCHEMA", "Unsupported execution settings schema; preserve it for migration.");
+  if (state.workspace !== workspace) fail("WORKSPACE_BINDING", "Execution settings belong to another workspace.");
+  if (!Number.isSafeInteger(state.revision) || state.revision < 1 || !Number.isSafeInteger(state.updatedAt) || state.updatedAt < 0) fail("INVALID_SETTINGS", "Invalid execution settings revision.");
+  validateSelection(state);
+}
+function snapshot2(paths) {
+  pathsFor2(paths.workspace);
+  let fd;
+  try {
+    fd = fs5.openSync(paths.state, fs5.constants.O_RDONLY | fs5.constants.O_NOFOLLOW);
+    const stat = fs5.fstatSync(fd);
+    if (!stat.isFile()) fail("UNSAFE_PATH", "Execution settings must be a regular file.");
+    if (stat.size > MAX_BYTES) fail("SIZE_LIMIT", "Execution settings exceed the size limit.");
+    const bytes = Buffer.alloc(MAX_BYTES + 1);
+    const length = fs5.readSync(fd, bytes, 0, bytes.length, 0);
+    if (length > MAX_BYTES) fail("SIZE_LIMIT", "Execution settings exceed the size limit.");
+    let state;
+    try {
+      state = JSON.parse(bytes.subarray(0, length).toString("utf8"));
+    } catch {
+      fail("INVALID_JSON", "Execution settings are not valid JSON.");
+    }
+    validate2(state, paths.workspace);
+    return state;
+  } catch (error) {
+    if (error instanceof SupervisorError) throw error;
+    if (error.code === "ENOENT") return null;
+    fail("PATH_ACCESS", "Cannot read execution settings.");
+  } finally {
+    if (fd !== void 0) fs5.closeSync(fd);
+  }
+}
+function publicSettings(state) {
+  return { mode: state?.mode ?? "default", model: state?.model ?? null, reasoningEffort: state?.reasoningEffort ?? null, revision: state?.revision ?? 0, configured: state !== null };
+}
+function readExecutionSettings(workspace) {
+  return publicSettings(snapshot2(pathsFor2(workspace)));
+}
+function setExecutionSettings(workspace, input) {
+  if (!input || typeof input !== "object" || Array.isArray(input) || Object.keys(input).some((key) => !["mode", "model", "reasoningEffort", "expectedRevision"].includes(key))) fail("INVALID_SETTINGS", "Invalid execution settings input.");
+  validateSelection(input);
+  if (!Number.isSafeInteger(input.expectedRevision) || input.expectedRevision < 0) fail("INVALID_SETTINGS", "Expected settings revision must be a nonnegative safe integer.");
+  const paths = pathsFor2(workspace, true);
+  return withStateLock(paths, () => {
+    const current = snapshot2(paths);
+    const revision = current?.revision ?? 0;
+    if (input.expectedRevision !== revision) fail("STALE_SETTINGS", "Execution settings changed; refresh before saving.");
+    if (current && ["mode", "model", "reasoningEffort"].every((key) => current[key] === input[key])) return publicSettings(current);
+    if (revision >= Number.MAX_SAFE_INTEGER) fail("REVISION_LIMIT", "Settings revision is exhausted; preserve the file for migration.");
+    const state = { schemaVersion: 1, workspace: paths.workspace, revision: revision + 1, mode: input.mode, model: input.model, reasoningEffort: input.reasoningEffort, updatedAt: Math.max(Date.now(), current?.updatedAt ?? 0) };
+    pathsFor2(paths.workspace);
+    writeState(paths, state, validate2);
+    return publicSettings(state);
+  });
+}
+function resolveSelection(settings, proposal, catalog) {
+  const list2 = catalog?.models;
+  if (!Array.isArray(list2) || !list2.length) fail("MODEL_CATALOG_UNAVAILABLE", "The native model catalog is unavailable.");
+  const requested = proposal.model ?? (settings.mode === "custom" ? settings.model : list2.find((entry2) => entry2.isDefault)?.model);
+  const entry = list2.find((entry2) => entry2.model === requested);
+  if (!entry) fail("MODEL_UNAVAILABLE", "The selected model is unavailable in the native execution catalog.");
+  const requestedEffort = proposal.reasoningEffort ?? (settings.mode === "custom" && settings.model === requested ? settings.reasoningEffort : null) ?? entry.defaultReasoningEffort;
+  if (!EFFORTS.has(requestedEffort) || !entry.supportedReasoningEfforts?.some((item) => item.reasoningEffort === requestedEffort)) fail("REASONING_UNAVAILABLE", "The selected reasoning effort is unavailable for this model.");
+  return { ...proposal, model: entry.model, reasoningEffort: requestedEffort };
+}
+if (process.argv[1] && path5.basename(process.argv[1]) === "settings.mjs" && import.meta.url === pathToFileURL(path5.resolve(process.argv[1])).href) {
+  try {
+    const args = process.argv.slice(2);
+    if (args.length !== 3 || args[0] !== "show" || args[1] !== "--workspace") fail("USAGE", "Usage: node scripts/settings.mjs show --workspace <project>");
+    process.stdout.write(JSON.stringify(readExecutionSettings(args[2]), null, 2) + "\n");
+  } catch (error) {
+    process.stderr.write(JSON.stringify({ error: { code: error instanceof SupervisorError ? error.code : "SETTINGS_FAILED" } }) + "\n");
+    process.exitCode = 1;
+  }
+}
+
+// plugins/codex-supervisor/scripts/supervisor.mjs
+import { createHash as createHash3 } from "node:crypto";
+import path6 from "node:path";
+import { pathToFileURL as pathToFileURL2 } from "node:url";
 
 // plugins/codex-supervisor/runtime/mentor-registry.mjs
 var DEFAULT_PALETTE = Object.freeze([
@@ -39583,7 +40491,7 @@ ${items(data.blockers)}
 
 This local record does not change native Goals, select a provider model, create a thread, or send a message.
 `;
-  return { markdown, digest: createHash2("sha256").update(markdown).digest("hex") };
+  return { markdown, digest: createHash3("sha256").update(markdown).digest("hex") };
 }
 function assign(state, taskId, input) {
   object4(input, "Assignment input", ["primaryMentorId", "collaboratorIds", "tags", "agentPreset"]);
@@ -39677,7 +40585,7 @@ function run(argv) {
     return { taskId, revision: state.revision, digest, path: target, checkpointSequence: task.checkpointSequence };
   });
 }
-if (process.argv[1] && path4.basename(process.argv[1]) === "supervisor.mjs" && import.meta.url === pathToFileURL(path4.resolve(process.argv[1])).href) {
+if (process.argv[1] && path6.basename(process.argv[1]) === "supervisor.mjs" && import.meta.url === pathToFileURL2(path6.resolve(process.argv[1])).href) {
   try {
     if (Number(process.versions.node.split(".")[0]) < 22) fail("NODE_VERSION", "Codex Supervisor requires Node.js >= 22.");
     const result2 = run(process.argv.slice(2));
@@ -39692,9 +40600,9 @@ if (process.argv[1] && path4.basename(process.argv[1]) === "supervisor.mjs" && i
 }
 
 // plugins/codex-supervisor/server/bindings.mjs
-import fs4 from "node:fs";
-import path5 from "node:path";
-import { randomUUID as randomUUID3 } from "node:crypto";
+import fs6 from "node:fs";
+import path7 from "node:path";
+import { randomUUID as randomUUID4 } from "node:crypto";
 var UUID = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
 var MAX_BINDINGS = 100;
 var MAX_REGISTRY_BYTES = 512 * 1024;
@@ -39712,12 +40620,12 @@ function fields(value, names) {
   return value && typeof value === "object" && !Array.isArray(value) && Object.keys(value).every((key) => names.includes(key));
 }
 function absolute(value, code = "INVALID_WORKSPACE") {
-  if (typeof value !== "string" || value.length > PATH_LIMIT || !path5.isAbsolute(value) || value !== path5.resolve(value) || /[\u0000-\u001f\u007f]/.test(value)) reject(code);
+  if (typeof value !== "string" || value.length > PATH_LIMIT || !path7.isAbsolute(value) || value !== path7.resolve(value) || /[\u0000-\u001f\u007f]/.test(value)) reject(code);
   return value;
 }
 function statOrNull2(target) {
   try {
-    return fs4.lstatSync(target);
+    return fs6.lstatSync(target);
   } catch (error) {
     if (error.code === "ENOENT") return null;
     reject("PATH_ACCESS");
@@ -39725,13 +40633,13 @@ function statOrNull2(target) {
 }
 function directoryPath(target, create = false) {
   absolute(target);
-  let current = path5.parse(target).root;
-  for (const part of target.slice(current.length).split(path5.sep).filter(Boolean)) {
-    current = path5.join(current, part);
+  let current = path7.parse(target).root;
+  for (const part of target.slice(current.length).split(path7.sep).filter(Boolean)) {
+    current = path7.join(current, part);
     let stat = statOrNull2(current);
     if (!stat && create) {
       try {
-        fs4.mkdirSync(current, { mode: 448 });
+        fs6.mkdirSync(current, { mode: 448 });
       } catch (error) {
         if (error.code !== "EEXIST") reject("PATH_ACCESS");
       }
@@ -39742,7 +40650,7 @@ function directoryPath(target, create = false) {
   return Boolean(statOrNull2(target));
 }
 function under(target, root) {
-  return target === root || target.startsWith(`${root}${path5.sep}`);
+  return target === root || target.startsWith(`${root}${path7.sep}`);
 }
 function threadContext(meta) {
   return meta && typeof meta === "object" && typeof meta.threadId === "string" && UUID.test(meta.threadId) ? meta.threadId.toLowerCase() : null;
@@ -39756,15 +40664,15 @@ var BindingRegistry = class {
     if (!dataDirectory || !pluginRoot) reject("DATA_UNAVAILABLE");
     try {
       this.root = absolute(dataDirectory, "DATA_UNAVAILABLE");
-      this.pluginRoot = fs4.realpathSync(absolute(pluginRoot));
-      if (this.root === path5.parse(this.root).root || under(this.root, this.pluginRoot)) reject("UNSAFE_DATA");
+      this.pluginRoot = fs6.realpathSync(absolute(pluginRoot));
+      if (this.root === path7.parse(this.root).root || under(this.root, this.pluginRoot)) reject("UNSAFE_DATA");
       directoryPath(this.root);
     } catch (error) {
       if (error instanceof PanelError) throw error;
       reject("DATA_UNAVAILABLE");
     }
-    this.file = path5.join(this.root, "bindings.v1.json");
-    this.lock = path5.join(this.root, ".bindings.lock");
+    this.file = path7.join(this.root, "bindings.v1.json");
+    this.lock = path7.join(this.root, ".bindings.lock");
   }
   validate(state) {
     if (!fields(state, ["schemaVersion", "bindings"]) || state.schemaVersion !== 1 || !Array.isArray(state.bindings) || state.bindings.length > MAX_BINDINGS) reject("INVALID_REGISTRY");
@@ -39787,12 +40695,12 @@ var BindingRegistry = class {
     if (stat.isSymbolicLink() || !stat.isFile()) reject("UNSAFE_PATH");
     let fd;
     try {
-      fd = fs4.openSync(this.file, fs4.constants.O_RDONLY | fs4.constants.O_NOFOLLOW);
-      const opened = fs4.fstatSync(fd);
+      fd = fs6.openSync(this.file, fs6.constants.O_RDONLY | fs6.constants.O_NOFOLLOW);
+      const opened = fs6.fstatSync(fd);
       if (!opened.isFile()) reject("UNSAFE_PATH");
       if (opened.size > MAX_REGISTRY_BYTES) reject("SIZE_LIMIT");
       const bytes = Buffer.alloc(MAX_REGISTRY_BYTES + 1);
-      const length = fs4.readSync(fd, bytes, 0, bytes.length, 0);
+      const length = fs6.readSync(fd, bytes, 0, bytes.length, 0);
       if (length > MAX_REGISTRY_BYTES) reject("SIZE_LIMIT");
       let state;
       try {
@@ -39806,7 +40714,7 @@ var BindingRegistry = class {
       if (error instanceof PanelError) throw error;
       reject("PATH_ACCESS");
     } finally {
-      if (fd !== void 0) fs4.closeSync(fd);
+      if (fd !== void 0) fs6.closeSync(fd);
     }
   }
   list(ownerThreadId) {
@@ -39825,7 +40733,7 @@ var BindingRegistry = class {
     if (!directoryPath(workspace)) reject("INVALID_WORKSPACE");
     let real;
     try {
-      real = fs4.realpathSync(workspace);
+      real = fs6.realpathSync(workspace);
     } catch {
       reject("INVALID_WORKSPACE");
     }
@@ -39839,7 +40747,7 @@ var BindingRegistry = class {
     directoryPath(this.root, true);
     let fd;
     try {
-      fd = fs4.openSync(this.lock, fs4.constants.O_WRONLY | fs4.constants.O_CREAT | fs4.constants.O_EXCL | fs4.constants.O_NOFOLLOW, 384);
+      fd = fs6.openSync(this.lock, fs6.constants.O_WRONLY | fs6.constants.O_CREAT | fs6.constants.O_EXCL | fs6.constants.O_NOFOLLOW, 384);
     } catch (error) {
       if (error.code === "EEXIST") reject("BINDING_BUSY");
       reject("PATH_ACCESS");
@@ -39847,38 +40755,38 @@ var BindingRegistry = class {
     let temporary;
     let temporaryFd;
     try {
-      fs4.writeFileSync(fd, JSON.stringify({ pid: process.pid }));
-      fs4.fsyncSync(fd);
+      fs6.writeFileSync(fd, JSON.stringify({ pid: process.pid }));
+      fs6.fsyncSync(fd);
       const state = this.read();
       const existing = state.bindings.find((entry2) => entry2.ownerThreadId === ownerThreadId && entry2.workspace === workspace);
       if (existing) return existing;
       if (state.bindings.length >= MAX_BINDINGS) reject("BINDING_LIMIT");
-      const entry = { id: randomUUID3(), ownerThreadId, workspace, label: path5.basename(workspace).slice(0, 128) || workspace };
+      const entry = { id: randomUUID4(), ownerThreadId, workspace, label: path7.basename(workspace).slice(0, 128) || workspace };
       state.bindings.push(entry);
       this.validate(state);
       const source = `${JSON.stringify(state, null, 2)}
 `;
       if (Buffer.byteLength(source) > MAX_REGISTRY_BYTES) reject("SIZE_LIMIT");
-      temporary = path5.join(this.root, `.bindings-${randomUUID3()}.tmp`);
-      temporaryFd = fs4.openSync(temporary, fs4.constants.O_WRONLY | fs4.constants.O_CREAT | fs4.constants.O_EXCL | fs4.constants.O_NOFOLLOW, 384);
-      fs4.writeFileSync(temporaryFd, source);
-      fs4.fsyncSync(temporaryFd);
-      fs4.closeSync(temporaryFd);
+      temporary = path7.join(this.root, `.bindings-${randomUUID4()}.tmp`);
+      temporaryFd = fs6.openSync(temporary, fs6.constants.O_WRONLY | fs6.constants.O_CREAT | fs6.constants.O_EXCL | fs6.constants.O_NOFOLLOW, 384);
+      fs6.writeFileSync(temporaryFd, source);
+      fs6.fsyncSync(temporaryFd);
+      fs6.closeSync(temporaryFd);
       temporaryFd = void 0;
       directoryPath(this.root);
       const target = statOrNull2(this.file);
       if (target && (target.isSymbolicLink() || !target.isFile())) reject("UNSAFE_PATH");
-      fs4.renameSync(temporary, this.file);
+      fs6.renameSync(temporary, this.file);
       temporary = void 0;
       return entry;
     } catch (error) {
       if (error instanceof PanelError) throw error;
       reject("REGISTRY_WRITE");
     } finally {
-      if (temporaryFd !== void 0) fs4.closeSync(temporaryFd);
-      if (temporary && statOrNull2(temporary)) fs4.unlinkSync(temporary);
-      fs4.closeSync(fd);
-      fs4.unlinkSync(this.lock);
+      if (temporaryFd !== void 0) fs6.closeSync(temporaryFd);
+      if (temporary && statOrNull2(temporary)) fs6.unlinkSync(temporary);
+      fs6.closeSync(fd);
+      fs6.unlinkSync(this.lock);
     }
   }
 };
@@ -39886,10 +40794,10 @@ var BindingRegistry = class {
 // plugins/codex-supervisor/server/panel-server.mjs
 var PANEL_URI = "ui://harzva-supervisor/panel";
 var PANEL_MIME = "text/html;profile=mcp-app";
-var VERSION = "0.3.0";
+var VERSION = "0.4.0";
 var MAX_RESOURCE_BYTES = 512 * 1024;
-var pluginRootDefault = path6.resolve(path6.dirname(fileURLToPath(import.meta.url)), "..");
-var SAFE_STATE_ERRORS = /* @__PURE__ */ new Set(["NOT_INITIALIZED", "STALE_CONTROL", "UNSAFE_PATH", "PATH_ACCESS", "WORKSPACE", "WORKSPACE_BINDING", "SIZE_LIMIT", "UNKNOWN_SCHEMA", "INVALID_CONTROL", "LOCKED", "REVISION_LIMIT"]);
+var pluginRootDefault = path8.resolve(path8.dirname(fileURLToPath(import.meta.url)), "..");
+var SAFE_STATE_ERRORS = /* @__PURE__ */ new Set(["NOT_INITIALIZED", "STALE_CONTROL", "STALE_SETTINGS", "UNSAFE_PATH", "PATH_ACCESS", "WORKSPACE", "WORKSPACE_BINDING", "SIZE_LIMIT", "UNKNOWN_SCHEMA", "INVALID_CONTROL", "INVALID_SETTINGS", "LOCKED", "REVISION_LIMIT", "MODEL_CATALOG_UNAVAILABLE", "MODEL_UNAVAILABLE", "REASONING_UNAVAILABLE"]);
 var ERROR_CODES = [.../* @__PURE__ */ new Set([
   "INVALID_WORKSPACE",
   "PATH_ACCESS",
@@ -39926,6 +40834,30 @@ var publicBindingSchema = {
   required: ["id", "label", "workspace"],
   additionalProperties: false
 };
+var nullableString = { anyOf: [{ type: "null" }, { type: "string" }] };
+var settingsSchema = {
+  type: "object",
+  additionalProperties: false,
+  required: ["mode", "model", "reasoningEffort", "revision", "configured"],
+  properties: { mode: { enum: ["default", "custom"] }, model: nullableString, reasoningEffort: nullableString, revision: { type: "integer", minimum: 0 }, configured: { type: "boolean" } }
+};
+var catalogSchema = { anyOf: [{ type: "null" }, {
+  type: "object",
+  additionalProperties: false,
+  required: ["configuredModel", "models"],
+  properties: {
+    configuredModel: nullableString,
+    configuredReasoningEffort: nullableString,
+    models: { type: "array", maxItems: 1e3, items: { type: "object", additionalProperties: false, required: ["id", "model", "displayName", "isDefault", "supportedReasoningEfforts", "defaultReasoningEffort"], properties: {
+      id: { type: "string" },
+      model: { type: "string" },
+      displayName: { type: "string" },
+      isDefault: { type: "boolean" },
+      defaultReasoningEffort: { type: "string" },
+      supportedReasoningEfforts: { type: "array", maxItems: 8, items: { type: "object", additionalProperties: false, required: ["reasoningEffort", "description"], properties: { reasoningEffort: { type: "string" }, description: { type: "string" } } } }
+    } } }
+  }
+}] };
 var snapshotSchema = {
   type: "object",
   additionalProperties: false,
@@ -39936,13 +40868,16 @@ var snapshotSchema = {
     binding: { anyOf: [{ type: "null" }, {
       type: "object",
       additionalProperties: false,
-      required: ["id", "label", "workspace", "control", "initialized", "mentorCount", "jobs"],
+      required: ["id", "label", "workspace", "control", "initialized", "mentorCount", "jobs", "executionSettings", "catalog", "conversationModelAvailable"],
       properties: {
         ...publicBindingSchema.properties,
         control: { type: "object", additionalProperties: false, required: ["workspace", "enabled", "revision", "configured"], properties: { workspace: { type: "string" }, enabled: { type: "boolean" }, revision: { type: "integer", minimum: 0 }, configured: { type: "boolean" } } },
+        executionSettings: settingsSchema,
+        catalog: catalogSchema,
+        conversationModelAvailable: { const: false },
         initialized: { type: "boolean" },
         mentorCount: { type: "integer", minimum: 0, maximum: 40 },
-        jobs: { type: "array", maxItems: 100, items: { type: "object", additionalProperties: false, required: ["id", "status", "authorized", "attemptCount"], properties: { id: { type: "string" }, status: { type: "string", enum: ["proposed", "authorized", "dispatching", "running", "verifying", "succeeded", "failed", "needs-user-action", "uncertain", "cancelling", "cancelled"] }, authorized: { type: "boolean" }, attemptCount: { type: "integer", minimum: 0, maximum: 3 }, checkpointSequence: { type: "integer", minimum: 0 } } } }
+        jobs: { type: "array", maxItems: 100, items: { type: "object", additionalProperties: false, required: ["id", "status", "authorized", "attemptCount", "requestedModel", "requestedReasoningEffort", "actualModel", "actualReasoningEffort"], properties: { id: { type: "string" }, status: { type: "string", enum: ["proposed", "authorized", "dispatching", "running", "verifying", "succeeded", "failed", "needs-user-action", "uncertain", "cancelling", "cancelled"] }, authorized: { type: "boolean" }, attemptCount: { type: "integer", minimum: 0, maximum: 3 }, checkpointSequence: { type: "integer", minimum: 0 }, requestedModel: nullableString, requestedReasoningEffort: nullableString, actualModel: nullableString, actualReasoningEffort: nullableString } } }
       }
     }] }
   }
@@ -39992,7 +40927,24 @@ var PANEL_TOOLS = [
     outputSchema,
     annotations: writeAnnotations,
     _meta: appMeta
-  }
+  },
+  { name: "supervisor_models", title: "Read execution models", description: "Read the native execution model catalog and supported reasoning efforts for the bound workspace. It does not run a model.", inputSchema: bindingSchema, outputSchema, annotations: readAnnotations, _meta: appMeta },
+  {
+    name: "supervisor_set_execution",
+    title: "Save execution settings",
+    description: "Save model and reasoning defaults for new proposals only. Existing authorized jobs retain their immutable settings.",
+    inputSchema: { type: "object", additionalProperties: false, required: ["bindingId", "mode", "model", "reasoningEffort", "expectedRevision"], properties: {
+      bindingId: { type: "string", format: "uuid" },
+      mode: { enum: ["default", "custom"] },
+      model: nullableString,
+      reasoningEffort: nullableString,
+      expectedRevision: { type: "integer", minimum: 0, maximum: Number.MAX_SAFE_INTEGER }
+    } },
+    outputSchema,
+    annotations: writeAnnotations,
+    _meta: appMeta
+  },
+  { name: "supervisor_stop", title: "Stop workspace execution", description: "Disable new dispatch and request cancellation of authorized or active Supervisor jobs in this bound workspace. Pending cancellation is not proof of termination.", inputSchema: bindingSchema, outputSchema, annotations: writeAnnotations, _meta: appMeta }
 ];
 function argumentsFor(value, required2) {
   const input = value ?? {};
@@ -40014,25 +40966,26 @@ function summarize(entry) {
   }
   const execution = new ExecutionStore(entry.workspace).snapshot();
   const jobs = Object.values(execution.jobs).map((job) => {
-    const result2 = { id: job.id, status: job.status, authorized: job.authorization !== null, attemptCount: job.attempts.length };
+    const selection = job.attempts.at(-1)?.result?.selection;
+    const result2 = { id: job.id, status: job.status, authorized: job.authorization !== null, attemptCount: job.attempts.length, requestedModel: job.proposal.model ?? null, requestedReasoningEffort: job.proposal.reasoningEffort ?? null, actualModel: selection?.model ?? null, actualReasoningEffort: selection?.reasoningEffort ?? null };
     const sequence = job.attempts.at(-1)?.result?.checkpointSequence;
     if (Number.isSafeInteger(sequence) && sequence >= 0) result2.checkpointSequence = sequence;
     return result2;
   });
-  return { ...publicBinding(entry), control: readControl(entry.workspace), initialized, mentorCount, jobs };
+  return { ...publicBinding(entry), control: readControl(entry.workspace), initialized, mentorCount, jobs, executionSettings: readExecutionSettings(entry.workspace), catalog: null, conversationModelAvailable: false };
 }
-function snapshot2(registry2, owner, entry = null) {
+function snapshot3(registry2, owner, entry = null, catalog = null) {
   const bindings = registry2.list(owner);
-  return { schemaVersion: 1, bindings: bindings.map(publicBinding), binding: entry ? summarize(entry) : null };
+  return { schemaVersion: 1, bindings: bindings.map(publicBinding), binding: entry ? { ...summarize(entry), catalog } : null };
 }
-function result(snapshot3) {
-  return { content: [{ type: "text", text: JSON.stringify(snapshot3) }], structuredContent: snapshot3 };
+function result(snapshot4) {
+  return { content: [{ type: "text", text: JSON.stringify(snapshot4) }], structuredContent: snapshot4 };
 }
 function errorResult(error) {
   const code = error instanceof PanelError && SAFE_ERRORS.has(error.code) ? error.code : error instanceof SupervisorError && SAFE_STATE_ERRORS.has(error.code) ? error.code : "PANEL_STATE_UNAVAILABLE";
   return { isError: true, content: [{ type: "text", text: JSON.stringify({ error: { code } }) }], structuredContent: { error: { code } } };
 }
-function createPanelServer({ dataDirectory = process.env.HARZVA_SUPERVISOR_DATA, pluginRoot = pluginRootDefault, htmlPath = path6.join(pluginRoot, "ui", "panel.html") } = {}) {
+function createPanelServer({ dataDirectory = process.env.HARZVA_SUPERVISOR_DATA, pluginRoot = pluginRootDefault, htmlPath = path8.join(pluginRoot, "ui", "panel.html"), modelReader = models } = {}) {
   const server = new Server({ name: "harzva-supervisor-panel", version: VERSION }, { capabilities: { tools: {}, resources: {} } });
   server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: structuredClone(PANEL_TOOLS) }));
   server.setRequestHandler(ListResourcesRequestSchema, async () => ({ resources: [{ uri: PANEL_URI, name: "Supervisor", mimeType: PANEL_MIME }] }));
@@ -40040,18 +40993,18 @@ function createPanelServer({ dataDirectory = process.env.HARZVA_SUPERVISOR_DATA,
     if (request.params.uri !== PANEL_URI) throw new Error("RESOURCE_NOT_FOUND");
     let html;
     try {
-      const stat = fs5.lstatSync(htmlPath);
+      const stat = fs7.lstatSync(htmlPath);
       if (stat.isSymbolicLink() || !stat.isFile() || stat.size > MAX_RESOURCE_BYTES) throw new Error("RESOURCE_UNAVAILABLE");
-      const fd = fs5.openSync(htmlPath, fs5.constants.O_RDONLY | fs5.constants.O_NOFOLLOW);
+      const fd = fs7.openSync(htmlPath, fs7.constants.O_RDONLY | fs7.constants.O_NOFOLLOW);
       try {
-        const opened = fs5.fstatSync(fd);
+        const opened = fs7.fstatSync(fd);
         if (!opened.isFile() || opened.size > MAX_RESOURCE_BYTES) throw new Error("RESOURCE_UNAVAILABLE");
         const bytes = Buffer.alloc(MAX_RESOURCE_BYTES + 1);
-        const length = fs5.readSync(fd, bytes, 0, bytes.length, 0);
+        const length = fs7.readSync(fd, bytes, 0, bytes.length, 0);
         if (length > MAX_RESOURCE_BYTES) throw new Error("RESOURCE_UNAVAILABLE");
         html = bytes.subarray(0, length).toString("utf8");
       } finally {
-        fs5.closeSync(fd);
+        fs7.closeSync(fd);
       }
     } catch {
       throw new Error("RESOURCE_UNAVAILABLE");
@@ -40068,25 +41021,54 @@ function createPanelServer({ dataDirectory = process.env.HARZVA_SUPERVISOR_DATA,
         const bindings = registry3.list(owner);
         const entry = bindings.at(-1) ?? null;
         if (entry) registry3.get(owner, entry.id);
-        return result(snapshot2(registry3, owner, entry));
+        return result(snapshot3(registry3, owner, entry));
       }
       if (!owner) reject("THREAD_CONTEXT_REQUIRED");
       const registry2 = new BindingRegistry(dataDirectory, pluginRoot);
       if (request.params.name === "supervisor_bind_workspace") {
         const input = argumentsFor(request.params.arguments, ["workspace"]);
         const entry = registry2.bind(owner, input.workspace);
-        return result(snapshot2(registry2, owner, entry));
+        return result(snapshot3(registry2, owner, entry));
       }
       if (request.params.name === "supervisor_status") {
         const input = argumentsFor(request.params.arguments, ["bindingId"]);
-        return result(snapshot2(registry2, owner, registry2.get(owner, input.bindingId)));
+        return result(snapshot3(registry2, owner, registry2.get(owner, input.bindingId)));
       }
       if (request.params.name === "supervisor_set_enabled") {
         const input = argumentsFor(request.params.arguments, ["bindingId", "enabled", "expectedRevision"]);
         if (typeof input.enabled !== "boolean" || !Number.isSafeInteger(input.expectedRevision) || input.expectedRevision < 0) reject("INVALID_ARGUMENTS");
         const entry = registry2.get(owner, input.bindingId);
         setControl(entry.workspace, { enabled: input.enabled, expectedRevision: input.expectedRevision });
-        return result(snapshot2(registry2, owner, entry));
+        return result(snapshot3(registry2, owner, entry));
+      }
+      if (request.params.name === "supervisor_models" || request.params.name === "supervisor_set_execution") {
+        const saving = request.params.name === "supervisor_set_execution";
+        const input = argumentsFor(request.params.arguments, saving ? ["bindingId", "mode", "model", "reasoningEffort", "expectedRevision"] : ["bindingId"]);
+        const entry = registry2.get(owner, input.bindingId);
+        if (saving && (!["default", "custom"].includes(input.mode) || !Number.isSafeInteger(input.expectedRevision) || input.expectedRevision < 0 || input.mode === "default" && (input.model !== null || input.reasoningEffort !== null))) reject("INVALID_ARGUMENTS");
+        let catalog;
+        try {
+          catalog = await modelReader({ workspace: entry.workspace });
+        } catch {
+          reject("MODEL_CATALOG_UNAVAILABLE");
+        }
+        registry2.get(owner, input.bindingId);
+        if (saving) {
+          resolveSelection(input, {}, catalog);
+          setExecutionSettings(entry.workspace, { mode: input.mode, model: input.model, reasoningEffort: input.reasoningEffort, expectedRevision: input.expectedRevision });
+        }
+        return result(snapshot3(registry2, owner, entry, catalog));
+      }
+      if (request.params.name === "supervisor_stop") {
+        const input = argumentsFor(request.params.arguments, ["bindingId"]);
+        const entry = registry2.get(owner, input.bindingId);
+        setControl(entry.workspace, { enabled: false });
+        const store = new ExecutionStore(entry.workspace);
+        const cancellable = /* @__PURE__ */ new Set(["authorized", "dispatching", "running", "verifying", "failed", "needs-user-action", "uncertain", "cancelling"]);
+        if (Object.values(store.snapshot().jobs).some((job) => cancellable.has(job.status))) store.mutate((state) => {
+          for (const job of Object.values(state.jobs)) if (cancellable.has(job.status)) cancel(state, job.id);
+        });
+        return result(snapshot3(registry2, owner, entry));
       }
       reject("UNKNOWN_TOOL");
     } catch (error) {
@@ -40100,7 +41082,7 @@ async function startPanelServer(options) {
   await server.connect(new StdioServerTransport());
   return server;
 }
-if (process.argv[1] && import.meta.url === pathToFileURL2(path6.resolve(process.argv[1])).href) {
+if (process.argv[1] && import.meta.url === pathToFileURL3(path8.resolve(process.argv[1])).href) {
   startPanelServer().catch(() => {
     process.stderr.write("Supervisor panel unavailable.\n");
     process.exitCode = 1;

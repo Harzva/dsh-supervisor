@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "installedVersion": "0.4.0+codex.20261017144756",
+  "success": true,
+  "realCodexDesktopClick": false,
+  "testHost": {
+    "kind": "isolated-loopback-browser",
+    "realCodexDesktopClick": false,
+    "officialAppBridge": true,
+    "officialPostMessageTransport": true,
+    "mcpClient": "official-sdk",
+    "ownerContext": "random test UUID, distinct from real Codex chats",
+    "iframeSandbox": "allow-scripts",
+    "listener": "127.0.0.1",
+    "authenticatedPost": true
+  },
+  "checks": {
+    "unauthorizedPostRejected": true,
+    "explicitWorkspaceBindingWithoutInitialization": true,
+    "offSaved": true,
+    "onSaved": true,
+    "refreshRestoresDurableState": true,
+    "keyboardSpaceSwitch": true,
+    "nativeCatalogAndDefaultSettingSaved": true,
+    "explicitModelAndSupportedEffortSaved": true,
+    "staleSettingsRejectedAndStopStillAvailable": true,
+    "stopWithEmptyOrStaleListClosesGate": true,
+    "staleRevisionRejectedWithoutOptimisticFlip": true,
+    "staleSwitchDisabledUntilRefresh": true,
+    "staleRefreshAndSubsequentSave": true,
+    "reopenRestoresBindingAndSavedSwitch": true,
+    "jobRequestedModelVisibleWithoutFalseActualClaim": true,
+    "hostThemeChange": true,
+    "mobile390NoHorizontalOverflow": {
+      "viewportWidth": 390,
+      "documentScrollWidth": 390,
+      "bodyScrollWidth": 390,
+      "overflow": []
+    },
+    "waitingJobCancelledViaActualInstalledPanel": true,
+    "noInferenceOrExternalBrowserRequests": true,
+    "noRawErrors": {
+      "mcpProtocol": 0,
+      "page": 0,
+      "bridge": 0,
+      "http": 0,
+      "console": 0,
+      "stderrBytes": 0
+    }
+  },
+  "checkCount": 20,
+  "htmlSha256": "31998115a3b2303a1db9fa57ce6208288cd66dd1dbaf6aa67fe190a3467c79a2",
+  "runtimeSha256": "c70c8bca5366f0d1ef234e01749e019107ea9c63867610a3084acbd5ce5326aa",
+  "selectedExecution": {
+    "model": "gpt-5.6-terra",
+    "reasoningEffort": "high"
+  },
+  "visualReview": {
+    "passed": true,
+    "reviewer": "CX Luna",
+    "finalInstalledScreenshots": true,
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "width": 390,
+    "staleStopStillAvailable": true
+  },
+  "screenshots": [
+    {
+      "theme": "light",
+      "width": 900,
+      "state": null,
+      "file": "ui-model-panel-harness-light.png"
+    },
+    {
+      "theme": "light",
+      "width": 900,
+      "state": "stale-revision-message",
+      "file": "ui-model-panel-harness-stale.png"
+    },
+    {
+      "theme": "dark",
+      "width": 900,
+      "state": null,
+      "file": "ui-model-panel-harness-dark.png"
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "state": null,
+      "file": "ui-model-panel-harness-mobile-dark.png"
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "state": null,
+      "file": "ui-model-panel-harness-mobile-light.png"
+    }
+  ]
+}

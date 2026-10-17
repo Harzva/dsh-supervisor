@@ -1,0 +1,13 @@
+{
+  "baseVersion": "0.4.0",
+  "installedVersion": "0.4.0+codex.20261017144756",
+  "files": 22,
+  "cacheMatchesDevelopmentSource": true,
+  "basePackageExactFiles": 20,
+  "manifestDifference": "cachebuster version only",
+  "runtimeEquivalentToVerifiedExecutionPackage": true,
+  "executedCacheVersion": "0.4.0+codex.20261017144223",
+  "testedCachePrunedBySupportedReinstall": true,
+  "runtimeSha256": "c70c8bca5366f0d1ef234e01749e019107ea9c63867610a3084acbd5ce5326aa",
+  "htmlSha256": "31998115a3b2303a1db9fa57ce6208288cd66dd1dbaf6aa67fe190a3467c79a2"
+}

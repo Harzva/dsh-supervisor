@@ -10,10 +10,13 @@ const MAX_LINE_BYTES = 2 * 1024 * 1024
 const MAX_READ_BYTES = 16 * 1024 * 1024
 const MAX_EVENTS = 20000
 const MAX_OUTPUT_BYTES = 64 * 1024
+// The installed host exposes this bounded set. Each model advertises its own
+// supported subset; unknown future values require an explicit adapter update.
+export const REASONING_EFFORTS = Object.freeze(['none', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max', 'ultra'])
 const TERMINAL = new Set(['completed', 'failed', 'interrupted'])
 const RPC_METHODS = new Set(['initialize', 'config/read', 'model/list', 'thread/start', 'thread/resume', 'thread/read', 'thread/queue/add', 'thread/queue/list', 'thread/queue/delete', 'thread/goal/get', 'turn/interrupt', 'command/exec', 'command/exec/terminate'])
 const RPC_CODES = new Set([-32700, -32600, -32601, -32602, -32603])
-const TRANSPORT_CODES = new Set(['INVALID_INPUT', 'NATIVE_PROTOCOL', 'NATIVE_WORKSPACE', 'NATIVE_PERMISSIONS', 'NATIVE_OWNERSHIP', 'NATIVE_START', 'NATIVE_LIMIT', 'NATIVE_IO', 'NATIVE_EXIT', 'NATIVE_RPC', 'NATIVE_TIMEOUT', 'NATIVE_CLOSED', 'NATIVE_DUPLICATE', 'NATIVE_CORRELATION', 'NATIVE_RECEIPT', 'NATIVE_CANCELLED', 'NATIVE_MODEL'])
+const TRANSPORT_CODES = new Set(['INVALID_INPUT', 'NATIVE_PROTOCOL', 'NATIVE_WORKSPACE', 'NATIVE_PERMISSIONS', 'NATIVE_OWNERSHIP', 'NATIVE_START', 'NATIVE_LIMIT', 'NATIVE_IO', 'NATIVE_EXIT', 'NATIVE_RPC', 'NATIVE_TIMEOUT', 'NATIVE_CLOSED', 'NATIVE_DUPLICATE', 'NATIVE_CORRELATION', 'NATIVE_RECEIPT', 'NATIVE_CANCELLED', 'NATIVE_MODEL', 'NATIVE_REASONING'])
 const STARTUP_READ_GRACE_MS = 2000
 const MATERIALIZATION_READ_RETRIES = 3
 const SIMPLE_NATIVE_ERRORS = new Set(['contextWindowExceeded', 'sessionBudgetExceeded', 'usageLimitExceeded', 'serverOverloaded', 'cyberPolicy', 'misalignmentPolicyViolation', 'internalServerError', 'unauthorized', 'badRequest', 'threadRollbackFailed', 'sandboxError', 'other'])
@@ -44,6 +47,14 @@ function validId(value, name) {
 }
 function modelId(value) {
   if (typeof value !== 'string' || !/^[a-zA-Z0-9][a-zA-Z0-9_.:/-]{0,199}$/.test(value)) fail('INVALID_INPUT', 'Invalid native model identifier.')
+  return value
+}
+function reasoningEffort(value, code = 'INVALID_INPUT') {
+  if (!REASONING_EFFORTS.includes(value)) fail(code, 'Unsupported native reasoning effort.')
+  return value
+}
+function publicLabel(value, maximum, label) {
+  if (typeof value !== 'string' || !value.trim() || value.length > maximum || /[\u0000-\u001f\u007f]/.test(value)) fail('NATIVE_PROTOCOL', `Codex returned an invalid public ${label}.`)
   return value
 }
 function workspacePath(value) {
@@ -372,6 +383,8 @@ export function createNativeExecutor({ spawnImpl = spawn, serverCommand = 'codex
       const config = await rpc.request('config/read', { cwd: workspace, includeLayers: false })
       const configured = config?.config?.model
       const configuredModel = configured === null || configured === undefined ? null : modelId(configured)
+      const configuredEffort = config?.config?.model_reasoning_effort
+      const configuredReasoningEffort = configuredEffort === null || configuredEffort === undefined ? null : reasoningEffort(configuredEffort, 'NATIVE_PROTOCOL')
       const catalog = []
       const ids = new Set()
       const cursors = new Set()
@@ -380,15 +393,26 @@ export function createNativeExecutor({ spawnImpl = spawn, serverCommand = 'codex
         const response = await rpc.request('model/list', { limit: 100, includeHidden: false, ...(cursor ? { cursor } : {}) })
         if (!Array.isArray(response?.data) || response.data.length > 100) fail('NATIVE_PROTOCOL', 'Codex returned an invalid model catalog.')
         for (const entry of response.data) {
-          if (typeof entry?.displayName !== 'string' || entry.displayName.length > 256 || /[\u0000-\u001f\u007f]/.test(entry.displayName) || typeof entry.isDefault !== 'boolean') fail('NATIVE_PROTOCOL', 'Codex returned an invalid public model label.')
+          if (typeof entry?.isDefault !== 'boolean') fail('NATIVE_PROTOCOL', 'Codex returned an invalid public model label.')
+          const displayName = publicLabel(entry.displayName, 256, 'model label')
           const id = modelId(entry.id)
           const model = modelId(entry.model)
           if (ids.has(id)) fail('NATIVE_PROTOCOL', 'Codex returned duplicate model catalog IDs.')
           ids.add(id)
-          catalog.push({ id, model, isDefault: entry.isDefault, displayName: entry.displayName })
+          if (!Array.isArray(entry.supportedReasoningEfforts) || !entry.supportedReasoningEfforts.length || entry.supportedReasoningEfforts.length > REASONING_EFFORTS.length) fail('NATIVE_PROTOCOL', 'Codex returned an invalid reasoning effort catalog.')
+          const efforts = new Set()
+          const supportedReasoningEfforts = entry.supportedReasoningEfforts.map(option => {
+            const effort = reasoningEffort(option?.reasoningEffort, 'NATIVE_PROTOCOL')
+            if (efforts.has(effort)) fail('NATIVE_PROTOCOL', 'Codex returned duplicate reasoning effort options.')
+            efforts.add(effort)
+            return { reasoningEffort: effort, description: publicLabel(option.description, 1024, 'reasoning description') }
+          })
+          const defaultReasoningEffort = reasoningEffort(entry.defaultReasoningEffort, 'NATIVE_PROTOCOL')
+          if (!efforts.has(defaultReasoningEffort)) fail('NATIVE_PROTOCOL', 'Codex returned a reasoning default outside its supported options.')
+          catalog.push({ id, model, isDefault: entry.isDefault, displayName, supportedReasoningEfforts, defaultReasoningEffort })
         }
         cursor = response.nextCursor
-        if (!cursor) return { configuredModel, models: catalog }
+        if (!cursor) return { configuredModel, configuredReasoningEffort, models: catalog }
         if (typeof cursor !== 'string' || cursor.length > 4096 || cursors.has(cursor)) fail('NATIVE_PROTOCOL', 'Codex returned an invalid model catalog cursor.')
         cursors.add(cursor)
       }
@@ -408,17 +432,18 @@ export function createNativeExecutor({ spawnImpl = spawn, serverCommand = 'codex
     } finally { await rpc.close() }
   }
 
-  async function execute({ workspace, prompt, model, threadId, marker = randomUUID(), expectedPreviousTurnId, timeoutMs = 120000, onThread, onDispatch, onQueued, onStarted, signal } = {}) {
+  async function execute({ workspace, prompt, model, reasoningEffort: requestedEffort, threadId, marker = randomUUID(), expectedPreviousTurnId, timeoutMs = 120000, onThread, onDispatch, onQueued, onStarted, signal } = {}) {
     workspace = workspacePath(workspace)
     timeoutMs = timeoutValue(timeoutMs)
     if (typeof prompt !== 'string' || !prompt.trim() || Buffer.byteLength(prompt) > 256 * 1024) fail('INVALID_INPUT', 'Prompt must be nonempty and at most 256 KiB.')
     if (model !== undefined) modelId(model)
+    if (requestedEffort !== undefined) reasoningEffort(requestedEffort)
     validId(marker, 'dispatch marker')
     if (threadId !== undefined && threadId !== null) validId(threadId, 'native thread ID')
     if (expectedPreviousTurnId !== undefined && expectedPreviousTurnId !== null) validId(expectedPreviousTurnId, 'previous native turn ID')
     for (const [name, handler] of Object.entries({ onThread, onDispatch, onQueued, onStarted })) callback(handler, name)
     if (signal && typeof signal.addEventListener !== 'function') fail('INVALID_INPUT', 'Invalid abort signal.')
-    const state = { threadId: threadId || null, turnId: null, queuedSubmissionId: null, dispatched: false, needsAction: false, persistenceFailed: false, starts: new Map(), terminals: new Map(), errors: new Map(), requests: [], startedSaved: false, transport: null }
+    const state = { threadId: threadId || null, turnId: null, queuedSubmissionId: null, dispatched: false, needsAction: false, persistenceFailed: false, starts: new Map(), terminals: new Map(), errors: new Map(), requests: [], startedSaved: false, transport: null, selection: null }
     const deadline = Date.now() + timeoutMs
     let stopReason = null
     let stopResolve
@@ -482,7 +507,7 @@ export function createNativeExecutor({ spawnImpl = spawn, serverCommand = 'codex
         if (Array.isArray(params.turn.items) && params.turn.items.some(item => item.type === 'userMessage' && item.clientId === marker)) correlate(turn.id, session)
       }
     })
-    const result = (status, summary) => ({ threadId: state.threadId, turnId: state.turnId, marker, queuedSubmissionId: state.queuedSubmissionId, status, summary, ...(state.turnId && state.errors.has(state.turnId) ? { nativeError: state.errors.get(state.turnId) } : {}), ...(state.transport ? { transport: state.transport } : {}) })
+    const result = (status, summary) => ({ threadId: state.threadId, turnId: state.turnId, marker, queuedSubmissionId: state.queuedSubmissionId, status, summary, ...(state.selection ? { selection: state.selection } : {}), ...(state.turnId && state.errors.has(state.turnId) ? { nativeError: state.errors.get(state.turnId) } : {}), ...(state.transport ? { transport: state.transport } : {}) })
     const ownMaterializationRace = error => state.dispatched && state.queuedSubmissionId && state.threadId && error instanceof NativeExecutorError && error.materializationThreadId === state.threadId && error.rpcMethod === 'thread/read' && error.rpcCode === -32600
 
     async function reconcileLocal(requestTimeoutMs) {
@@ -555,15 +580,23 @@ export function createNativeExecutor({ spawnImpl = spawn, serverCommand = 'codex
         if (previous.matched || previous.queued.length || previous.busy || previous.activeGoal || previous.thread.status.type === 'systemError') return result('needs-user-action', 'Native thread has existing work; manual reconciliation is required before dispatch.')
         if ((expectedPreviousTurnId && previous.latest?.id !== expectedPreviousTurnId) || (previous.latest && (!expectedPreviousTurnId || !TERMINAL.has(previous.latest.status)))) return result('needs-user-action', 'Native thread changed after the saved execution receipt.')
       }
-      const controls = { cwd: workspace, runtimeWorkspaceRoots: [workspace], approvalPolicy: 'on-request', approvalsReviewer: 'user', sandbox: 'workspace-write', allowProviderModelFallback: false, ...(model === undefined ? {} : { model }) }
+      const controls = { cwd: workspace, runtimeWorkspaceRoots: [workspace], approvalPolicy: 'on-request', approvalsReviewer: 'user', sandbox: 'workspace-write', allowProviderModelFallback: false, ...(model === undefined ? {} : { model }), ...(requestedEffort === undefined ? {} : { config: { model_reasoning_effort: requestedEffort } }) }
       const response = await guarded(rpc.request(state.threadId ? 'thread/resume' : 'thread/start', state.threadId ? { ...controls, threadId: state.threadId, excludeTurns: true } : { ...controls, ephemeral: false }))
       const thread = checkThread(response.thread, workspace, state.threadId)
       state.threadId = thread.id
+      // Save ownership even if native settings were replaced. Selection is only
+      // confirmed once the response passes both exact-match checks below.
       await persist(onThread, { threadId: state.threadId })
       checkPermissions(response, workspace)
+      const actualModel = modelId(response.model)
       if (model !== undefined && response.model !== model) fail('NATIVE_MODEL', 'Codex did not retain the explicitly selected model.')
+      const actualEffort = response.reasoningEffort === null || response.reasoningEffort === undefined ? null : reasoningEffort(response.reasoningEffort, 'NATIVE_PROTOCOL')
+      if (requestedEffort !== undefined && actualEffort !== requestedEffort) fail('NATIVE_REASONING', 'Codex did not retain the explicitly selected reasoning effort.')
+      // An older response may omit reasoningEffort. Keep it unknown, never infer
+      // an actual value from a requested/default setting.
+      state.selection = { model: actualModel, reasoningEffort: actualEffort }
       if (thread.status.type !== 'idle') return result('needs-user-action', 'Native thread is not idle before dispatch.')
-      await persist(onDispatch, { threadId: state.threadId, marker })
+      await persist(onDispatch, { threadId: state.threadId, marker, selection: state.selection })
       // queue/add is itself dispatch-capable. The durable intent barrier must
       // precede it. clientUserMessageId correlates receipts; it is NOT a native
       // idempotency key. Never blindly retry this call or use turn/start.

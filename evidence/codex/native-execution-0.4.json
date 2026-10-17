@@ -1,0 +1,74 @@
+{
+  "version": "0.4.0+codex.20261017144223",
+  "nativeQueueUsed": true,
+  "inferenceTurnsMax": 2,
+  "inferenceTurnsDispatched": 2,
+  "rawLogsPersisted": false,
+  "cancellation": {
+    "attempted": true,
+    "realInstalledMcpServer": true,
+    "sdkTransport": "stdio",
+    "ownedRandomBinding": true,
+    "requestIssued": true,
+    "startedReceiptSavedBeforeStop": true,
+    "dispatchGateClosed": true,
+    "immediateStatus": "cancelling",
+    "status": "cancelled",
+    "attemptCount": 1,
+    "nativeThreadConfirmed": true,
+    "nativeQueueConfirmed": true,
+    "nativeTurnConfirmed": true,
+    "actualSelection": {
+      "model": "gpt-5.6-sol",
+      "reasoningEffort": "medium"
+    },
+    "selectionMatches": true,
+    "nativeStatus": "interrupted",
+    "transport": {
+      "code": "NATIVE_CANCELLED"
+    },
+    "nativeError": null,
+    "verificationPassed": false,
+    "verificationCount": 0,
+    "passedChecks": 0,
+    "checkpointSequence": null,
+    "artifactAbsentAtObservation": true,
+    "noAcceptanceAfterStop": true,
+    "successfulRecordPreserved": true,
+    "panelFinalStatus": "cancelled"
+  },
+  "phase": "installed-cancellation-finished",
+  "selectedModel": "gpt-5.6-sol",
+  "selectedReasoningEffort": "medium",
+  "catalogModelCount": 3,
+  "settings": {
+    "mode": "custom",
+    "model": "gpt-5.6-sol",
+    "reasoningEffort": "medium",
+    "revision": 1,
+    "configured": true
+  },
+  "execution": {
+    "status": "succeeded",
+    "attemptCount": 1,
+    "nativeThreadConfirmed": true,
+    "nativeQueueConfirmed": true,
+    "nativeTurnConfirmed": true,
+    "actualSelection": {
+      "model": "gpt-5.6-sol",
+      "reasoningEffort": "medium"
+    },
+    "selectionMatches": true,
+    "nativeStatus": "completed",
+    "transport": null,
+    "nativeError": null,
+    "verificationPassed": true,
+    "verificationCount": 2,
+    "passedChecks": 2,
+    "checkpointSequence": 1,
+    "progressCheckpointConfirmed": true,
+    "exactArtifactConfirmed": true,
+    "artifactSha256": "2a49e17194da3ce79291e373923730834cf1bdb2ed2a46b41e34a6fc6d8fb0bf"
+  },
+  "completed": true
+}

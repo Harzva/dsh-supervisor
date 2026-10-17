@@ -5,17 +5,19 @@ import { Server } from '@modelcontextprotocol/sdk/server/index.js'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { CallToolRequestSchema, ListToolsRequestSchema, ListResourcesRequestSchema, ReadResourceRequestSchema } from '@modelcontextprotocol/sdk/types.js'
 import { readControl, setControl } from '../scripts/control.mjs'
-import { ExecutionStore } from '../scripts/execution-store.mjs'
+import { ExecutionStore, cancel } from '../scripts/execution-store.mjs'
+import { models as nativeModels } from '../scripts/native-executor.mjs'
+import { readExecutionSettings, setExecutionSettings, resolveSelection } from '../scripts/settings.mjs'
 import { run as supervisor } from '../scripts/supervisor.mjs'
 import { SupervisorError } from '../scripts/state.mjs'
 import { BindingRegistry, PanelError, reject, threadContext } from './bindings.mjs'
 
 export const PANEL_URI = 'ui://harzva-supervisor/panel'
 export const PANEL_MIME = 'text/html;profile=mcp-app'
-const VERSION = '0.3.0'
+const VERSION = '0.4.0'
 const MAX_RESOURCE_BYTES = 512 * 1024
 const pluginRootDefault = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const SAFE_STATE_ERRORS = new Set(['NOT_INITIALIZED', 'STALE_CONTROL', 'UNSAFE_PATH', 'PATH_ACCESS', 'WORKSPACE', 'WORKSPACE_BINDING', 'SIZE_LIMIT', 'UNKNOWN_SCHEMA', 'INVALID_CONTROL', 'LOCKED', 'REVISION_LIMIT'])
+const SAFE_STATE_ERRORS = new Set(['NOT_INITIALIZED', 'STALE_CONTROL', 'STALE_SETTINGS', 'UNSAFE_PATH', 'PATH_ACCESS', 'WORKSPACE', 'WORKSPACE_BINDING', 'SIZE_LIMIT', 'UNKNOWN_SCHEMA', 'INVALID_CONTROL', 'INVALID_SETTINGS', 'LOCKED', 'REVISION_LIMIT', 'MODEL_CATALOG_UNAVAILABLE', 'MODEL_UNAVAILABLE', 'REASONING_UNAVAILABLE'])
 const ERROR_CODES = [...new Set([
   'INVALID_WORKSPACE', 'PATH_ACCESS', 'UNSAFE_PATH', 'INVALID_BINDING', 'DATA_UNAVAILABLE', 'UNSAFE_DATA', 'INVALID_REGISTRY', 'SIZE_LIMIT',
   'THREAD_CONTEXT_REQUIRED', 'UNKNOWN_BINDING', 'BINDING_BUSY', 'BINDING_LIMIT', 'REGISTRY_WRITE', 'INVALID_ARGUMENTS', 'UNKNOWN_TOOL',
@@ -34,18 +36,33 @@ const publicBindingSchema = {
   type: 'object', properties: { id: { type: 'string', format: 'uuid' }, label: { type: 'string' }, workspace: { type: 'string' } },
   required: ['id', 'label', 'workspace'], additionalProperties: false,
 }
+const nullableString = { anyOf: [{ type: 'null' }, { type: 'string' }] }
+const settingsSchema = {
+  type: 'object', additionalProperties: false, required: ['mode', 'model', 'reasoningEffort', 'revision', 'configured'],
+  properties: { mode: { enum: ['default', 'custom'] }, model: nullableString, reasoningEffort: nullableString, revision: { type: 'integer', minimum: 0 }, configured: { type: 'boolean' } },
+}
+const catalogSchema = { anyOf: [{ type: 'null' }, {
+  type: 'object', additionalProperties: false, required: ['configuredModel', 'models'], properties: {
+    configuredModel: nullableString, configuredReasoningEffort: nullableString,
+    models: { type: 'array', maxItems: 1000, items: { type: 'object', additionalProperties: false, required: ['id', 'model', 'displayName', 'isDefault', 'supportedReasoningEfforts', 'defaultReasoningEffort'], properties: {
+      id: { type: 'string' }, model: { type: 'string' }, displayName: { type: 'string' }, isDefault: { type: 'boolean' }, defaultReasoningEffort: { type: 'string' },
+      supportedReasoningEfforts: { type: 'array', maxItems: 8, items: { type: 'object', additionalProperties: false, required: ['reasoningEffort', 'description'], properties: { reasoningEffort: { type: 'string' }, description: { type: 'string' } } } },
+    } } },
+  },
+}] }
 const snapshotSchema = {
   type: 'object', additionalProperties: false, required: ['schemaVersion', 'bindings', 'binding'],
   properties: {
     schemaVersion: { const: 1 },
     bindings: { type: 'array', maxItems: 100, items: publicBindingSchema },
     binding: { anyOf: [{ type: 'null' }, {
-      type: 'object', additionalProperties: false, required: ['id', 'label', 'workspace', 'control', 'initialized', 'mentorCount', 'jobs'],
+      type: 'object', additionalProperties: false, required: ['id', 'label', 'workspace', 'control', 'initialized', 'mentorCount', 'jobs', 'executionSettings', 'catalog', 'conversationModelAvailable'],
       properties: {
         ...publicBindingSchema.properties,
         control: { type: 'object', additionalProperties: false, required: ['workspace', 'enabled', 'revision', 'configured'], properties: { workspace: { type: 'string' }, enabled: { type: 'boolean' }, revision: { type: 'integer', minimum: 0 }, configured: { type: 'boolean' } } },
+        executionSettings: settingsSchema, catalog: catalogSchema, conversationModelAvailable: { const: false },
         initialized: { type: 'boolean' }, mentorCount: { type: 'integer', minimum: 0, maximum: 40 },
-        jobs: { type: 'array', maxItems: 100, items: { type: 'object', additionalProperties: false, required: ['id', 'status', 'authorized', 'attemptCount'], properties: { id: { type: 'string' }, status: { type: 'string', enum: ['proposed', 'authorized', 'dispatching', 'running', 'verifying', 'succeeded', 'failed', 'needs-user-action', 'uncertain', 'cancelling', 'cancelled'] }, authorized: { type: 'boolean' }, attemptCount: { type: 'integer', minimum: 0, maximum: 3 }, checkpointSequence: { type: 'integer', minimum: 0 } } } },
+        jobs: { type: 'array', maxItems: 100, items: { type: 'object', additionalProperties: false, required: ['id', 'status', 'authorized', 'attemptCount', 'requestedModel', 'requestedReasoningEffort', 'actualModel', 'actualReasoningEffort'], properties: { id: { type: 'string' }, status: { type: 'string', enum: ['proposed', 'authorized', 'dispatching', 'running', 'verifying', 'succeeded', 'failed', 'needs-user-action', 'uncertain', 'cancelling', 'cancelled'] }, authorized: { type: 'boolean' }, attemptCount: { type: 'integer', minimum: 0, maximum: 3 }, checkpointSequence: { type: 'integer', minimum: 0 }, requestedModel: nullableString, requestedReasoningEffort: nullableString, actualModel: nullableString, actualReasoningEffort: nullableString } } },
       },
     }] },
   },
@@ -82,6 +99,14 @@ export const PANEL_TOOLS = [
     },
     outputSchema, annotations: writeAnnotations, _meta: appMeta,
   },
+  { name: 'supervisor_models', title: 'Read execution models', description: 'Read the native execution model catalog and supported reasoning efforts for the bound workspace. It does not run a model.', inputSchema: bindingSchema, outputSchema, annotations: readAnnotations, _meta: appMeta },
+  {
+    name: 'supervisor_set_execution', title: 'Save execution settings', description: 'Save model and reasoning defaults for new proposals only. Existing authorized jobs retain their immutable settings.',
+    inputSchema: { type: 'object', additionalProperties: false, required: ['bindingId', 'mode', 'model', 'reasoningEffort', 'expectedRevision'], properties: {
+      bindingId: { type: 'string', format: 'uuid' }, mode: { enum: ['default', 'custom'] }, model: nullableString, reasoningEffort: nullableString, expectedRevision: { type: 'integer', minimum: 0, maximum: Number.MAX_SAFE_INTEGER },
+    } }, outputSchema, annotations: writeAnnotations, _meta: appMeta,
+  },
+  { name: 'supervisor_stop', title: 'Stop workspace execution', description: 'Disable new dispatch and request cancellation of authorized or active Supervisor jobs in this bound workspace. Pending cancellation is not proof of termination.', inputSchema: bindingSchema, outputSchema, annotations: writeAnnotations, _meta: appMeta },
 ]
 
 function argumentsFor(value, required) {
@@ -104,17 +129,18 @@ function summarize(entry) {
   }
   const execution = new ExecutionStore(entry.workspace).snapshot()
   const jobs = Object.values(execution.jobs).map(job => {
-    const result = { id: job.id, status: job.status, authorized: job.authorization !== null, attemptCount: job.attempts.length }
+    const selection = job.attempts.at(-1)?.result?.selection
+    const result = { id: job.id, status: job.status, authorized: job.authorization !== null, attemptCount: job.attempts.length, requestedModel: job.proposal.model ?? null, requestedReasoningEffort: job.proposal.reasoningEffort ?? null, actualModel: selection?.model ?? null, actualReasoningEffort: selection?.reasoningEffort ?? null }
     const sequence = job.attempts.at(-1)?.result?.checkpointSequence
     if (Number.isSafeInteger(sequence) && sequence >= 0) result.checkpointSequence = sequence
     return result
   })
-  return { ...publicBinding(entry), control: readControl(entry.workspace), initialized, mentorCount, jobs }
+  return { ...publicBinding(entry), control: readControl(entry.workspace), initialized, mentorCount, jobs, executionSettings: readExecutionSettings(entry.workspace), catalog: null, conversationModelAvailable: false }
 }
 
-function snapshot(registry, owner, entry = null) {
+function snapshot(registry, owner, entry = null, catalog = null) {
   const bindings = registry.list(owner)
-  return { schemaVersion: 1, bindings: bindings.map(publicBinding), binding: entry ? summarize(entry) : null }
+  return { schemaVersion: 1, bindings: bindings.map(publicBinding), binding: entry ? { ...summarize(entry), catalog } : null }
 }
 
 function result(snapshot) {
@@ -126,7 +152,7 @@ function errorResult(error) {
   return { isError: true, content: [{ type: 'text', text: JSON.stringify({ error: { code } }) }], structuredContent: { error: { code } } }
 }
 
-export function createPanelServer({ dataDirectory = process.env.HARZVA_SUPERVISOR_DATA, pluginRoot = pluginRootDefault, htmlPath = path.join(pluginRoot, 'ui', 'panel.html') } = {}) {
+export function createPanelServer({ dataDirectory = process.env.HARZVA_SUPERVISOR_DATA, pluginRoot = pluginRootDefault, htmlPath = path.join(pluginRoot, 'ui', 'panel.html'), modelReader = nativeModels } = {}) {
   // Constructing and listing the entrypoint cannot create either plugin data or
   // a workspace. Invalid data configuration is surfaced only as a static error.
   const server = new Server({ name: 'harzva-supervisor-panel', version: VERSION }, { capabilities: { tools: {}, resources: {} } })
@@ -178,6 +204,35 @@ export function createPanelServer({ dataDirectory = process.env.HARZVA_SUPERVISO
         if (typeof input.enabled !== 'boolean' || !Number.isSafeInteger(input.expectedRevision) || input.expectedRevision < 0) reject('INVALID_ARGUMENTS')
         const entry = registry.get(owner, input.bindingId)
         setControl(entry.workspace, { enabled: input.enabled, expectedRevision: input.expectedRevision })
+        return result(snapshot(registry, owner, entry))
+      }
+      if (request.params.name === 'supervisor_models' || request.params.name === 'supervisor_set_execution') {
+        const saving = request.params.name === 'supervisor_set_execution'
+        const input = argumentsFor(request.params.arguments, saving ? ['bindingId', 'mode', 'model', 'reasoningEffort', 'expectedRevision'] : ['bindingId'])
+        const entry = registry.get(owner, input.bindingId)
+        if (saving && (!['default', 'custom'].includes(input.mode) || !Number.isSafeInteger(input.expectedRevision) || input.expectedRevision < 0 || (input.mode === 'default' && (input.model !== null || input.reasoningEffort !== null)))) reject('INVALID_ARGUMENTS')
+        let catalog
+        try { catalog = await modelReader({ workspace: entry.workspace }) } catch { reject('MODEL_CATALOG_UNAVAILABLE') }
+        // Native discovery awaits another process. Recheck the binding path
+        // before any write or state read; it may have been replaced meanwhile.
+        registry.get(owner, input.bindingId)
+        if (saving) {
+          resolveSelection(input, {}, catalog)
+          setExecutionSettings(entry.workspace, { mode: input.mode, model: input.model, reasoningEffort: input.reasoningEffort, expectedRevision: input.expectedRevision })
+        }
+        return result(snapshot(registry, owner, entry, catalog))
+      }
+      if (request.params.name === 'supervisor_stop') {
+        const input = argumentsFor(request.params.arguments, ['bindingId'])
+        const entry = registry.get(owner, input.bindingId)
+        // Close the dispatch gate first. Cancellation remains available when
+        // the switch or settings revision shown in the UI is stale.
+        setControl(entry.workspace, { enabled: false })
+        const store = new ExecutionStore(entry.workspace)
+        const cancellable = new Set(['authorized', 'dispatching', 'running', 'verifying', 'failed', 'needs-user-action', 'uncertain', 'cancelling'])
+        if (Object.values(store.snapshot().jobs).some(job => cancellable.has(job.status))) store.mutate(state => {
+          for (const job of Object.values(state.jobs)) if (cancellable.has(job.status)) cancel(state, job.id)
+        })
         return result(snapshot(registry, owner, entry))
       }
       reject('UNKNOWN_TOOL')

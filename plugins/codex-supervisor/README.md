@@ -1,10 +1,10 @@
-# Harzva Supervisor / DS 学院 — Codex 0.3.0
+# Harzva Supervisor / DS 学院 — Codex 0.4.0
 
 Codex 本地开发版：把已授权工作推进到原生执行、独立验收和持久检查点，并保留学院／导师评审与可校验上下文交接。独立插件标识为 `harzva-supervisor`；DSH 包仍为 `dsh-supervisor@0.2.4`。
 
 ## 安装与调用
 
-需要 Node.js 22 或更新版本。执行链使用已安装 Codex 的登录状态和 experimental app-server 原生队列接口，已对照本机 Codex 0.149.0 合同实现；其他版本须另行核验。0.3.0 增加本地 stdio MCP App 对话页；官方 MCP / MCP Apps SDK 已打包，安装后无需 npm 安装。构建源码先运行 `npm ci`。`run`／`drain` 期间会启动限定工作区的 Codex app-server 子进程；面板服务只响应查看和开关操作，没有常驻任务观察器或 hooks。
+需要 Node.js 22 或更新版本。执行链使用已安装 Codex 的登录状态和 experimental app-server 原生队列接口，已对照本机 Codex 0.149.0 合同实现；其他版本须另行核验。0.4.0 在 stdio MCP App 对话页增加执行模型、推理强度和立即停止；官方 MCP / MCP Apps SDK 已打包，安装后无需 npm 安装。构建源码先运行 `npm ci`。`run`／`drain` 期间会启动限定工作区的 Codex app-server 子进程；面板读取目录、保存设置和请求取消，没有常驻任务观察器或 hooks。
 
 调用脚本的宿主还必须允许写入工程的受保护目录 `.codex/supervisor/`，并允许原生 CLI 使用它自己的缓存和已有登录状态。本机 SDK 的默认 `workspace-write` 调用曾在初始化受保护工程状态时返回 `PATH_ACCESS`；工程位于可写根目录内不等于其 `.codex` 自动可写。按当前任务已经授予的权限使用宿主支持的路径授权或权限 profile，并核验实际结果；插件不修改全局权限，也不自行读取或复制登录凭据。本机在既定完整 profile 中的调用结果不能证明每个默认 `workspace-write` 宿主都支持这些路径。
 
@@ -36,6 +36,20 @@ codex plugin list --available --json
 - 关闭正好发生在 native thread 创建后、queue 派发前时，不投 queue，保留真实回执为 `uncertain` 供核对；开启不会自动重投。
 
 未配置过开关时缺省开启，以保持 0.2.1 行为。只有明确的开关写操作才创建工程 `.codex/supervisor/control.v1.json`；打开未绑定面板不会创建工程状态。关联记录位于宿主展开的 `${PLUGIN_DATA}`，有界、0600、原子写入；不存模型提示词、路由或原始对话日志。新工程初始化学院与运行任务仍通过原来的 setup / execute 技能完成。
+
+### 执行模型与立即停止
+
+关联工程后点击“读取模型”，从原生执行目录选择模型和该模型支持的推理强度，再保存。选择“Codex 默认执行模型”会在每份新 proposal 创建时读取当时的目录默认模型与强度，明确写入授权摘要；它不是当前对话模型。保存使用独立 revision 和工程私有 `settings.v1.json`。设置只影响新 proposal，已授权或正在执行的任务保持原设置。proposal 中用户明确选择的 model/effort 优先，不能静默替换。
+
+监督判断仍由调用 supervise 的当前对话模型完成。Codex 0.149.0 的 MCP App HostContext 与 thread/read 没有当前对话实际 model/effort 的只读查询接口，因此本版不承诺自动跟随输入框选择。配置文件的 model 也不能代表当前对话实际选择。执行器要求原生 start/resume 响应精确保留显式模型与强度后才派发；任务列表显示已确认的实际值，未报告时保持未知。
+
+“立即停止”先关闭工程派发门，再取消该工程的已授权待执行、活跃、失败待重试或待核对任务。未授权 proposal 和已成功记录保留。活跃 runner 会中断它自己的原生 turn 或验收命令；按钮返回 `cancelling` 仅表示请求已保存，刷新到 `cancelled` 才证明已确认终止。进程丢失或原生终止未确认时仍须核对，不能声称全部停止。停止不依赖界面里的旧设置 revision，也不会接管其他聊天或停止队列外的工作。
+
+查看新任务使用的工程设置：
+
+```bash
+node "<plugin-root>/scripts/settings.mjs" show --workspace "<project>"
+```
 
 官方依据：[MCP App 对话入口](https://developers.openai.com/plugins/build/extensions)、[UI 桥](https://developers.openai.com/plugins/build/chatgpt-ui)、[本地 stdio 打包](https://developers.openai.com/plugins/deploy/desktop-only)。当前是本地开发安装；没有公共目录或市场发布。
 
@@ -131,7 +145,7 @@ node "<plugin-root>/scripts/execution.mjs" run --workspace "<project>" --job smo
 node "<plugin-root>/scripts/execution.mjs" status --workspace "<project>" --job smoke-file
 ```
 
-保留 `propose` 返回的完整 digest 供授权使用。已保存 proposal、grant、workspace 和上限不能编辑或替换；变更范围、模型或验收方法须创建新 job，并确认新的范围仍有用户授权。`model` 可选：不填时沿用 CLI 配置，显式填写时要求原生响应准确匹配，不静默切换模型。用户没有明确选择时，先用 `models` 读取原生模型目录，将目录默认模型写入 proposal；桌面配置名称可能不被 CLI 账号支持。DSH route 不会自动填入此字段。`models` 只返回模型标识和目录信息，不写执行状态，也不创建推理回合。
+保留 `propose` 返回的完整 digest 供授权使用。已保存 proposal、grant、workspace 和上限不能编辑或替换；变更范围、模型、推理强度或验收方法须创建新 job，并确认新的范围仍有用户授权。`model` 和 `reasoningEffort` 可选，显式填写时要求原生响应准确匹配。面板设置已保存时，`propose` 从新鲜目录解析缺失值；旧工程没有设置且未显式指定时，底层沿用 CLI 配置。用户没有明确选择且没有保存设置时，先用 `models` 读取目录，将目录默认模型及其默认强度写入 proposal；桌面配置名称可能不被 CLI 账号支持。DSH route 不会自动填入此字段。`models` 只返回模型标识和支持的强度，不写执行状态，也不创建推理回合。
 
 执行子进程继承已有代理环境；macOS 未设置代理环境时可使用系统已启用的 HTTP／HTTPS 代理。只设置该子进程环境，不改写个人配置、登录或系统网络设置，不禁用 TLS 验证；PAC／SOCKS 自动适配不在本版范围内。
 

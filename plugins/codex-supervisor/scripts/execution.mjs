@@ -7,6 +7,7 @@ import { verify } from './verification.mjs'
 import { run as supervisor, recordCheckpoint } from './supervisor.mjs'
 import { fail, SupervisorError, readInput, workspacePaths } from './state.mjs'
 import { readControl } from './control.mjs'
+import { applyExecutionSettings } from './settings.mjs'
 
 const HELP = `Harzva Supervisor execution chain (Codex native queue).
 Usage: node scripts/execution.mjs <command> --workspace <project> [options]
@@ -20,7 +21,7 @@ Usage: node scripts/execution.mjs <command> --workspace <project> [options]
   status [--job <id>]  Show bounded status, receipts and verification evidence.
   help
 Before proposing, initialize the ordinary Supervisor roster and assign the task.
-Proposal: {instruction,successCriteria:[...],verification:[...],timeoutMs?,maxAttempts?,model?}.
+Proposal: {instruction,successCriteria:[...],verification:[...],timeoutMs?,maxAttempts?,model?,reasoningEffort?}.
 Verification: {kind:"file",path:"relative/file",contains?,sha256?} or
 {kind:"command",argv:["node","--test"],timeoutMs?}; commands run through native workspace sandbox.
 authorize records an explicit user decision for this immutable proposal digest and workspace.
@@ -134,11 +135,12 @@ async function runJobOwned(store, id, dependencies = {}) {
       const result = await nativeExecute({
         workspace, prompt: promptFor(job, attempt, assignment), marker: attempt.id,
         threadId: job.threadId || undefined, expectedPreviousTurnId: previousTurnId,
-        model: job.proposal.model, timeoutMs: job.proposal.timeoutMs, signal: controller.signal,
+        model: job.proposal.model, reasoningEffort: job.proposal.reasoningEffort, timeoutMs: job.proposal.timeoutMs, signal: controller.signal,
         onThread: async ({ threadId }) => update({ status: 'dispatching', threadId }),
-        onDispatch: async () => {
+        onDispatch: async ({ selection } = {}) => {
           const current = jobFrom(store.snapshot(), id)
           if (current.status !== 'dispatching' || current.attempts.at(-1)?.id !== attempt.id || controller.signal.aborted) fail('CANCELLED', 'Dispatch was superseded.')
+          if (selection) update({ status: 'dispatching', result: { ...current.attempts.at(-1).result, selection } })
           if (!readControl(workspace).enabled) {
             dispatchBlocked = true
             fail('SUPERVISOR_DISABLED', 'Supervisor was turned off before native queue dispatch. Inspect the saved thread receipt before continuing.')
@@ -148,28 +150,30 @@ async function runJobOwned(store, id, dependencies = {}) {
         onStarted: async ({ threadId, turnId }) => update({ status: 'running', threadId, turnId }),
       })
       const receipt = { ...(result.turnId ? { turnId: result.turnId } : {}), ...(result.threadId ? { threadId: result.threadId } : {}) }
+      const selection = result.selection || jobFrom(store.snapshot(), id).attempts.at(-1).result?.selection
+      const selectionReceipt = selection ? { selection } : {}
       if (controller.signal.aborted || jobFrom(store.snapshot(), id).status === 'cancelling') {
         store.mutate(state => cancel(state, id))
-        update({ status: ['completed', 'failed', 'interrupted'].includes(result.status) ? 'cancelled' : 'uncertain', ...receipt, result: { status: result.status, reason: 'cancellation-requested', cancellationRequested: true, ...(result.transport ? { transport: result.transport } : {}) } })
+        update({ status: ['completed', 'failed', 'interrupted'].includes(result.status) ? 'cancelled' : 'uncertain', ...receipt, result: { ...selectionReceipt, status: result.status, reason: 'cancellation-requested', cancellationRequested: true, ...(result.transport ? { transport: result.transport } : {}) } })
         return publicJob(jobFrom(store.snapshot(), id))
       }
       if (result.status !== 'completed' || dispatchBlocked) {
         const status = dispatchBlocked ? 'uncertain' : ['needs-user-action', 'uncertain'].includes(result.status) ? result.status : 'failed'
-        update({ status, ...receipt, result: { status: result.status, reason: dispatchBlocked ? 'supervisor-disabled-before-dispatch' : 'native-execution-not-completed', ...(result.nativeError ? { nativeError: result.nativeError } : {}), ...(result.transport ? { transport: result.transport } : {}) } })
+        update({ status, ...receipt, result: { ...selectionReceipt, status: result.status, reason: dispatchBlocked ? 'supervisor-disabled-before-dispatch' : 'native-execution-not-completed', ...(result.nativeError ? { nativeError: result.nativeError } : {}), ...(result.transport ? { transport: result.transport } : {}) } })
       } else {
-        update({ status: 'verifying', ...receipt, result: { status: 'completed', ...(job.proposal.verification.some(check => check.kind === 'command') ? { verificationStarted: true } : {}) } })
+        update({ status: 'verifying', ...receipt, result: { ...selectionReceipt, status: 'completed', ...(job.proposal.verification.some(check => check.kind === 'command') ? { verificationStarted: true } : {}) } })
         const checks = await verification(workspace, job.proposal.verification, { signal: controller.signal })
         if (controller.signal.aborted || jobFrom(store.snapshot(), id).status === 'cancelling') {
           store.mutate(state => cancel(state, id))
           const unconfirmed = verificationUncertain(checks)
-          update({ status: unconfirmed ? 'uncertain' : 'cancelled', verification: checks, result: { status: 'completed', reason: 'cancelled-during-verification', cancellationRequested: true, ...(unconfirmed ? { verificationUncertain: true } : {}) } })
+          update({ status: unconfirmed ? 'uncertain' : 'cancelled', verification: checks, result: { ...selectionReceipt, status: 'completed', reason: 'cancelled-during-verification', cancellationRequested: true, ...(unconfirmed ? { verificationUncertain: true } : {}) } })
           return publicJob(jobFrom(store.snapshot(), id))
         }
         // Save completed checks before the separate ordinary checkpoint write.
         // Recovery can reuse these receipts without repeating command actions.
-        update({ status: 'verifying', verification: checks, result: { status: 'completed', verificationFinished: true, ...(verificationUncertain(checks) ? { verificationUncertain: true } : {}) } })
+        update({ status: 'verifying', verification: checks, result: { ...selectionReceipt, status: 'completed', verificationFinished: true, ...(verificationUncertain(checks) ? { verificationUncertain: true } : {}) } })
         const checkpointSequence = checks.passed ? saveVerifiedCheckpoint(workspace, jobFrom(store.snapshot(), id), checks) : undefined
-        update({ status: verifiedStatus(checks), verification: checks, result: { status: 'completed', ...(verificationUncertain(checks) ? { verificationUncertain: true } : {}), ...(checkpointSequence === undefined ? {} : { checkpointSequence }) } })
+        update({ status: verifiedStatus(checks), verification: checks, result: { ...selectionReceipt, status: 'completed', ...(verificationUncertain(checks) ? { verificationUncertain: true } : {}), ...(checkpointSequence === undefined ? {} : { checkpointSequence }) } })
       }
     } catch {
       const current = jobFrom(store.snapshot(), id)
@@ -303,7 +307,7 @@ export async function run(argv, dependencies = {}) {
   }
   if (command === 'propose') {
     supervisor(['status', '--workspace', store.snapshot().workspace, '--task', values['--task']])
-    const proposal = readInput(values['--input'])
+    const proposal = await applyExecutionSettings(store.workspace, readInput(values['--input']), { models: dependencies.models || models })
     return publicJob(store.mutate(state => propose(state, { jobId, taskId: values['--task'], proposal })))
   }
   if (command === 'authorize') return publicJob(store.mutate(state => authorize(state, { jobId, digest: values['--digest'] })))

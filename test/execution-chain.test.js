@@ -134,6 +134,49 @@ test('accepted execution writes a durable progress checkpoint without completing
   assert.equal(f.roster().checkpointSequence, roster.checkpointSequence)
 })
 
+test('execution forwards authorized reasoning and persists only confirmed selection through verification', async (t) => {
+  const f = fixture(t)
+  await addJob(f, { model: 'selected-model', reasoningEffort: 'high' })
+  const selection = { model: 'selected-model', reasoningEffort: 'high' }
+  const result = await runJob(f.store, 'job', {
+    execute: async options => {
+      assert.equal(options.model, 'selected-model')
+      assert.equal(options.reasoningEffort, 'high')
+      const threadId = 'owned-native-thread'
+      await options.onThread({ threadId })
+      assert.equal(f.job().attempts[0].result?.selection, undefined)
+      await options.onDispatch({ selection })
+      assert.deepEqual(f.job().attempts[0].result.selection, selection)
+      await options.onQueued({ threadId, queuedSubmissionId: 'queue-receipt' })
+      await options.onStarted({ threadId, turnId: 'completed-turn' })
+      fs.writeFileSync(path.join(f.workspace, 'report.txt'), 'accepted')
+      return { status: 'completed', threadId, turnId: 'completed-turn', selection, summary: 'PRIVATE_TRANSCRIPT' }
+    },
+    verify: actualVerification(undefined, () => { assert.deepEqual(f.job().attempts[0].result.selection, selection) }),
+  })
+  assert.equal(result.status, 'succeeded')
+  assert.deepEqual(result.attempts[0].result.selection, selection)
+  assert.deepEqual(new ExecutionStore(f.workspace).snapshot().jobs.job.attempts[0].result.selection, selection)
+  assert.doesNotMatch(JSON.stringify(result), /PRIVATE_TRANSCRIPT/)
+})
+
+test('cancelled execution retains its confirmed native model and reasoning receipt', async (t) => {
+  const f = fixture(t)
+  await addJob(f, { model: 'selected-model', reasoningEffort: 'low' })
+  const selection = { model: 'selected-model', reasoningEffort: 'low' }
+  const controller = new AbortController()
+  const result = await runJob(f.store, 'job', {
+    signal: controller.signal,
+    execute: async options => {
+      const receipt = await callbacks({ ...options, onDispatch: () => options.onDispatch({ selection }) })
+      controller.abort()
+      return { ...receipt, status: 'interrupted', selection }
+    },
+  })
+  assert.equal(result.status, 'cancelled')
+  assert.deepEqual(result.attempts[0].result.selection, selection)
+})
+
 test('only proven failed acceptance permits retry within the original approved attempt cap', async (t) => {
   const f = fixture(t)
   await addJob(f, { maxAttempts: 2 })

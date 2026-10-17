@@ -1,0 +1,106 @@
+{
+  "ok": true,
+  "date": "2026-10-17T14:50:47.142Z",
+  "installedVersion": "0.4.0+codex.20261017144756",
+  "limits": {
+    "rpcTimeoutMs": 20000,
+    "discoveryDeadlineMs": 45000,
+    "overallDeadlineMs": 120000,
+    "inferenceCalls": 0,
+    "queueCalls": 0,
+    "resumeCalls": 0,
+    "currentUserThreadCalls": 0
+  },
+  "entrypoint": {
+    "type": "thread",
+    "resourceUri": "ui://harzva-supervisor/panel",
+    "toolCount": 7,
+    "toolNames": [
+      "supervisor_bind_workspace",
+      "supervisor_models",
+      "supervisor_panel",
+      "supervisor_set_enabled",
+      "supervisor_set_execution",
+      "supervisor_status",
+      "supervisor_stop"
+    ],
+    "hostMetadataConfirmed": true,
+    "appOnlyControls": true
+  },
+  "binding": {
+    "explicitSelection": true,
+    "hostOverridesForgedThreadId": true,
+    "forgedCwdIgnored": true,
+    "crossThreadStatusSettingsAndStopDenied": true,
+    "noProjectWriteUntilSettings": true
+  },
+  "catalog": {
+    "realNativeCatalogRead": true,
+    "modelCount": 3,
+    "sha256": "787626aa5830943b3c37b28b053d6b899eba97024d22ff1b81d0341668614d07",
+    "chosenModel": "gpt-5.6-sol",
+    "supportedReasoningEfforts": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max",
+      "ultra"
+    ],
+    "selectedReasoningEffort": "low",
+    "conversationModelAvailable": false
+  },
+  "settings": {
+    "customSaved": true,
+    "revision": 1,
+    "staleDenied": true,
+    "bytesUnchangedAfterDeniedWrites": true,
+    "settingsSha256": "449601f23c72a0aa05a6b3e72c7b0724714305447043890bd9de367d5dafc907"
+  },
+  "emptyNativeThreadSelection": {
+    "model": "gpt-5.6-sol",
+    "reasoningEffort": "low",
+    "exactRequestedSettingsRetained": true,
+    "turnCount": 0,
+    "ephemeral": true
+  },
+  "stop": {
+    "noJobs": true,
+    "gateEnabled": false,
+    "revision": 1,
+    "noTerminationClaim": true,
+    "noRosterOrExecutionStateCreated": true
+  },
+  "resource": {
+    "bytes": 398624,
+    "sha256": "31998115a3b2303a1db9fa57ce6208288cd66dd1dbaf6aa67fe190a3467c79a2",
+    "cacheBytesEqualNativeResource": true
+  },
+  "bundledStdio": {
+    "toolCount": 7,
+    "stdoutNoiseLines": 0,
+    "stderrBytes": 0,
+    "readonlyDataCreated": false
+  },
+  "desktopClick": "not observed; native Codex UI was not controlled",
+  "requestCounts": {
+    "initialize": 1,
+    "thread/start": 2,
+    "mcpServerStatus/list": 2,
+    "mcpServer/tool/call": 9,
+    "mcpServer/resource/read": 1
+  },
+  "processesClosed": true,
+  "rpcStdoutNoiseLines": 0,
+  "nativeTransportDiagnostics": {
+    "wire": "codex",
+    "stderrBytes": 5596,
+    "stderrCategories": {
+      "permission": false,
+      "sqlite": false,
+      "logs": false,
+      "protocol": false,
+      "panic": false
+    }
+  }
+}

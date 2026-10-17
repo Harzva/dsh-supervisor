@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { createHash, randomUUID } from 'node:crypto'
 import { fail, SupervisorError, workspacePaths, readState, writeState, withStateLock } from './state.mjs'
+import { REASONING_EFFORTS } from './native-executor.mjs'
 
 const ID = /^[a-z0-9][a-z0-9_-]{0,63}$/i
 const STATUSES = ['proposed', 'authorized', 'dispatching', 'running', 'verifying', 'succeeded', 'failed', 'needs-user-action', 'uncertain', 'cancelling', 'cancelled']
@@ -88,7 +89,7 @@ export function resolveWorkspaceFile(workspace, relativePath) {
 }
 
 export function validateProposal(input, workspace, { inspectPaths = true } = {}) {
-  object(input, 'Execution proposal', ['instruction', 'successCriteria', 'verification', 'timeoutMs', 'maxAttempts', 'model'])
+  object(input, 'Execution proposal', ['instruction', 'successCriteria', 'verification', 'timeoutMs', 'maxAttempts', 'model', 'reasoningEffort'])
   const proposal = {
     instruction: string(input.instruction, 'Instruction', 8000, { multiline: true }),
     successCriteria: strings(input.successCriteria, 'Success criteria', 8, 800, 1),
@@ -119,6 +120,10 @@ export function validateProposal(input, workspace, { inspectPaths = true } = {})
     } else fail('INVALID_EXECUTION', 'Verification kind is unsupported.')
   }
   if (input.model !== undefined) proposal.model = string(input.model, 'Explicit model', 128)
+  if (input.reasoningEffort !== undefined) {
+    if (!REASONING_EFFORTS.includes(input.reasoningEffort)) fail('INVALID_EXECUTION', 'Explicit reasoning effort is unsupported.')
+    proposal.reasoningEffort = input.reasoningEffort
+  }
   if (Buffer.byteLength(JSON.stringify(proposal)) > 256 * 1024) fail('SIZE_LIMIT', 'Execution proposal exceeds its size limit.')
   return proposal
 }
@@ -221,7 +226,16 @@ function validateExecutionState(state, workspace) {
       previousTime = attempt.intentAt
       receiptId(attempt.queuedSubmissionId, 'Queued submission id')
       receiptId(attempt.turnId, 'Turn id')
-      if (attempt.result !== undefined) metadata(attempt.result, 'Attempt result')
+      if (attempt.result !== undefined) {
+        metadata(attempt.result, 'Attempt result')
+        if (attempt.result.selection !== undefined) {
+          const selection = object(attempt.result.selection, 'Native selection receipt', ['model', 'reasoningEffort'])
+          string(selection.model, 'Confirmed native model', 200)
+          if (!/^[a-zA-Z0-9][a-zA-Z0-9_.:/-]{0,199}$/.test(selection.model)) fail('INVALID_EXECUTION', 'Confirmed native model identifier is invalid.')
+          if (selection.reasoningEffort !== null && !REASONING_EFFORTS.includes(selection.reasoningEffort)) fail('INVALID_EXECUTION', 'Confirmed native reasoning effort is unsupported.')
+          if (!Object.hasOwn(selection, 'reasoningEffort') || (job.proposal.model !== undefined && selection.model !== job.proposal.model) || (job.proposal.reasoningEffort !== undefined && selection.reasoningEffort !== job.proposal.reasoningEffort)) fail('RECEIPT_CONFLICT', 'Confirmed native selection differs from the authorized proposal.')
+        }
+      }
       if (index < job.attempts.length - 1 && attempt.status !== 'failed') fail('INVALID_EXECUTION', 'Only a failed attempt may precede another attempt.')
     }
     if (job.attempts.length && job.status !== job.attempts.at(-1).status && !(job.status === 'cancelled' && job.attempts.at(-1).status === 'failed')) fail('INVALID_EXECUTION', 'Job status differs from its latest attempt receipt.')
@@ -395,6 +409,7 @@ function validateChanges(before, after) {
       for (const key of ['id', 'number', 'intentAt']) if (oldAttempt[key] !== newAttempt[key]) fail('RECEIPT_IMMUTABLE', 'Attempt identity and intent cannot be replaced.')
       if (TERMINAL.has(oldAttempt.status) && JSON.stringify(oldAttempt) !== JSON.stringify(newAttempt)) fail('RECEIPT_IMMUTABLE', 'Terminal attempt receipts cannot be replaced.')
       for (const key of ['queuedSubmissionId', 'turnId']) if (oldAttempt[key] !== null && newAttempt[key] !== oldAttempt[key]) fail('RECEIPT_CONFLICT', 'Submission and turn identities cannot be replaced.')
+      if (oldAttempt.result?.selection && JSON.stringify(canonical(oldAttempt.result.selection)) !== JSON.stringify(canonical(newAttempt.result?.selection))) fail('RECEIPT_CONFLICT', 'Confirmed native model and reasoning receipts cannot be replaced.')
       transition(oldAttempt.status, newAttempt.status)
     }
     if (next.updatedAt < previous.updatedAt) fail('INVALID_EXECUTION', 'Job update timestamp cannot move backwards.')

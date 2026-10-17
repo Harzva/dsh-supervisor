@@ -1,5 +1,13 @@
 # Codex 接手记录 · 2026-10-17
 
+## 0.4.0 模型、强度与立即停止
+
+原生目录选择执行模型及其支持的强度；工程设置以独立 revision 原子保存，只解析新 proposal，显式值进入不可变授权摘要。worker 响应必须精确保留选定模型/强度，实际值持久化到 selection 回执并显示在面板。MCP App HostContext/thread/read 没有当前对话型号的只读接口，因此没有伪称自动跟随。立即停止先关闭派发门，再取消本工程的已授权/活跃任务；请求与确认分别显示 cancelling/cancelled。
+
+全套147项、Codex131项回归通过；20项已安装官方AppBridge界面检查及CX Luna亮暗/390px视觉验收通过；模型、设置冲突、跨thread绑定和资源一致性由原生宿主直接验收，零模型推理。真实安装执行两项独立检查通过并写入进展检查点1，另一个启动后的原生任务通过实际MCP停止，确认interrupted/cancelled。原生宿主探针在只读子代理环境受SQLite路径权限限制，主任务既有完整profile验收通过；没有更改权限、HOME或认证。
+
+证据：[UI](ui-panel-0.4.json)、[原生入口](native-panel-0.4.json)、[真实执行/取消](native-execution-0.4.json)、[安装一致性](installation-0.4.json)。最终开发缓存仅文案比执行试用缓存更新，行为脚本与runtime与保留的已验证包逐字一致。真实桌面入口点击未代为观察；不是常驻循环。
+
 ## 0.3.0 对话页与工程开关
 
 通过官方本地 stdio MCP App 注册 Supervisor thread entrypoint。工程须在面板内明确选择；服务端不把默认安装缓存 cwd 当工程，也不信任 UI 自造 cwd。绑定按宿主提供的 thread ID 隔离，数据位于稳定 PLUGIN_DATA；状态及开关操作只接受该对话的随机 binding ID。关闭阻止新派发与重试；已运行工作仍可验收。开启不创建任务、授权或后台观察器。

@@ -15,7 +15,7 @@ for (const key of ['name', 'version', 'description', 'license', 'repository', 'a
 }
 const extension = manifest.extensions['com.openai']
 assert.deepEqual(extension.interface, compatibility.interface)
-assert.equal(extension.onboardingSkill, compatibility.extensions['com.openai'].onboardingSkill)
+assert.equal(compatibility.extensions, undefined)
 assert.equal(compatibility.skills, './skills/')
 assert(!manifest.mcpServers && !compatibility.mcpServers && !extension.hooks && !extension.apps)
 const mcp = JSON.parse(await readFile(join(plugin, 'mcp.json'), 'utf8'))
@@ -56,7 +56,7 @@ for (const entry of await readdir(plugin, { withFileTypes: true })) {
   assert(allowedRoots.has(entry.name), `Unexpected bundled entry: ${entry.name}`)
   assert(!entry.isSymbolicLink(), `Symlink package entry: ${entry.name}`)
 }
-for (const script of ['control.mjs', 'execution.mjs', 'execution-store.mjs', 'native-executor.mjs', 'verification.mjs', 'state.mjs', 'supervisor.mjs']) {
+for (const script of ['control.mjs', 'settings.mjs', 'execution.mjs', 'execution-store.mjs', 'native-executor.mjs', 'verification.mjs', 'state.mjs', 'supervisor.mjs']) {
   const stat = await lstat(join(plugin, 'scripts', script))
   assert(stat.isFile() && !stat.isSymbolicLink(), `Missing or unsafe runtime script: ${script}`)
 }

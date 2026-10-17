@@ -20,7 +20,7 @@ function fixture(t, options = {}) {
   t.after(() => fs.rmSync(workspace, { recursive: true, force: true }))
   const native = { messages: [], processes: [], turns: clone(options.turns || []), queued: clone(options.queued || []), status: options.status || 'idle', goal: options.goal || null }
   const thread = () => ({ id: THREAD, cwd: workspace, status: { type: native.status }, canAcceptDirectInput: true, turns: clone(native.turns) })
-  const permissions = () => ({ cwd: workspace, model: options.model || 'host-default-model', approvalPolicy: 'on-request', approvalsReviewer: 'user', sandbox: { type: 'workspaceWrite', writableRoots: [], networkAccess: false, excludeSlashTmp: true, excludeTmpdirEnvVar: true }, thread: thread(), ...(options.permissions || {}) })
+  const permissions = () => ({ cwd: workspace, model: options.model || 'host-default-model', reasoningEffort: options.reasoningEffort === undefined ? 'medium' : options.reasoningEffort, approvalPolicy: 'on-request', approvalsReviewer: 'user', sandbox: { type: 'workspaceWrite', writableRoots: [], networkAccess: false, excludeSlashTmp: true, excludeTmpdirEnvVar: true }, thread: thread(), ...(options.permissions || {}) })
   native.spawnImpl = (command, args, spawnOptions) => {
     const child = new EventEmitter()
     child.stdin = new PassThrough()
@@ -109,6 +109,8 @@ test('native queue handshake preserves permissions and completion arriving befor
   assert.equal(controls.approvalsReviewer, 'user')
   assert.equal(controls.allowProviderModelFallback, false)
   assert.equal(Object.hasOwn(controls, 'model'), false)
+  assert.equal(Object.hasOwn(controls, 'config'), false)
+  assert.deepEqual(result.selection, { model: 'host-default-model', reasoningEffort: 'medium' })
   assert.equal(f.native.processes[0].command, 'codex')
   assert.equal(f.native.processes[0].options.cwd, f.workspace)
   assert.equal(Object.hasOwn(f.native.processes[0].options, 'env'), false)
@@ -525,6 +527,45 @@ test('explicit model selection must be retained exactly without fallback', async
   await assert.rejects(replaced.execute({ model: 'bad\nmodel' }), { code: 'INVALID_INPUT' })
 })
 
+test('explicit reasoning selection reaches native start and resume and is confirmed before dispatch', async t => {
+  for (const resumed of [false, true]) {
+    const f = fixture(t, { model: 'selected-model', reasoningEffort: 'xhigh', ...(resumed ? { turns: [{ id: 'saved-turn', status: 'failed', items: [] }], status: 'notLoaded' } : {}) })
+    let barrierSelection
+    const result = await f.execute({ model: 'selected-model', reasoningEffort: 'xhigh', ...(resumed ? { threadId: THREAD, expectedPreviousTurnId: 'saved-turn' } : {}), onDispatch: async ({ selection }) => { barrierSelection = selection; assert.equal(f.native.messages.some(message => message.method === 'thread/queue/add'), false) } })
+    assert.equal(result.status, 'completed')
+    const controls = f.native.messages.find(message => message.method === (resumed ? 'thread/resume' : 'thread/start')).params
+    assert.deepEqual(controls.config, { model_reasoning_effort: 'xhigh' })
+    assert.equal(Object.hasOwn(controls, 'reasoningEffort'), false)
+    assert.deepEqual(result.selection, { model: 'selected-model', reasoningEffort: 'xhigh' })
+    assert.deepEqual(barrierSelection, result.selection)
+  }
+})
+
+test('changed or missing explicit reasoning fails before queueing and never claims a confirmed selection', async t => {
+  for (const options of [{ reasoningEffort: 'low' }, { reasoningEffort: null }, { permissions: { reasoningEffort: undefined } }]) {
+    const f = fixture(t, options)
+    const result = await f.execute({ reasoningEffort: 'high' })
+    assert.equal(result.status, 'failed')
+    assert.deepEqual(result.transport, { code: 'NATIVE_REASONING' })
+    assert.equal(Object.hasOwn(result, 'selection'), false)
+    assert.equal(f.native.messages.some(message => message.method === 'thread/queue/add'), false)
+  }
+  const invalid = fixture(t)
+  for (const effort of ['unexpected', '', null, 'high\n', {}, 1]) await assert.rejects(invalid.execute({ reasoningEffort: effort }), { code: 'INVALID_INPUT' })
+  assert.equal(invalid.native.processes.length, 0)
+})
+
+test('default selection receipts use only native response values and preserve unknown reasoning', async t => {
+  const f = fixture(t, { model: 'native-configured-model', reasoningEffort: null })
+  const result = await f.execute()
+  assert.deepEqual(result.selection, { model: 'native-configured-model', reasoningEffort: null })
+  const unknown = fixture(t, { reasoningEffort: 'unrecognized-future-effort' })
+  const rejected = await unknown.execute()
+  assert.equal(rejected.status, 'failed')
+  assert.deepEqual(rejected.transport, { code: 'NATIVE_PROTOCOL' })
+  assert.equal(unknown.native.messages.some(message => message.method === 'thread/queue/add'), false)
+})
+
 test('verification abort terminates only its native connection process id and awaits completion', async t => {
   const controller = new AbortController()
   let executionRequest
@@ -587,18 +628,18 @@ test('readonly native model discovery returns only configured ID and bounded pub
   const f = fixture(t, { onMessage: ({ message, reply }) => {
     if (message.method === 'config/read') {
       assert.deepEqual(message.params, { cwd: f.workspace, includeLayers: false })
-      reply(message, { config: { model: 'desktop-alias', developer_instructions: 'PRIVATE_INSTRUCTIONS', model_provider: 'PRIVATE_PROVIDER', custom_key: 'PRIVATE_KEY' }, origins: { model: { path: '/private/config.toml' } }, layers: ['PRIVATE_LAYER'] })
+      reply(message, { config: { model: 'desktop-alias', model_reasoning_effort: 'high', developer_instructions: 'PRIVATE_INSTRUCTIONS', model_provider: 'PRIVATE_PROVIDER', custom_key: 'PRIVATE_KEY' }, origins: { model: { path: '/private/config.toml' } }, layers: ['PRIVATE_LAYER'] })
       return true
     }
     if (message.method === 'model/list') {
       assert.equal(message.params.includeHidden, false)
-      const entry = (id, isDefault) => ({ id, model: id, isDefault, displayName: id, description: 'PRIVATE_DESCRIPTION', upgradeInfo: { hidden: 'PRIVATE_UPGRADE' } })
+      const entry = (id, isDefault) => ({ id, model: id, isDefault, displayName: id, supportedReasoningEfforts: [{ reasoningEffort: 'low', description: 'Fast checks' }, { reasoningEffort: 'high', description: 'Detailed reasoning' }], defaultReasoningEffort: 'low', description: 'PRIVATE_DESCRIPTION', upgradeInfo: { hidden: 'PRIVATE_UPGRADE' } })
       reply(message, message.params.cursor ? { data: [entry('provider/custom-model', false)], nextCursor: null } : { data: [entry('native-supported-model', true)], nextCursor: 'page-two' })
       return true
     }
   } })
   const result = await f.executor.models({ workspace: f.workspace })
-  assert.deepEqual(result, { configuredModel: 'desktop-alias', models: [{ id: 'native-supported-model', model: 'native-supported-model', isDefault: true, displayName: 'native-supported-model' }, { id: 'provider/custom-model', model: 'provider/custom-model', isDefault: false, displayName: 'provider/custom-model' }] })
+  assert.deepEqual(result, { configuredModel: 'desktop-alias', configuredReasoningEffort: 'high', models: [{ id: 'native-supported-model', model: 'native-supported-model', isDefault: true, displayName: 'native-supported-model' }, { id: 'provider/custom-model', model: 'provider/custom-model', isDefault: false, displayName: 'provider/custom-model' }].map(entry => ({ ...entry, supportedReasoningEfforts: [{ reasoningEffort: 'low', description: 'Fast checks' }, { reasoningEffort: 'high', description: 'Detailed reasoning' }], defaultReasoningEffort: 'low' })) })
   assert.doesNotMatch(JSON.stringify(result), /PRIVATE_|private\/config/)
   assert.equal(f.native.messages.some(message => message.method === 'thread/start' || message.method === 'thread/queue/add'), false)
 })
@@ -608,11 +649,32 @@ test('native catalog repeated cursors and oversized labels fail with sanitized e
     const f = fixture(t, { onMessage: ({ message, reply }) => {
       if (message.method === 'config/read') { reply(message, { config: { model: null } }); return true }
       if (message.method === 'model/list') {
-        reply(message, { data: [{ id: 'model', model: 'model', isDefault: true, displayName: variant === 'label' ? 'PRIVATE_LABEL'.repeat(100) : 'Model' }], nextCursor: variant === 'cursor' ? 'duplicate-cursor' : null })
+        reply(message, { data: [{ id: 'model', model: 'model', isDefault: true, displayName: variant === 'label' ? 'PRIVATE_LABEL'.repeat(100) : 'Model', supportedReasoningEfforts: [{ reasoningEffort: 'medium', description: 'Balanced' }], defaultReasoningEffort: 'medium' }], nextCursor: variant === 'cursor' ? 'duplicate-cursor' : null })
         return true
       }
     } })
     await assert.rejects(f.executor.models({ workspace: f.workspace }), error => error.code === 'NATIVE_PROTOCOL' && !error.message.includes('PRIVATE_LABEL'))
+  }
+})
+
+test('native reasoning catalog rejects missing, duplicate, unknown and mismatched options without copying native text', async t => {
+  for (const patch of [
+    { supportedReasoningEfforts: undefined }, { supportedReasoningEfforts: [] },
+    { supportedReasoningEfforts: [{ reasoningEffort: 'medium', description: 'Balanced' }, { reasoningEffort: 'medium', description: 'Repeated' }] },
+    { supportedReasoningEfforts: [{ reasoningEffort: 'PRIVATE_FUTURE_VALUE', description: 'Balanced' }] },
+    { defaultReasoningEffort: 'high' }, { defaultReasoningEffort: 'PRIVATE_FUTURE_VALUE' },
+    { supportedReasoningEfforts: [{ reasoningEffort: 'medium', description: 'PRIVATE_DESCRIPTION'.repeat(100) }] },
+    { supportedReasoningEfforts: [{ reasoningEffort: 'medium', description: 'PRIVATE\nDESCRIPTION' }] },
+  ]) {
+    const f = fixture(t, { onMessage: ({ message, reply }) => {
+      if (message.method === 'config/read') { reply(message, { config: { model: null } }); return true }
+      if (message.method === 'model/list') {
+        reply(message, { data: [{ id: 'model', model: 'model', isDefault: true, displayName: 'Model', supportedReasoningEfforts: [{ reasoningEffort: 'medium', description: 'Balanced' }], defaultReasoningEffort: 'medium', ...patch }], nextCursor: null })
+        return true
+      }
+    } })
+    await assert.rejects(f.executor.models({ workspace: f.workspace }), error => error.code === 'NATIVE_PROTOCOL' && !error.message.includes('PRIVATE'))
+    assert.equal(f.native.messages.some(message => message.method === 'thread/start' || message.method === 'thread/queue/add'), false)
   }
 })
 

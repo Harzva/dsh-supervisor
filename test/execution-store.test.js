@@ -83,6 +83,38 @@ test('authorization is explicit, workspace/digest bound, immutable and cannot re
   assert.equal(store.snapshot().jobs.job.attempts.length, 1)
 })
 
+test('model and reasoning are digest-bound and cannot be changed after authorization', (t) => {
+  const { workspace, store, statePath } = fixture(t)
+  const selected = proposal({ model: 'selected-model', reasoningEffort: 'high' })
+  const normalized = validateProposal(selected, workspace)
+  assert.equal(normalized.reasoningEffort, 'high')
+  for (const changed of [proposal({ model: 'different-model', reasoningEffort: 'high' }), proposal({ model: 'selected-model', reasoningEffort: 'low' }), proposal({ model: 'selected-model' })]) assert.notEqual(digestProposal(validateProposal(changed, workspace)), digestProposal(normalized))
+  for (const effort of ['unknown', '', null, ' high', 1]) expectError('INVALID_EXECUTION', () => validateProposal(proposal({ reasoningEffort: effort }), workspace))
+  const job = store.mutate(state => propose(state, { jobId: 'selected', taskId: 'task', proposal: selected }))
+  store.mutate(state => authorize(state, { jobId: job.id, digest: job.digest }))
+  const before = fs.readFileSync(statePath, 'utf8')
+  for (const patch of [{ model: 'different-model' }, { reasoningEffort: 'low' }]) expectError('PROPOSAL_IMMUTABLE', () => store.mutate(state => {
+    Object.assign(state.jobs.selected.proposal, patch)
+    state.jobs.selected.digest = digestProposal(state.jobs.selected.proposal)
+    state.jobs.selected.authorization.proposalDigest = state.jobs.selected.digest
+  }))
+  assert.equal(fs.readFileSync(statePath, 'utf8'), before)
+  assert.deepEqual(new ExecutionStore(workspace).snapshot().jobs.selected.proposal, normalized)
+})
+
+test('confirmed native selection receipts match the grant and remain immutable across active updates', (t) => {
+  const { store } = fixture(t)
+  const job = store.mutate(state => propose(state, { jobId: 'job', taskId: 'task', proposal: proposal({ model: 'selected-model', reasoningEffort: 'high' }) }))
+  store.mutate(state => authorize(state, { jobId: job.id, digest: job.digest }))
+  const attempt = store.mutate(state => beginAttempt(state, 'job'))
+  for (const selection of [{ model: 'fallback-model', reasoningEffort: 'high' }, { model: 'selected-model', reasoningEffort: 'low' }, { model: 'selected-model', reasoningEffort: null }]) expectError('RECEIPT_CONFLICT', () => store.mutate(state => updateAttempt(state, { jobId: 'job', attemptId: attempt.id, status: 'dispatching', result: { selection } })))
+  const selection = { model: 'selected-model', reasoningEffort: 'high' }
+  store.mutate(state => updateAttempt(state, { jobId: 'job', attemptId: attempt.id, status: 'dispatching', result: { selection } }))
+  expectError('RECEIPT_CONFLICT', () => store.mutate(state => updateAttempt(state, { jobId: 'job', attemptId: attempt.id, status: 'running', result: { status: 'inProgress' } })))
+  store.mutate(state => updateAttempt(state, { jobId: 'job', attemptId: attempt.id, status: 'running', result: { status: 'inProgress', selection } }))
+  assert.deepEqual(store.snapshot().jobs.job.attempts[0].result.selection, selection)
+})
+
 test('dispatch intent survives restart; CAS recovery records receipts and uncertainty never redispatches', (t) => {
   const { store, workspace } = fixture(t)
   createAuthorized(store, 3)

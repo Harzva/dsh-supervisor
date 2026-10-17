@@ -1,0 +1,126 @@
+{
+  "date": "2026-10-17",
+  "timezone": "Asia/Shanghai",
+  "previousEvidence": "checks-0.2.1.json",
+  "baseline": {
+    "repository": "Harzva/dsh-supervisor",
+    "baseBranch": "feat/smart-supervision-v2",
+    "commit": "5092a0905c8d41c88f25f6c06c6c27a9b05a15c5",
+    "dshVersion": "0.2.4",
+    "tag": "p0-0.2.4",
+    "tagCommit": "910b12298386567f916a06dbdf0750904ed5b124"
+  },
+  "plugin": {
+    "name": "harzva-supervisor",
+    "version": "0.3.0",
+    "skills": [
+      "setup",
+      "supervise",
+      "execute",
+      "faculty-review",
+      "handoff"
+    ],
+    "format": "portable + Codex compatibility",
+    "codexContract": "0.149.0 experimental app-server queue",
+    "localMcpServers": 1,
+    "runtimeNpmInstallRequired": false,
+    "bundledSdk": {
+      "mcp": "1.24.0",
+      "mcpApps": "1.0.1"
+    }
+  },
+  "checks": {
+    "npm run codex:check": {
+      "passed": true,
+      "tests": 115
+    },
+    "npm run verify:p0": {
+      "passed": true,
+      "tests": 131,
+      "dshBaselineTests": 16,
+      "packFiles": 19,
+      "publicScanFindings": 0
+    },
+    "skillCreatorQuickValidate": {
+      "passed": true,
+      "skills": 5
+    },
+    "standaloneZip": {
+      "passed": true,
+      "fileCount": 21,
+      "installedCacheMatchesPackage": true,
+      "noNpmInstallForRuntime": true
+    },
+    "independentReview": {
+      "passed": true,
+      "scope": "control, bindings, MCP SDK/stdout, error output schemas and visual UI",
+      "panelAndControlTests": 24
+    },
+    "gitDiffCheck": {
+      "passed": true
+    },
+    "officialMcpAppsUi": {
+      "passed": true,
+      "tests": 14,
+      "evidence": "ui-panel.json"
+    }
+  },
+  "hostAcceptance": {
+    "installed": true,
+    "enabled": true,
+    "version": "0.3.0",
+    "entrypoint": {
+      "name": "supervisor_panel",
+      "title": "Supervisor",
+      "type": "thread",
+      "resourceUri": "ui://harzva-supervisor/panel",
+      "metadataConfirmedByNativeHost": true
+    },
+    "nativeMcp": {
+      "passed": true,
+      "evidence": "native-panel-installation.json",
+      "offOnSaved": true,
+      "staleWriteDenied": true,
+      "crossThreadDenied": true,
+      "modelInference": 0
+    },
+    "installedUi": {
+      "passed": true,
+      "evidence": "ui-panel.json",
+      "checkCount": 14,
+      "testHost": "official MCP Apps AppBridge/PostMessageTransport isolated test host using actual installed HTML and MCP runtime"
+    },
+    "previousInstalledExecutionChainEvidence": "local-installation.json",
+    "desktopEntryClick": "not directly observed; native Codex UI cannot be controlled with the available computer-use tool"
+  },
+  "repositoryAudit": {
+    "method": "GitHub GraphQL",
+    "visibility": "PRIVATE",
+    "license": "Apache-2.0",
+    "releaseCount": 0,
+    "checkedAt": "2026-10-17T02:15:39Z"
+  },
+  "publication": {
+    "githubReleaseCreated": false,
+    "npmPublished": false,
+    "dshMarketplaceSubmitted": false,
+    "publicPluginDirectorySubmitted": false
+  },
+  "artifact": {
+    "archive": "harzva-supervisor-0.3.0.zip",
+    "sha256": "939cf78fffa8d1a60dd005a414693ab3dd7b538213460f1f56d49e37ca7987a0",
+    "fileCount": 21
+  },
+  "sourceDigests": {
+    "runtime/mcp-server.mjs": "e11df82e9f088f94f6d19a4f9ad255efa8a470c864ad5686576d52a109b7d190",
+    "runtime/mentor-registry.mjs": "3b5766d88bab4e6bf94c27cb56b07b0460eb7b2d348dbe9bf4e9560ce405b3d5",
+    "scripts/control.mjs": "dc17c935b919e092921b6bb0f2f9ab9cb0b4a6bcd8c2fdf7d28b4f012ff4fc9e",
+    "scripts/execution-store.mjs": "c26d8e12aa0e2cf3629830a22bcdcbf928342484ccbd2f044f88441cf9f20a30",
+    "scripts/execution.mjs": "8a8922aaaf29d77eb16118e1f69b0dbe31d6a30689b8edb96f6489f7c4c2a885",
+    "scripts/native-executor.mjs": "d865364869368352423779a68a466bcc84f061981e5d39d3da717e85bd86b485",
+    "scripts/state.mjs": "4443655d3a13b501c239dcee012c9545c346fd265b2022127aa521d4ac46d03b",
+    "scripts/supervisor.mjs": "a39a053d5f21e837c3e5ab9d25d08bc1b701e55b75b9a4424c65c4b20a713def",
+    "scripts/verification.mjs": "728633d57c56fa578a2716230503378b93afb92f3f2dcb31cbf5cefb69938c95",
+    "ui/panel.html": "6c6bc28c3bddecc9bb70a6f42e750610ef25d31d4b5ae6f88fd5e6c770dd3a44"
+  }
+}

@@ -1,126 +1,127 @@
 {
   "date": "2026-10-17",
-  "timezone": "Asia/Shanghai",
-  "previousEvidence": "checks-0.2.1.json",
-  "baseline": {
-    "repository": "Harzva/dsh-supervisor",
-    "baseBranch": "feat/smart-supervision-v2",
-    "commit": "5092a0905c8d41c88f25f6c06c6c27a9b05a15c5",
-    "dshVersion": "0.2.4",
-    "tag": "p0-0.2.4",
-    "tagCommit": "910b12298386567f916a06dbdf0750904ed5b124"
-  },
   "plugin": {
     "name": "harzva-supervisor",
-    "version": "0.3.0",
-    "skills": [
-      "setup",
-      "supervise",
-      "execute",
-      "faculty-review",
-      "handoff"
-    ],
-    "format": "portable + Codex compatibility",
-    "codexContract": "0.149.0 experimental app-server queue",
-    "localMcpServers": 1,
-    "runtimeNpmInstallRequired": false,
-    "bundledSdk": {
-      "mcp": "1.24.0",
-      "mcpApps": "1.0.1"
-    }
+    "version": "0.4.0",
+    "installedVersion": "0.4.0+codex.20261017144756"
   },
+  "previousEvidence": "checks-0.3.0.json",
   "checks": {
-    "npm run codex:check": {
-      "passed": true,
-      "tests": 115
-    },
-    "npm run verify:p0": {
-      "passed": true,
+    "codex": {
       "tests": 131,
-      "dshBaselineTests": 16,
-      "packFiles": 19,
-      "publicScanFindings": 0
-    },
-    "skillCreatorQuickValidate": {
-      "passed": true,
-      "skills": 5
-    },
-    "standaloneZip": {
-      "passed": true,
-      "fileCount": 21,
-      "installedCacheMatchesPackage": true,
-      "noNpmInstallForRuntime": true
-    },
-    "independentReview": {
-      "passed": true,
-      "scope": "control, bindings, MCP SDK/stdout, error output schemas and visual UI",
-      "panelAndControlTests": 24
-    },
-    "gitDiffCheck": {
       "passed": true
     },
-    "officialMcpAppsUi": {
+    "fullProject": {
+      "tests": 147,
       "passed": true,
-      "tests": 14,
-      "evidence": "ui-panel.json"
-    }
-  },
-  "hostAcceptance": {
-    "installed": true,
-    "enabled": true,
-    "version": "0.3.0",
-    "entrypoint": {
-      "name": "supervisor_panel",
-      "title": "Supervisor",
-      "type": "thread",
-      "resourceUri": "ui://harzva-supervisor/panel",
-      "metadataConfirmedByNativeHost": true
+      "dshBaseline": 16,
+      "publicScanFindings": 0,
+      "dshPackageFiles": 19
     },
-    "nativeMcp": {
+    "pluginCreator": {
+      "passed": true
+    },
+    "skills": {
       "passed": true,
-      "evidence": "native-panel-installation.json",
-      "offOnSaved": true,
-      "staleWriteDenied": true,
-      "crossThreadDenied": true,
-      "modelInference": 0
+      "count": 5
     },
     "installedUi": {
       "passed": true,
-      "evidence": "ui-panel.json",
-      "checkCount": 14,
-      "testHost": "official MCP Apps AppBridge/PostMessageTransport isolated test host using actual installed HTML and MCP runtime"
+      "count": 20,
+      "visualReview": "CX Luna"
     },
-    "previousInstalledExecutionChainEvidence": "local-installation.json",
-    "desktopEntryClick": "not directly observed; native Codex UI cannot be controlled with the available computer-use tool"
-  },
-  "repositoryAudit": {
-    "method": "GitHub GraphQL",
-    "visibility": "PRIVATE",
-    "license": "Apache-2.0",
-    "releaseCount": 0,
-    "checkedAt": "2026-10-17T02:15:39Z"
-  },
-  "publication": {
-    "githubReleaseCreated": false,
-    "npmPublished": false,
-    "dshMarketplaceSubmitted": false,
-    "publicPluginDirectorySubmitted": false
+    "nativeHost": {
+      "passed": true,
+      "modelInference": 0,
+      "tools": 7
+    },
+    "realExecution": {
+      "passed": true,
+      "checks": 2,
+      "attempts": 1,
+      "checkpointSequence": 1
+    },
+    "realCancellation": {
+      "passed": true,
+      "status": "cancelled",
+      "nativeStatus": "interrupted",
+      "attempts": 1
+    },
+    "gitDiffCheck": {
+      "passed": true
+    }
   },
   "artifact": {
-    "archive": "harzva-supervisor-0.3.0.zip",
-    "sha256": "939cf78fffa8d1a60dd005a414693ab3dd7b538213460f1f56d49e37ca7987a0",
-    "fileCount": 21
+    "name": "harzva-supervisor",
+    "version": "0.4.0",
+    "archive": "harzva-supervisor-0.4.0.zip",
+    "sha256": "cc9fc844c476ad76a3664dea4ab6ffd1c1228de2a5fa9204cd130b80cddf487b",
+    "fileCount": 22,
+    "files": {
+      ".codex-plugin/plugin.json": "2d60c5f1c60d1fed7bd962d12d3769baca946122c5323afb01861ac1d38c448a",
+      "LICENSE": "50e6751797c50dedd75ef1b8a0d9e42f5f8472e9fbce91f34718e9f97b0c780a",
+      "README.md": "14ef1562c591a42ca036f2fa3b28c8140233b793b174d6d3f46bc2fcdcc5cb99",
+      "THIRD_PARTY_NOTICES.txt": "7c8b124fca6c210f45965071d55b91d948eac9f1a827a766befe519aa4ec0f63",
+      "mcp.json": "f1f4d4e45def8538c2b75117062a823a52680a7ae1dc67f4a28f40fee1805037",
+      "plugin.json": "04aaa93a3dd5244e6db489f19e6bd53dc66855bb1612927f01fa5eedfbb2ffbf",
+      "runtime/mcp-server.mjs": "c70c8bca5366f0d1ef234e01749e019107ea9c63867610a3084acbd5ce5326aa",
+      "runtime/mentor-registry.mjs": "3b5766d88bab4e6bf94c27cb56b07b0460eb7b2d348dbe9bf4e9560ce405b3d5",
+      "scripts/control.mjs": "dc17c935b919e092921b6bb0f2f9ab9cb0b4a6bcd8c2fdf7d28b4f012ff4fc9e",
+      "scripts/execution-store.mjs": "c3855f910c05db82658129ab0dbca16db4d633935450637a926c2df2106e39f9",
+      "scripts/execution.mjs": "a0372077c2c4376183a5e72cfef37ccc2bb568145804f4e8d748563e99f26e01",
+      "scripts/native-executor.mjs": "76b84c2231725d8a9e8cba9fa326208ccea5a77c02a3b3f4047f84bb3cbe45fc",
+      "scripts/settings.mjs": "6f17a4c10504556b40ea45a36fe8b8e907f803277191419b5bfebb2f2e69fa96",
+      "scripts/state.mjs": "4443655d3a13b501c239dcee012c9545c346fd265b2022127aa521d4ac46d03b",
+      "scripts/supervisor.mjs": "a39a053d5f21e837c3e5ab9d25d08bc1b701e55b75b9a4424c65c4b20a713def",
+      "scripts/verification.mjs": "728633d57c56fa578a2716230503378b93afb92f3f2dcb31cbf5cefb69938c95",
+      "skills/execute/SKILL.md": "826ae10d7ef98cabca2af8c4c1640ab46c4b81efed6de8c4ff45a7c7caca3192",
+      "skills/faculty-review/SKILL.md": "2b7603b67f80f3acc35cd5fc37233ec9ebab0bf830a6e02145b2cb06c8eaeffa",
+      "skills/handoff/SKILL.md": "5a9f41e7cc1dbbc2234d3deede593386de0ce18728d5d3fa6c459de31ae19b6a",
+      "skills/setup/SKILL.md": "e8d0d9325ec8394495a904bc29be11dbc5c42c38193243467a2169c7b013bca3",
+      "skills/supervise/SKILL.md": "86b75312b1d83d8180c4d86346e3b3fd38701fe51b6a3aa483e69fcb04c136d5",
+      "ui/panel.html": "31998115a3b2303a1db9fa57ce6208288cd66dd1dbaf6aa67fe190a3467c79a2"
+    }
+  },
+  "installation": {
+    "baseVersion": "0.4.0",
+    "installedVersion": "0.4.0+codex.20261017144756",
+    "files": 22,
+    "cacheMatchesDevelopmentSource": true,
+    "basePackageExactFiles": 20,
+    "manifestDifference": "cachebuster version only",
+    "runtimeEquivalentToVerifiedExecutionPackage": true,
+    "executedCacheVersion": "0.4.0+codex.20261017144223",
+    "testedCachePrunedBySupportedReinstall": true,
+    "runtimeSha256": "c70c8bca5366f0d1ef234e01749e019107ea9c63867610a3084acbd5ce5326aa",
+    "htmlSha256": "31998115a3b2303a1db9fa57ce6208288cd66dd1dbaf6aa67fe190a3467c79a2"
   },
   "sourceDigests": {
-    "runtime/mcp-server.mjs": "e11df82e9f088f94f6d19a4f9ad255efa8a470c864ad5686576d52a109b7d190",
+    ".codex-plugin/plugin.json": "2d60c5f1c60d1fed7bd962d12d3769baca946122c5323afb01861ac1d38c448a",
+    "LICENSE": "50e6751797c50dedd75ef1b8a0d9e42f5f8472e9fbce91f34718e9f97b0c780a",
+    "README.md": "14ef1562c591a42ca036f2fa3b28c8140233b793b174d6d3f46bc2fcdcc5cb99",
+    "THIRD_PARTY_NOTICES.txt": "7c8b124fca6c210f45965071d55b91d948eac9f1a827a766befe519aa4ec0f63",
+    "mcp.json": "f1f4d4e45def8538c2b75117062a823a52680a7ae1dc67f4a28f40fee1805037",
+    "plugin.json": "04aaa93a3dd5244e6db489f19e6bd53dc66855bb1612927f01fa5eedfbb2ffbf",
+    "runtime/mcp-server.mjs": "c70c8bca5366f0d1ef234e01749e019107ea9c63867610a3084acbd5ce5326aa",
     "runtime/mentor-registry.mjs": "3b5766d88bab4e6bf94c27cb56b07b0460eb7b2d348dbe9bf4e9560ce405b3d5",
     "scripts/control.mjs": "dc17c935b919e092921b6bb0f2f9ab9cb0b4a6bcd8c2fdf7d28b4f012ff4fc9e",
-    "scripts/execution-store.mjs": "c26d8e12aa0e2cf3629830a22bcdcbf928342484ccbd2f044f88441cf9f20a30",
-    "scripts/execution.mjs": "8a8922aaaf29d77eb16118e1f69b0dbe31d6a30689b8edb96f6489f7c4c2a885",
-    "scripts/native-executor.mjs": "d865364869368352423779a68a466bcc84f061981e5d39d3da717e85bd86b485",
+    "scripts/execution-store.mjs": "c3855f910c05db82658129ab0dbca16db4d633935450637a926c2df2106e39f9",
+    "scripts/execution.mjs": "a0372077c2c4376183a5e72cfef37ccc2bb568145804f4e8d748563e99f26e01",
+    "scripts/native-executor.mjs": "76b84c2231725d8a9e8cba9fa326208ccea5a77c02a3b3f4047f84bb3cbe45fc",
+    "scripts/settings.mjs": "6f17a4c10504556b40ea45a36fe8b8e907f803277191419b5bfebb2f2e69fa96",
     "scripts/state.mjs": "4443655d3a13b501c239dcee012c9545c346fd265b2022127aa521d4ac46d03b",
     "scripts/supervisor.mjs": "a39a053d5f21e837c3e5ab9d25d08bc1b701e55b75b9a4424c65c4b20a713def",
     "scripts/verification.mjs": "728633d57c56fa578a2716230503378b93afb92f3f2dcb31cbf5cefb69938c95",
-    "ui/panel.html": "6c6bc28c3bddecc9bb70a6f42e750610ef25d31d4b5ae6f88fd5e6c770dd3a44"
-  }
+    "skills/execute/SKILL.md": "826ae10d7ef98cabca2af8c4c1640ab46c4b81efed6de8c4ff45a7c7caca3192",
+    "skills/faculty-review/SKILL.md": "2b7603b67f80f3acc35cd5fc37233ec9ebab0bf830a6e02145b2cb06c8eaeffa",
+    "skills/handoff/SKILL.md": "5a9f41e7cc1dbbc2234d3deede593386de0ce18728d5d3fa6c459de31ae19b6a",
+    "skills/setup/SKILL.md": "e8d0d9325ec8394495a904bc29be11dbc5c42c38193243467a2169c7b013bca3",
+    "skills/supervise/SKILL.md": "86b75312b1d83d8180c4d86346e3b3fd38701fe51b6a3aa483e69fcb04c136d5",
+    "ui/panel.html": "31998115a3b2303a1db9fa57ce6208288cd66dd1dbaf6aa67fe190a3467c79a2"
+  },
+  "limitations": [
+    "Current conversation model/effort cannot be read through supported readonly host APIs; explicit execution selection is required.",
+    "The Codex desktop entrypoint click was not controlled or directly observed.",
+    "Immediate stop applies to Supervisor jobs in the bound workspace; cancelling/uncertain does not prove termination."
+  ]
 }
