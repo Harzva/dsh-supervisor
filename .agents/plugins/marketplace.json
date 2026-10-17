@@ -1,0 +1,10 @@
+{
+  "name": "harzva-supervisor-dev",
+  "interface": { "displayName": "Harzva Supervisor Development" },
+  "plugins": [{
+    "name": "harzva-supervisor",
+    "source": { "source": "local", "path": "./plugins/codex-supervisor" },
+    "policy": { "installation": "AVAILABLE", "authentication": "ON_INSTALL" },
+    "category": "Productivity"
+  }]
+}

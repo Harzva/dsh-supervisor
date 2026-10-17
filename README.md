@@ -2,6 +2,22 @@
 
 DSH Host + Client plugin for per-session supervision, role-aware Supervisors, durable responsibility assignments, context-health warnings and recoverable Handoff workflows.
 
+## Codex edition
+
+The independent `harzva-supervisor@0.1.0` Codex development plugin lives in
+[`plugins/codex-supervisor/`](plugins/codex-supervisor/README.md). It packages
+supervision, faculty review and handoff skills with a bounded local record
+helper, reusing the canonical mentor rules. Run `npm run codex:check` to verify
+it and `npm run codex:pack` to build its portable ZIP. The repo marketplace is
+`.agents/plugins/marketplace.json`.
+
+Codex owns execution, delegation, permissions and native Goals. This edition
+does not import DSH host events, start a watchdog or automatically map DSH
+model routes. The DSH package remains version `0.2.4`; Smart Supervision v2
+and DSH marketplace publication retain their separate implementation tracks.
+See [`evidence/codex/README.md`](evidence/codex/README.md) for takeover findings
+and the verification boundary.
+
 ## Supervisor configuration
 
 The plugin accepts an optional legacy-compatible `mentors` array. Existing `faculties` configurations are automatically projected into role-aware Supervisors, so older profiles continue to work.

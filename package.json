@@ -40,7 +40,10 @@
     "pack:check": "node scripts/verify-pack.mjs",
     "check": "npm run build && node --check lib/index.js && node --check lib/client.js && node --check lib/mentor-registry.js && node --check lib/supervisor-store.js && node --check lib/handoff-service.js && node --test && npm run preflight",
     "verify:p0": "npm run check && npm run scan:public && npm run pack:check",
-    "prepack": "npm run build && npm run preflight && npm run scan:public"
+    "prepack": "npm run build && npm run preflight && npm run scan:public",
+    "codex:build": "node scripts/build-codex.mjs",
+    "codex:check": "node scripts/build-codex.mjs --check && node scripts/verify-codex.mjs && node --test test/codex-supervisor.test.js",
+    "codex:pack": "node scripts/pack-codex.mjs"
   },
   "dsh": {
     "bundle": {
