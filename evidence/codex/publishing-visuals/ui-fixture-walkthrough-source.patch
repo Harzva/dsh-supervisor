@@ -1,0 +1,46 @@
+Subject: Record the existing AppBridge fixture walkthrough
+
+Applied to a temporary copy of `work/ui-model-panel-harness-public.mjs`; the
+installed runtime and panel HTML were not changed.
+
+```diff
+--- work/ui-model-panel-harness-public.mjs
++++ work/ui-model-panel-harness-recording.mjs
+@@
+-const fixture = '/private/tmp/harzva-supervisor-public-demo-v2'
++const fixture = '/private/tmp/harzva-supervisor-public-video-v2'
++const videoDir = path.join(root, 'outputs/codex-submission-0.4.1')
++const videoPath = path.join(videoDir, 'ui-fixture-walkthrough.webm')
++fs.mkdirSync(videoDir, { recursive: true, mode: 0o700 })
++fs.rmSync(fixture, { recursive: true, force: true })
+@@
+-response.end(existingWrapperHtml)
++response.end(existingWrapperHtmlWithSourceBanner)
+@@
+-browser = await chromium.launch({ headless: true })
+-page = await browser.newPage({ viewport: { width: 900, height: 950 }, deviceScaleFactor: 1 })
++browser = await chromium.launch({ headless: true, slowMo: 180 })
++recordingContext = await browser.newContext({
++  viewport: { width: 900, height: 1050 },
++  deviceScaleFactor: 1,
++  recordVideo: { dir: videoDir, size: { width: 900, height: 1050 } },
++})
++page = await recordingContext.newPage()
++recordedVideo = page.video()
+@@
+-path.join(work, 'ui-model-panel-public-*.png')
++path.join(videoDir, 'ui-fixture-walkthrough-*.png')
+@@
++await page.setViewportSize({ width: 900, height: 1050 })
++await page.waitForTimeout(400)
+@@
+-fs.writeFileSync(path.join(work, 'ui-model-panel-public-proof.json'), proof)
++fs.writeFileSync(path.join(videoDir, 'ui-fixture-walkthrough-proof.json'), proof)
+@@
++await recordingContext.close()
++const recordedPath = await recordedVideo.path()
++fs.renameSync(recordedPath, videoPath)
+```
+
+The wrapper banner is literal text: `UI fixture walkthrough · SDK AppBridge
+test host · synthetic sample data · no model inference · not Codex desktop`.

@@ -1,6 +1,6 @@
 {
   "name": "harzva-supervisor",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Authorized native execution, independent acceptance checks, faculty reviews and recoverable handoffs for Codex.",
   "author": {
     "name": "Harzva",
@@ -10,19 +10,29 @@
   "license": "Apache-2.0",
   "skills": "./skills/",
   "interface": {
-    "displayName": "Harzva Supervisor / DS 学院",
-    "shortDescription": "授权执行、独立验收和学院监督交接",
-    "longDescription": "把已授权工作交给 Codex 原生执行队列，独立验收实际产物，以学院责任、检查点和交接推进项目。",
+    "displayName": "Harzva Supervisor",
+    "shortDescription": "Execute, verify and hand off",
+    "longDescription": "Carry out already-authorized project work through a bounded local Codex execution queue. Check the resulting files and approved commands independently, coordinate faculty reviews, and preserve checkpoints and project handoffs. The conversation panel provides a dispatch switch, execution model and reasoning-effort settings, and an immediate-stop request. Requires a local desktop thread, Node.js 22+, and an installed, signed-in Codex CLI. Tested against the experimental Codex CLI 0.149.0 app-server protocol. The execution model is selected separately from the conversation model. There is no unattended continuation service; stopping cannot undo completed changes or external effects. Preview images show the packaged panel in an SDK AppBridge test host; production desktop placement is host-dependent.",
     "developerName": "Harzva",
     "category": "Productivity",
     "capabilities": [
       "Read",
       "Write"
     ],
+    "composerIcon": "./assets/composer-icon.svg",
+    "logo": "./assets/logo.svg",
+    "websiteURL": "https://harzva.github.io/supervisor/",
+    "supportURL": "https://harzva.github.io/supervisor/support/",
+    "privacyPolicyURL": "https://harzva.github.io/supervisor/privacy/",
+    "termsOfServiceURL": "https://harzva.github.io/supervisor/terms/",
     "defaultPrompt": [
-      "执行当前已授权建议，独立验收并记录检查点。",
-      "请学院导师独立评审这个方案。",
-      "整理本项目的上下文交接。"
+      "Execute the currently authorized suggestion, verify the artifacts, and record a checkpoint.",
+      "Ask the faculty mentors to review this concrete proposal.",
+      "Prepare a recoverable handoff for the current project."
+    ],
+    "screenshots": [
+      "./assets/supervisor-panel-harness-light.png",
+      "./assets/supervisor-panel-harness-dark.png"
     ]
   }
 }

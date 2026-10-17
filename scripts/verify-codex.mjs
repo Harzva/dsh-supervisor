@@ -51,7 +51,7 @@ assert.equal(entry.source.source, 'local')
 assert.equal(resolve(root, entry.source.path), resolve(plugin))
 assert.deepEqual(entry.policy, { installation: 'AVAILABLE', authentication: 'ON_INSTALL' })
 assert.equal(entry.category, 'Productivity')
-const allowedRoots = new Set(['plugin.json', '.codex-plugin', 'LICENSE', 'README.md', 'THIRD_PARTY_NOTICES.txt', 'mcp.json', 'server', 'ui', 'scripts', 'runtime', 'skills'])
+const allowedRoots = new Set(['plugin.json', '.codex-plugin', 'LICENSE', 'README.md', 'THIRD_PARTY_NOTICES.txt', 'mcp.json', 'server', 'ui', 'scripts', 'runtime', 'skills', 'assets'])
 for (const entry of await readdir(plugin, { withFileTypes: true })) {
   assert(allowedRoots.has(entry.name), `Unexpected bundled entry: ${entry.name}`)
   assert(!entry.isSymbolicLink(), `Symlink package entry: ${entry.name}`)

@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "product": "Harzva Supervisor",
+  "version": "0.4.0",
+  "sourceRecord": "../ui-panel-0.4.json",
+  "testHost": {
+    "kind": "isolated-loopback-browser",
+    "officialAppBridge": true,
+    "officialPostMessageTransport": true,
+    "realCodexDesktopClick": false,
+    "separateFromProductionHost": true
+  },
+  "honestLabel": "SDK AppBridge test harness (not the Codex desktop host); real local CLI execution evidence is recorded separately.",
+  "captures": [
+    {
+      "file": "supervisor-panel-harness-light.png",
+      "source": "../ui-0.4/ui-model-panel-harness-light.png",
+      "width": 720,
+      "height": 1135,
+      "theme": "light",
+      "state": "bound project, enabled, model and effort selected"
+    },
+    {
+      "file": "supervisor-panel-harness-dark.png",
+      "source": "../ui-0.4/ui-model-panel-harness-dark.png",
+      "width": 720,
+      "height": 1168,
+      "theme": "dark",
+      "state": "waiting job with stop and refresh controls"
+    },
+    {
+      "file": "supervisor-panel-harness-mobile-light.png",
+      "source": "../ui-0.4/ui-model-panel-harness-mobile-light.png",
+      "width": 390,
+      "height": 1416,
+      "theme": "light",
+      "state": "narrow stacked layout"
+    },
+    {
+      "file": "supervisor-panel-harness-mobile-dark.png",
+      "source": "../ui-0.4/ui-model-panel-harness-mobile-dark.png",
+      "width": 390,
+      "height": 1416,
+      "theme": "dark",
+      "state": "narrow stacked layout"
+    },
+    {
+      "file": "supervisor-panel-harness-stale.png",
+      "source": "../ui-0.4/ui-model-panel-harness-stale.png",
+      "width": 720,
+      "height": 963,
+      "theme": "light",
+      "state": "stale revision warning with refresh and stop available"
+    }
+  ],
+  "visualObservations": [
+    "The panel uses neutral light and dark surfaces, thin dividers, and a green enabled switch.",
+    "Project binding, Supervisor execution, execution model, and tasks are presented as separate sections.",
+    "The mobile capture stacks controls vertically and wraps the long project path.",
+    "The stale state visibly changes the switch to a refresh-needed state and keeps stop/refresh controls visible."
+  ],
+  "uncertainties": [
+    "The actual production Codex desktop host placement and conversation model selector are not visible in these captures.",
+    "Long absolute paths are clipped or wrapped by the harness viewport; this is not a claim about production host text measurement."
+  ],
+  "siteRender": {
+    "overview": "policy-site-overview.png",
+    "mobile": "policy-site-mobile-cdp.png",
+    "renderer": "local headless Chrome via CDP",
+    "mobileViewportWidth": 390,
+    "mobileDocumentScrollWidth": 390,
+    "externalScripts": false
+  },
+  "publicationRerender": {
+    "sourceHarness": "work/ui-model-panel-harness.mjs",
+    "syntheticWorkspace": "/private/tmp/harzva-supervisor-public-demo-v2/project",
+    "proof": "harness-public-proof.json",
+    "checks": 20,
+    "modelInference": false,
+    "externalBrowserRequests": false,
+    "assets": [
+      "supervisor-panel-harness-light.png",
+      "supervisor-panel-harness-dark.png"
+    ]
+  }
+}

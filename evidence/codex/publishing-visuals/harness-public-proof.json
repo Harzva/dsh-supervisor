@@ -1,0 +1,293 @@
+{
+  "schemaVersion": 1,
+  "installedPluginVersion": "0.4.0+codex.20261017144756",
+  "testHost": {
+    "kind": "isolated-loopback-browser",
+    "realCodexDesktopClick": false,
+    "officialAppBridge": true,
+    "officialPostMessageTransport": true,
+    "mcpClient": "official-sdk",
+    "ownerContext": "random test UUID, distinct from real Codex chats",
+    "iframeSandbox": "allow-scripts",
+    "listener": "127.0.0.1",
+    "authenticatedPost": true
+  },
+  "installedFiles": {
+    "htmlSha256": "31998115a3b2303a1db9fa57ce6208288cd66dd1dbaf6aa67fe190a3467c79a2",
+    "runtimeSha256": "c70c8bca5366f0d1ef234e01749e019107ea9c63867610a3084acbd5ce5326aa",
+    "htmlBytes": 398624,
+    "runtimeBytes": 1603035
+  },
+  "workspace": "SYNTHETIC_PUBLIC_WORKSPACE/project",
+  "dataDirectory": "SYNTHETIC_PUBLIC_DATA/plugin-data",
+  "checks": {
+    "unauthorizedPostRejected": true,
+    "explicitWorkspaceBindingWithoutInitialization": true,
+    "offSaved": true,
+    "onSaved": true,
+    "refreshRestoresDurableState": true,
+    "keyboardSpaceSwitch": true,
+    "nativeCatalogAndDefaultSettingSaved": true,
+    "explicitModelAndSupportedEffortSaved": true,
+    "staleSettingsRejectedAndStopStillAvailable": true,
+    "stopWithEmptyOrStaleListClosesGate": true,
+    "staleRevisionRejectedWithoutOptimisticFlip": true,
+    "staleSwitchDisabledUntilRefresh": true,
+    "staleRefreshAndSubsequentSave": true,
+    "reopenRestoresBindingAndSavedSwitch": true,
+    "jobRequestedModelVisibleWithoutFalseActualClaim": true,
+    "hostThemeChange": true,
+    "mobile390NoHorizontalOverflow": {
+      "viewportWidth": 390,
+      "documentScrollWidth": 390,
+      "bodyScrollWidth": 390,
+      "overflow": []
+    },
+    "waitingJobCancelledViaActualInstalledPanel": true,
+    "noInferenceOrExternalBrowserRequests": true,
+    "noRawErrors": {
+      "mcpProtocol": 0,
+      "page": 0,
+      "bridge": 0,
+      "http": 0,
+      "console": 0,
+      "stderrBytes": 0
+    }
+  },
+  "screenshots": [
+    {
+      "theme": "light",
+      "viewportWidth": 900,
+      "path": "work/ui-model-panel-public-light.png"
+    },
+    {
+      "theme": "light",
+      "state": "stale-revision-message",
+      "viewportWidth": 900,
+      "path": "work/ui-model-panel-public-stale.png"
+    },
+    {
+      "theme": "dark",
+      "viewportWidth": 900,
+      "path": "work/ui-model-panel-public-dark.png"
+    },
+    {
+      "theme": "dark",
+      "viewportWidth": 390,
+      "path": "work/ui-model-panel-public-mobile-dark.png"
+    },
+    {
+      "theme": "light",
+      "viewportWidth": 390,
+      "path": "work/ui-model-panel-public-mobile-light.png"
+    }
+  ],
+  "callSummary": [
+    {
+      "name": "supervisor_panel",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_bind_workspace",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_set_enabled",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_panel",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_set_enabled",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_panel",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_status",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_set_enabled",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_panel",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_set_enabled",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_panel",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_models",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_models",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_set_execution",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_panel",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_set_execution",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_panel",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_set_execution",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_set_execution",
+      "isError": true,
+      "code": "STALE_SETTINGS"
+    },
+    {
+      "name": "supervisor_stop",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_panel",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_status",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_set_enabled",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_panel",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_set_enabled",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_set_enabled",
+      "isError": true,
+      "code": "STALE_CONTROL"
+    },
+    {
+      "name": "supervisor_panel",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_status",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_set_enabled",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_panel",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_panel",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_panel",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_models",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_set_execution",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_status",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_models",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_stop",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_status",
+      "isError": false,
+      "code": null
+    },
+    {
+      "name": "supervisor_panel",
+      "isError": false,
+      "code": null
+    }
+  ],
+  "selectedExecution": {
+    "model": "gpt-5.6-terra",
+    "reasoningEffort": "high"
+  },
+  "finalControl": {
+    "workspace": "SYNTHETIC_PUBLIC_WORKSPACE/project",
+    "enabled": false,
+    "revision": 9,
+    "configured": true
+  },
+  "success": true
+}

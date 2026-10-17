@@ -1,0 +1,3 @@
+{
+  "release_notes": "Harzva Supervisor 0.4.1 public-review candidate adds product, support, privacy and terms links, brand assets and structured review materials. Native execution and cancellation behavior remains the validated 0.4.0 baseline: five skills, explicit project binding, native model and reasoning defaults for new proposals, revision-checked dispatch control, cancellation requests, immutable grants and independent acceptance checks. Does not automatically mirror the current conversation's model, create native Goals, monitor other chats or install background watchers."
+}

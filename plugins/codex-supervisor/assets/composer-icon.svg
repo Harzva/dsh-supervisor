@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title desc">
+  <title id="title">Harzva Supervisor</title>
+  <desc id="desc">A simple H mark with a checked execution path.</desc>
+  <rect width="96" height="96" fill="#171a18"/>
+  <path d="M23 21v54M73 21v54M23 48h50" fill="none" stroke="#f7f8f6" stroke-width="9" stroke-linecap="square"/>
+  <path d="M43 59l8 8 17-19" fill="none" stroke="#3d9b6b" stroke-width="8" stroke-linecap="square" stroke-linejoin="miter"/>
+</svg>

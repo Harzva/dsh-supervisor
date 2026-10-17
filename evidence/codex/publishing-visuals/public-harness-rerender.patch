@@ -1,0 +1,32 @@
+Subject: Re-render publication captures with a synthetic workspace
+
+The publication PNGs were regenerated from the existing harness rather than
+edited in place.  The temporary copy changed only the fixture path, output
+filenames, and proof filename:
+
+```diff
+--- work/ui-model-panel-harness.mjs
++++ work/ui-model-panel-harness-public.mjs
+@@
+-const fixture = path.join(work, `ui-panel-harness-fixture-${randomUUID()}`)
++// Re-render publication assets with a synthetic, non-private project path.
++const fixture = '/private/tmp/harzva-supervisor-public-demo-v2'
+@@
+-const light = path.join(work, 'ui-model-panel-harness-light.png')
++const light = path.join(work, 'ui-model-panel-public-light.png')
+-const stale = path.join(work, 'ui-model-panel-harness-stale.png')
++const stale = path.join(work, 'ui-model-panel-public-stale.png')
+-const dark = path.join(work, 'ui-model-panel-harness-dark.png')
++const dark = path.join(work, 'ui-model-panel-public-dark.png')
+-const mobileDark = path.join(work, 'ui-model-panel-harness-mobile-dark.png')
++const mobileDark = path.join(work, 'ui-model-panel-public-mobile-dark.png')
+-const mobileLight = path.join(work, 'ui-model-panel-harness-mobile-light.png')
++const mobileLight = path.join(work, 'ui-model-panel-public-mobile-light.png')
+@@
+-path.join(work, 'ui-model-panel-proof.json')
++path.join(work, 'ui-model-panel-public-proof.json')
+```
+
+The temporary script was run with Node from the repository worktree and exited
+successfully with `checks: 20` and `screenshots: 5`. The resulting assets were
+copied into the package and evidence directories without raster post-processing.

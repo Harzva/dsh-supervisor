@@ -1,4 +1,4 @@
-# Harzva Supervisor / DS 学院 — Codex 0.4.0
+# Harzva Supervisor / DS 学院 — Codex 0.4.1
 
 Codex 本地开发版：把已授权工作推进到原生执行、独立验收和持久检查点，并保留学院／导师评审与可校验上下文交接。独立插件标识为 `harzva-supervisor`；DSH 包仍为 `dsh-supervisor@0.2.4`。
 
@@ -220,3 +220,12 @@ npm run codex:pack -- --output <deliverable-directory>
 `codex:build` 同步复用模块和许可证；`codex:check` 检查五个技能、包结构、CLI、执行状态、原生协议和执行链行为，默认使用模拟协议测试，不调用模型；`codex:pack` 生成仅含插件文件的 ZIP 与 SHA-256 清单。产物排除项目状态、私有交接和 P0 证据。实际宿主的安装、执行和审批验收须另外记录。DSH 的 `verify:p0` 保持独立。
 
 规范依据：[OpenAI 插件打包](https://developers.openai.com/plugins/build/plugins)、[技能开发](https://developers.openai.com/plugins/build/skills)、[Codex 固定提交解析器](https://github.com/openai/codex/blob/5009a99dfc07830ddf7464c26f310a2b8532b55d/codex-rs/core-plugins/src/agent_plugin_manifest.rs)。本版采用 portable root manifest + Codex compatibility manifest；未执行公共目录、npm 或 DSH 市场发布。
+
+## Public review candidate
+
+0.4.1 adds directory listing assets, public policy links and structured review cases; runtime behavior is unchanged from the locally verified 0.4.0 baseline. This is a submission candidate, not a directory approval or public-market release. Local MCP publication requires an approved partner and an allowlisted publishing organization.
+
+Product: https://harzva.github.io/supervisor/
+Support: https://harzva.github.io/supervisor/support/
+Privacy: https://harzva.github.io/supervisor/privacy/
+Terms: https://harzva.github.io/supervisor/terms/

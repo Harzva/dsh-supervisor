@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>{{TITLE}}</title>
+    <meta name="description" content="{{DESCRIPTION}}">
+    <link rel="canonical" href="{{CANONICAL_URL}}">
+    <link rel="stylesheet" href="{{CSS_HREF}}">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="brand" href="{{ROOT_HREF}}" aria-label="Harzva Supervisor home">
+          <span class="brand__mark" aria-hidden="true">H</span>
+          <span class="brand__name">Harzva Supervisor</span>
+        </a>
+        <nav class="site-nav" aria-label="Policy pages">
+          {{NAV}}
+        </nav>
+      </div>
+    </header>
+    <main class="site-main">
+      <article class="policy">
+        {{DRAFT_NOTICE}}
+        <p class="policy__kicker">Harzva Supervisor for Codex</p>
+        <h1>{{TITLE}}</h1>
+        <p class="policy__meta">{{META}}</p>
+        <div class="policy__body">
+          {{CONTENT}}
+        </div>
+      </article>
+    </main>
+    <footer class="site-footer">
+      <div class="site-footer__inner">
+        <span>Harzva · Developer and maintainer</span>
+        <a href="mailto:{{SUPPORT_EMAIL}}">{{SUPPORT_EMAIL}}</a>
+      </div>
+    </footer>
+  </body>
+</html>

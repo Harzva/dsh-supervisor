@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Harzva review preparation subset derived from the OpenAI submission field reference (2026-10-18)",
+  "description": "Local preparation validator, not an OpenAI-published importer schema. A real demo URL remains a separate submission requirement.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["test_cases"],
+  "properties": {
+    "test_cases": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["positive", "negative"],
+      "properties": {
+        "positive": { "type": "array", "minItems": 5, "maxItems": 5, "items": { "$ref": "#/$defs/positive" } },
+        "negative": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "$ref": "#/$defs/negative" } }
+      }
+    },
+    "demo_recording_url": { "type": "string", "minLength": 1, "pattern": "^https://" },
+    "commerce": { "type": "boolean" },
+    "commerce_description": { "type": "string" }
+  },
+  "$defs": {
+    "positive": {
+      "type": "object", "additionalProperties": false,
+      "required": ["description", "prompt", "tools_triggered", "expected_behavior"],
+      "properties": {
+        "description": { "type": "string", "minLength": 1, "maxLength": 4000 },
+        "prompt": { "type": "string", "minLength": 1 },
+        "tools_triggered": { "type": "string", "minLength": 1 },
+        "expected_behavior": { "type": "string", "minLength": 1 },
+        "file_attachment_urls": { "type": "array", "items": { "type": "string", "pattern": "^https://" } },
+        "expected_output_url": { "type": "string", "pattern": "^https://" }
+      }
+    },
+    "negative": {
+      "type": "object", "additionalProperties": false,
+      "required": ["description", "prompt"],
+      "properties": {
+        "description": { "type": "string", "minLength": 1 },
+        "prompt": { "type": "string", "minLength": 1 },
+        "tools_triggered": { "type": "string" },
+        "expected_behavior": { "type": "string" },
+        "file_attachment_urls": { "type": "array", "items": { "type": "string", "pattern": "^https://" } },
+        "expected_output_url": { "type": "string", "pattern": "^https://" }
+      }
+    }
+  }
+}

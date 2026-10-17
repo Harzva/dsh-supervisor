@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "status": "blocked_before_transmission",
+  "observedUrl": "https://help.openai.com/zh-hans-cn",
+  "surface": "OpenAI Help Center support widget",
+  "observedState": {
+    "chatPanelVisible": true,
+    "loginPromptVisible": true,
+    "loginPromptText": "登录以获得更快速、更个性化的支持。",
+    "loginLinkVisible": true,
+    "loginLinkLabel": "Log in for support",
+    "textInputAvailable": false,
+    "sendControlAvailable": false
+  },
+  "loginAttempt": {
+    "authorizedEntry": "Log in for support in the support widget",
+    "authUrlObserved": "https://help.openai.com/auth/login?redirectTo=%2Fauth%2Flogin-success%3FreturnTo%3D%252Fzh-hans-cn%253Fchat%253Dtrue",
+    "navigationResult": "The address bar briefly showed the support auth URL, but the page DOM and tab metadata remained the Help Center page.",
+    "loginFormVisible": false,
+    "accountChooserVisible": false,
+    "mfaOrCaptchaVisible": false,
+    "newTermsVisible": false,
+    "credentialsReadOrEntered": false
+  },
+  "messageTransmitted": false,
+  "receiptObserved": false,
+  "blocker": "The support widget requires support login before it exposes a message composer; the single authorized login navigation did not commit to a login page, so no supported composer became available.",
+  "scopeGuard": "The existing platform login tab was not opened, changed, or submitted.",
+  "messagePreparedButNotSent": true,
+  "preparedMessageDestination": "OpenAI Support via the Help Center support widget"
+}

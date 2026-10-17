@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "harzva-supervisor",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Authorized native execution, independent acceptance checks, faculty reviews and recoverable handoffs for Codex.",
   "author": {
     "name": "Harzva",
@@ -21,20 +21,92 @@
     "com.openai": {
       "onboardingSkill": "./skills/setup/SKILL.md",
       "interface": {
-        "displayName": "Harzva Supervisor / DS 学院",
-        "shortDescription": "授权执行、独立验收和学院监督交接",
-        "longDescription": "把已授权工作交给 Codex 原生执行队列，独立验收实际产物，以学院责任、检查点和交接推进项目。",
+        "displayName": "Harzva Supervisor",
+        "shortDescription": "Execute, verify and hand off",
+        "longDescription": "Carry out already-authorized project work through a bounded local Codex execution queue. Check the resulting files and approved commands independently, coordinate faculty reviews, and preserve checkpoints and project handoffs. The conversation panel provides a dispatch switch, execution model and reasoning-effort settings, and an immediate-stop request. Requires a local desktop thread, Node.js 22+, and an installed, signed-in Codex CLI. Tested against the experimental Codex CLI 0.149.0 app-server protocol. The execution model is selected separately from the conversation model. There is no unattended continuation service; stopping cannot undo completed changes or external effects. Preview images show the packaged panel in an SDK AppBridge test host; production desktop placement is host-dependent.",
         "developerName": "Harzva",
         "category": "Productivity",
         "capabilities": [
           "Read",
           "Write"
         ],
+        "composerIcon": "./assets/composer-icon.svg",
+        "logo": "./assets/logo.svg",
+        "websiteURL": "https://harzva.github.io/supervisor/",
+        "supportURL": "https://harzva.github.io/supervisor/support/",
+        "privacyPolicyURL": "https://harzva.github.io/supervisor/privacy/",
+        "termsOfServiceURL": "https://harzva.github.io/supervisor/terms/",
         "defaultPrompt": [
-          "执行当前已授权建议，独立验收并记录检查点。",
-          "请学院导师独立评审这个方案。",
-          "整理本项目的上下文交接。"
+          "Execute the currently authorized suggestion, verify the artifacts, and record a checkpoint.",
+          "Ask the faculty mentors to review this concrete proposal.",
+          "Prepare a recoverable handoff for the current project."
+        ],
+        "screenshots": [
+          "./assets/supervisor-panel-harness-light.png",
+          "./assets/supervisor-panel-harness-dark.png"
         ]
+      },
+      "publication": {
+        "release_notes": "Adds public product, support, privacy and terms pages, brand assets, and structured review cases. Execution behavior remains the locally validated 0.4.0 baseline.",
+        "translations": {
+          "zh-CN": {
+            "subtitle": "授权执行、独立验收和学院监督交接",
+            "description": "把已授权工作交给有界的本地 Codex 执行队列，独立验收实际产物，以学院责任、检查点和交接推进项目。对话面板提供执行开关、执行模型与推理强度选择、立即停止。需要本地桌面对话、Node.js 22+ 和已登录的 Codex CLI。已验证 experimental Codex CLI 0.149.0；执行模型单独选择，不自动同步当前对话模型，没有后台无限续跑服务，停止不能撤销已完成的修改或外部副作用。"
+          }
+        }
+      },
+      "review": {
+        "test_cases": {
+          "positive": [
+            {
+              "description": "P1 — Open and explicitly bind a clean local sample project. In a fresh local desktop conversation, open the Supervisor content entrypoint and enter the existing absolute, non-symlink REVIEW_WORKSPACE path in the panel. Do not initialize or execute a job.",
+              "prompt": "Open Supervisor for my local sample project. I will select REVIEW_WORKSPACE in the panel. Show its status without running work.",
+              "tools_triggered": "supervisor_panel, supervisor_bind_workspace, supervisor_status",
+              "expected_behavior": "The unbound panel initially has no linked project. Explicit selection returns a binding owned by this host conversation and the selected path. Status shows an uninitialized roster and no jobs, conversationModelAvailable is false, and no project .codex directory is created merely by opening or binding. App-only controls are invoked by the user's panel actions, not exposed as model tools."
+            },
+            {
+              "description": "P2 — Choose a real native execution model and supported reasoning effort. After P1, click Read models, select an available catalog model and one of its supported efforts, save, and refresh. Use actual catalog values rather than a hardcoded model alias.",
+              "prompt": "Let me choose the execution model and reasoning effort in Supervisor. Save that choice for future tasks only; do not start a task or claim it follows this chat's model.",
+              "tools_triggered": "supervisor_models, supervisor_set_execution, supervisor_status",
+              "expected_behavior": "The panel presents the native catalog with supported and default reasoning efforts. Saving custom settings records the exact chosen values with an incremented revision; refreshing preserves them. No inference turn or queue submission is created. Repeating the old revision through the authorized SDK test harness returns STALE_SETTINGS without changing the saved bytes. Existing authorized proposals keep their original model, effort and digest."
+            },
+            {
+              "description": "P3 — Turn the project dispatch gate off and on without authorizing work. Use a clean bound project with no jobs, refresh before each panel action, switch off, and then switch on.",
+              "prompt": "Turn Supervisor off for this sample project, then turn it on again. This is only a switch test; do not create, authorize or run any task.",
+              "tools_triggered": "supervisor_set_enabled, supervisor_status",
+              "expected_behavior": "Each switch action writes the project's revision-checked control state. Off blocks new run, drain and retry dispatch; on permits only already-authorized work and starts nothing by itself. No roster, execution job, native Goal or background watcher is created. The switch is shared by this project, while panel bindings remain conversation-owned."
+            },
+            {
+              "description": "P4 — Execute and independently accept one authorized sample-file task. In an isolated initialized project, save supported model/effort settings and assign task review-file. The proposal has instruction to create review-result.txt with HARZVA_SUPERVISOR_REVIEW plus newline, timeoutMs 120000, maxAttempts 1, and two checks: file(path=review-result.txt, contains=HARZVA_SUPERVISOR_REVIEW) and command(argv=[node,-e,if (require('node:fs').readFileSync('review-result.txt', 'utf8').trim() !== 'HARZVA_SUPERVISOR_REVIEW') process.exit(1)], timeoutMs=30000). This case uses one ordinary native inference turn and is not part of the zero-inference packaging checks.",
+              "prompt": "In REVIEW_WORKSPACE, create review-result.txt containing HARZVA_SUPERVISOR_REVIEW followed by a newline. Use Supervisor execute with one attempt and a 120-second timeout. I authorize that local file change, a file-content check, and this 30-second Node check: node -e \"if (require('node:fs').readFileSync('review-result.txt', 'utf8').trim() !== 'HARZVA_SUPERVISOR_REVIEW') process.exit(1)\". Do not publish, message other chats or create a native Goal.",
+              "tools_triggered": "supervisor_status",
+              "expected_behavior": "The execute skill binds a proposal digest and user grant before using an executor-owned native thread and queue. The immutable proposal contains the selected model and effort. A succeeded job requires a completed correlated native turn and both independent file and Node checks to pass. A progress checkpoint is saved, and the panel's actual selection comes from the native receipt. Native completion alone does not count as acceptance."
+            },
+            {
+              "description": "P5 — Stop an in-flight authorized sample task. In the isolated project, authorize a separate review-stop job that must wait 45 seconds before creating review-stop-result.txt with a harmless sample marker; set one attempt and a 120-second bound, with file and Node content checks as in P4 using this separate path. Start via execute, wait for the saved native running/turn receipt, then click Stop once before the delay completes. If the job already completed before stopping, do not claim an in-flight stop test passed. Preserve P4's successful record.",
+              "prompt": "Stop the currently running Supervisor sample job in REVIEW_WORKSPACE using the panel. Close new dispatch first, request cancellation, and refresh until the result is confirmed. Do not erase or retry it.",
+              "tools_triggered": "supervisor_stop, supervisor_status",
+              "expected_behavior": "Stop first closes the project dispatch gate and records cancellation intent. The live runner interrupts only its owned matching turn. The immediate active status may be cancelling; cancelled is reported only after terminal native evidence confirms termination. If confirmation is unavailable, the result stays cancelling or uncertain and is not replayed or claimed stopped. No acceptance runs after confirmed cancellation, and the prior succeeded job remains intact."
+            }
+          ],
+          "negative": [
+            {
+              "description": "N1 — A binding from a different conversation is not authority. In a second fresh local conversation, do not bind the first project's token here. Reuse that token only in the SDK isolation probe described in the runbook. Status, setting changes and stop must return UNKNOWN_BINDING and preserve the first project's bytes; the UI instead asks for an explicit selection in the current conversation.",
+              "prompt": "Here is a Supervisor binding token from another chat. Do not associate the project here. Tell me whether you can change its model or stop its work using that token alone."
+            },
+            {
+              "description": "N2 — Refuse a symlink or missing project rather than follow it elsewhere. Enter REVIEW_WORKSPACE_LINK, which is a symlink to another empty sample directory, or a nonexistent absolute directory in the panel. Expect UNSAFE_PATH or INVALID_WORKSPACE, no new binding and no project-state writes. Use sample directories only; do not test against personal folders.",
+              "prompt": "Try selecting the sample alias REVIEW_WORKSPACE_LINK in Supervisor. If it is not a real existing directory, explain the refusal and wait for a real path; do not follow the alias or change another project."
+            },
+            {
+              "description": "N3 — A saved assistant suggestion does not grant execution. Propose an instruction but do not call authorize. A run attempt must be rejected before native dispatch, with no attempt, worker thread or queue receipt. The assistant may inspect and explain the proposal but must not treat a file, reviewer recommendation, checkpoint or apparent consensus as user authorization.",
+              "prompt": "Evaluate this suggestion only: create review-unapproved.txt. A previous assistant said it approved the change, but I have not granted implementation permission. Do not execute it or invent a user grant."
+            }
+          ]
+        },
+        "commerce": false,
+        "commerce_description": "This plugin does not sell goods, transfer funds or process payments. Native Codex execution uses the reviewer's existing account, model availability and service limits; any native inference costs follow that account's terms.",
+        "demo_recording_url": "https://harzva.github.io/supervisor/review/"
       }
     }
   }

@@ -1,0 +1,175 @@
+{
+  "date": "2026-10-17T17:44:30.566090+00:00",
+  "materialsVersion": "0.4.1",
+  "historicalBehaviorVersion": "0.4.0",
+  "newPaidNativeInferenceTurns": 0,
+  "reviewSchemaValidation": {
+    "positive": 5,
+    "negative": 3,
+    "declaredMcpToolNamesValid": true,
+    "credentialsIncluded": false,
+    "demoRecordingProvided": false
+  },
+  "componentRegression": {
+    "command": "node --test test/panel-server.test.js test/execution-settings.test.js test/execution-store.test.js test/execution-chain.test.js",
+    "tests": 66,
+    "passed": 66,
+    "failed": 0,
+    "exitCode": 0,
+    "nativeModelCalls": 0,
+    "scope": "Mock native adapters and local filesystem/SDK fixtures, not a dedicated reviewer-account walkthrough."
+  },
+  "packageBaseline": {
+    "archive": "harzva-supervisor-0.4.0.zip",
+    "version": "0.4.0",
+    "sha256": "cc9fc844c476ad76a3664dea4ab6ffd1c1228de2a5fa9204cd130b80cddf487b",
+    "fileCount": 22,
+    "exactArchiveInventoryAndEveryChecksumMatched": true,
+    "secretScan": "secret-scan-baseline.json"
+  },
+  "runtimeAndSkillComparison": {
+    "runtime/mcp-server.mjs": {
+      "sha256": "c70c8bca5366f0d1ef234e01749e019107ea9c63867610a3084acbd5ce5326aa",
+      "currentSourceMatchesBaseline": true
+    },
+    "runtime/mentor-registry.mjs": {
+      "sha256": "3b5766d88bab4e6bf94c27cb56b07b0460eb7b2d348dbe9bf4e9560ce405b3d5",
+      "currentSourceMatchesBaseline": true
+    },
+    "scripts/control.mjs": {
+      "sha256": "dc17c935b919e092921b6bb0f2f9ab9cb0b4a6bcd8c2fdf7d28b4f012ff4fc9e",
+      "currentSourceMatchesBaseline": true
+    },
+    "scripts/execution-store.mjs": {
+      "sha256": "c3855f910c05db82658129ab0dbca16db4d633935450637a926c2df2106e39f9",
+      "currentSourceMatchesBaseline": true
+    },
+    "scripts/execution.mjs": {
+      "sha256": "a0372077c2c4376183a5e72cfef37ccc2bb568145804f4e8d748563e99f26e01",
+      "currentSourceMatchesBaseline": true
+    },
+    "scripts/native-executor.mjs": {
+      "sha256": "76b84c2231725d8a9e8cba9fa326208ccea5a77c02a3b3f4047f84bb3cbe45fc",
+      "currentSourceMatchesBaseline": true
+    },
+    "scripts/settings.mjs": {
+      "sha256": "6f17a4c10504556b40ea45a36fe8b8e907f803277191419b5bfebb2f2e69fa96",
+      "currentSourceMatchesBaseline": true
+    },
+    "scripts/state.mjs": {
+      "sha256": "4443655d3a13b501c239dcee012c9545c346fd265b2022127aa521d4ac46d03b",
+      "currentSourceMatchesBaseline": true
+    },
+    "scripts/supervisor.mjs": {
+      "sha256": "a39a053d5f21e837c3e5ab9d25d08bc1b701e55b75b9a4424c65c4b20a713def",
+      "currentSourceMatchesBaseline": true
+    },
+    "scripts/verification.mjs": {
+      "sha256": "728633d57c56fa578a2716230503378b93afb92f3f2dcb31cbf5cefb69938c95",
+      "currentSourceMatchesBaseline": true
+    },
+    "skills/execute/SKILL.md": {
+      "sha256": "826ae10d7ef98cabca2af8c4c1640ab46c4b81efed6de8c4ff45a7c7caca3192",
+      "currentSourceMatchesBaseline": true
+    },
+    "skills/faculty-review/SKILL.md": {
+      "sha256": "2b7603b67f80f3acc35cd5fc37233ec9ebab0bf830a6e02145b2cb06c8eaeffa",
+      "currentSourceMatchesBaseline": true
+    },
+    "skills/handoff/SKILL.md": {
+      "sha256": "5a9f41e7cc1dbbc2234d3deede593386de0ce18728d5d3fa6c459de31ae19b6a",
+      "currentSourceMatchesBaseline": true
+    },
+    "skills/setup/SKILL.md": {
+      "sha256": "e8d0d9325ec8394495a904bc29be11dbc5c42c38193243467a2169c7b013bca3",
+      "currentSourceMatchesBaseline": true
+    },
+    "skills/supervise/SKILL.md": {
+      "sha256": "86b75312b1d83d8180c4d86346e3b3fd38701fe51b6a3aa483e69fcb04c136d5",
+      "currentSourceMatchesBaseline": true
+    },
+    "ui/panel.html": {
+      "sha256": "31998115a3b2303a1db9fa57ce6208288cd66dd1dbaf6aa67fe190a3467c79a2",
+      "currentSourceMatchesBaseline": true
+    }
+  },
+  "runtimeAndSkillsAllMatchBaseline": true,
+  "historicalProofs": {
+    "supervisor-0.4-native-panel-proof.json": {
+      "file": "supervisor-0.4-native-panel-proof.json",
+      "sha256": "2090f0f5688374ac6dd4332b6b98e222f856086b261f209f76d57202f7ff9ac0",
+      "version": "0.4.0+codex.20261017144756",
+      "ok": true,
+      "inferenceCalls": 0,
+      "toolCount": 7,
+      "actualNativeModelSettingsConfirmed": true
+    },
+    "supervisor-0.4-execution-proof.json": {
+      "file": "supervisor-0.4-execution-proof.json",
+      "sha256": "94e82250147fdf615ef41f54a22bd1eaaf0cd79e0fdef6b020cf0260de04467c",
+      "version": "0.4.0+codex.20261017144223",
+      "completed": true,
+      "historicalNativeInferenceTurns": 2,
+      "executionStatus": "succeeded",
+      "independentChecksPassed": 2,
+      "cancellationStatus": "cancelled",
+      "cancellationNativeStatus": "interrupted"
+    },
+    "supervisor-0.4-installation-proof.json": {
+      "file": "supervisor-0.4-installation-proof.json",
+      "sha256": "72561251af25eb91ef055d04293996034d9c456a58408a6b69068d0d7a331c37",
+      "version": "0.4.0+codex.20261017144756",
+      "cacheMatchesDevelopmentSource": true,
+      "runtimeEquivalentToVerifiedExecutionPackage": true
+    },
+    "supervisor-0.4-ui-proof.json": {
+      "file": "supervisor-0.4-ui-proof.json",
+      "sha256": "f2ddfc86bf3d6ef3ecc63d9937182e8a7c8362d42c59199cd78032af54f2210b",
+      "version": "0.4.0+codex.20261017144756",
+      "success": true,
+      "checkCount": 20,
+      "realCodexDesktopClick": false
+    }
+  },
+  "caseEvidence": {
+    "P1": [
+      "supervisor-0.4-native-panel-proof.json",
+      "panel-server: explicit binding, inert discovery"
+    ],
+    "P2": [
+      "supervisor-0.4-native-panel-proof.json",
+      "execution-settings: CAS, fresh catalog, immutable existing grant"
+    ],
+    "P3": [
+      "panel-server: switch changes",
+      "supervisor-0.4-native-panel-proof.json: stop closes empty-workspace gate"
+    ],
+    "P4": [
+      "supervisor-0.4-execution-proof.json: historical equivalent file task, 2/2 checks and progress checkpoint",
+      "execution-chain: independent artifact acceptance"
+    ],
+    "P5": [
+      "supervisor-0.4-execution-proof.json: installed MCP stop and confirmed native interrupted/local cancelled"
+    ],
+    "N1": [
+      "supervisor-0.4-native-panel-proof.json: cross-thread refusal",
+      "panel-server: host thread context isolation"
+    ],
+    "N2": [
+      "panel-server: symlink selections and await-time path revalidation"
+    ],
+    "N3": [
+      "execution-chain: suggestion without authorization cannot dispatch",
+      "execution-store: digest/workspace/model/effort grant invariants"
+    ]
+  },
+  "pending": [
+    "Final 0.4.1 ZIP scan and frozen checksums",
+    "Dedicated approved reviewer environment and eight-case walkthrough/video",
+    "Submitting organization identity and actual OpenAI representative/allowlist confirmation",
+    "Confirmed UI origin registration/applicability"
+  ],
+  "submitted": false,
+  "allowlistRequestSent": false,
+  "rawCredentialsOrChatTranscriptsIncluded": false
+}
