@@ -16,3 +16,4 @@ for (const [source, target] of files) {
   }
 }
 process.stdout.write(`Codex resources ${process.argv.includes('--check') ? 'verified' : 'built'} from canonical source.\n`)
+await import('./build-codex-ui.mjs')

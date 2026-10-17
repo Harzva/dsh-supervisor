@@ -1,0 +1,122 @@
+{
+  "date": "2026-10-17",
+  "timezone": "Asia/Shanghai",
+  "previousEvidence": "checks-0.2.0.json",
+  "baseline": {
+    "repository": "Harzva/dsh-supervisor",
+    "baseBranch": "feat/smart-supervision-v2",
+    "commit": "5092a0905c8d41c88f25f6c06c6c27a9b05a15c5",
+    "dshVersion": "0.2.4",
+    "tag": "p0-0.2.4",
+    "tagCommit": "910b12298386567f916a06dbdf0750904ed5b124"
+  },
+  "plugin": {
+    "name": "harzva-supervisor",
+    "version": "0.2.1",
+    "skills": [
+      "setup",
+      "supervise",
+      "execute",
+      "faculty-review",
+      "handoff"
+    ],
+    "format": "portable + Codex compatibility",
+    "dependencies": 0,
+    "codexContract": "0.149.0 experimental app-server queue"
+  },
+  "checks": {
+    "npm run codex:check": {
+      "passed": true,
+      "tests": 91
+    },
+    "npm run verify:p0": {
+      "passed": true,
+      "tests": 107,
+      "dshBaselineTests": 16,
+      "packFiles": 19,
+      "publicScanFindings": 0
+    },
+    "skillCreatorQuickValidate": {
+      "passed": true,
+      "skills": 5
+    },
+    "standaloneZip": {
+      "passed": true,
+      "fileCount": 16,
+      "allFileDigestsMatchSource": true,
+      "installedCacheMatchesPackage": true
+    },
+    "independentReview": {
+      "passed": true,
+      "tests": 61,
+      "findingsResolved": [
+        "cancel acknowledgement races",
+        "native model forwarding",
+        "recovery queue/Goal/latest-turn conflicts",
+        "verifier abort and uncertain termination",
+        "durable independent verifier intent",
+        "stop later commands after unconfirmed receipts",
+        "stale declared artifact rejection on recovery",
+        "acknowledged native thread startup history race",
+        "diagnostic preservation during inert recovery"
+      ]
+    },
+    "gitDiffCheck": {
+      "passed": true
+    }
+  },
+  "hostAcceptance": {
+    "actualPluginParser": {
+      "passed": true,
+      "method": "plugin/read",
+      "skills": 5,
+      "installed": true,
+      "enabled": true
+    },
+    "actualNativeQueue": {
+      "passed": true,
+      "evidence": "local-installation.json",
+      "attemptCount": 1,
+      "checksPassed": 2,
+      "progressCheckpointSequence": 1
+    },
+    "nativeSkillInvocation": {
+      "passed": true,
+      "names": [
+        "harzva-supervisor:setup",
+        "harzva-supervisor:execute"
+      ],
+      "source": "actual installed cache via explicit native skill inputs"
+    },
+    "desktopInstallation": "installed and enabled using supported local CLI",
+    "currentConversationRefresh": "not directly observed; natural restart may be needed",
+    "hostPermissionProfile": "same full-access environment as the current authorized local session; no persistent policy change"
+  },
+  "repositoryAudit": {
+    "method": "GitHub GraphQL",
+    "visibility": "PRIVATE",
+    "license": "Apache-2.0",
+    "releaseCount": 0,
+    "checkedAt": "2026-10-17T02:15:39Z"
+  },
+  "publication": {
+    "githubReleaseCreated": false,
+    "npmPublished": false,
+    "dshMarketplaceSubmitted": false,
+    "publicPluginDirectorySubmitted": false
+  },
+  "artifact": {
+    "archive": "harzva-supervisor-0.2.1.zip",
+    "sha256": "0e095292214e3518cacca283063c8a35a39c4d0404db2672092120ce5e0e09de",
+    "fileCount": 16
+  },
+  "sourceDigests": {
+    "runtime/mentor-registry.mjs": "3b5766d88bab4e6bf94c27cb56b07b0460eb7b2d348dbe9bf4e9560ce405b3d5",
+    "scripts/execution-store.mjs": "c26d8e12aa0e2cf3629830a22bcdcbf928342484ccbd2f044f88441cf9f20a30",
+    "scripts/execution.mjs": "53da3282292c134718f62f2c16c573cfc796e892295a07051065ee4c67aa0994",
+    "scripts/native-executor.mjs": "d865364869368352423779a68a466bcc84f061981e5d39d3da717e85bd86b485",
+    "scripts/state.mjs": "4443655d3a13b501c239dcee012c9545c346fd265b2022127aa521d4ac46d03b",
+    "scripts/supervisor.mjs": "d337eb8e4567e1a838e2c2d7a71e7d2d2657cdc95eab3cf73800911a7990a824",
+    "scripts/verification.mjs": "728633d57c56fa578a2716230503378b93afb92f3f2dcb31cbf5cefb69938c95"
+  }
+}

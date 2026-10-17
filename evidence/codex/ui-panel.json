@@ -1,0 +1,77 @@
+{
+  "date": "2026-10-17",
+  "installedPluginVersion": "0.3.0",
+  "success": true,
+  "testHost": "official MCP Apps AppBridge/PostMessageTransport isolated test host using actual installed HTML and MCP runtime",
+  "realCodexDesktopClick": false,
+  "uiSha256": "6c6bc28c3bddecc9bb70a6f42e750610ef25d31d4b5ae6f88fd5e6c770dd3a44",
+  "runtimeSha256": "e11df82e9f088f94f6d19a4f9ad255efa8a470c864ad5686576d52a109b7d190",
+  "checks": {
+    "unauthorizedPostRejected": true,
+    "explicitWorkspaceBindingWithoutInitialization": true,
+    "offSaved": true,
+    "onSaved": true,
+    "refreshRestoresDurableState": true,
+    "keyboardSpaceSwitch": true,
+    "staleRevisionRejectedWithoutOptimisticFlip": true,
+    "staleSwitchDisabledUntilRefresh": true,
+    "staleRefreshAndSubsequentSave": true,
+    "reopenRestoresBindingAndSavedSwitch": true,
+    "hostThemeChange": true,
+    "mobile390NoHorizontalOverflow": {
+      "viewportWidth": 390,
+      "documentScrollWidth": 390,
+      "bodyScrollWidth": 390,
+      "overflow": []
+    },
+    "noModelJobsOrExternalRequests": true,
+    "noRawErrors": {
+      "mcpProtocol": 0,
+      "page": 0,
+      "bridge": 0,
+      "http": 0,
+      "console": 0,
+      "stderrBytes": 0
+    }
+  },
+  "checkCount": 14,
+  "visualReview": {
+    "passed": true,
+    "reviewer": "CX Luna",
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "narrowWidth": 390,
+    "staleStateSemanticRiskResolved": true,
+    "desktopEntryPositionNotObserved": true
+  },
+  "screenshotEvidence": [
+    {
+      "theme": "light",
+      "width": 900,
+      "file": "ui/ui-panel-harness-light.png"
+    },
+    {
+      "theme": "light",
+      "width": 900,
+      "state": "stale-revision-message",
+      "file": "ui/ui-panel-harness-stale.png"
+    },
+    {
+      "theme": "dark",
+      "width": 900,
+      "file": "ui/ui-panel-harness-dark.png"
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "file": "ui/ui-panel-harness-mobile-dark.png"
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "file": "ui/ui-panel-harness-mobile-light.png"
+    }
+  ]
+}

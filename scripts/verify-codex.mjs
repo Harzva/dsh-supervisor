@@ -18,6 +18,10 @@ assert.deepEqual(extension.interface, compatibility.interface)
 assert.equal(extension.onboardingSkill, compatibility.extensions['com.openai'].onboardingSkill)
 assert.equal(compatibility.skills, './skills/')
 assert(!manifest.mcpServers && !compatibility.mcpServers && !extension.hooks && !extension.apps)
+const mcp = JSON.parse(await readFile(join(plugin, 'mcp.json'), 'utf8'))
+assert.equal(mcp.$schema, 'https://agent-plugins.org/schemas/1.0.0/mcp.schema.json')
+assert.deepEqual(Object.keys(mcp.mcpServers), ['supervisor-panel'])
+assert.deepEqual(mcp.mcpServers['supervisor-panel'], { type: 'stdio', command: 'node', args: ['${PLUGIN_ROOT}/runtime/mcp-server.mjs'], env: { HARZVA_SUPERVISOR_DATA: '${PLUGIN_DATA}' } })
 for (const path of [extension.onboardingSkill, compatibility.skills]) {
   assert(path.startsWith('./') && !path.split('/').includes('..'), `Bad package path: ${path}`)
   assert((await lstat(resolve(plugin, path))).isDirectory() || (await lstat(resolve(plugin, path))).isFile())
@@ -47,13 +51,14 @@ assert.equal(entry.source.source, 'local')
 assert.equal(resolve(root, entry.source.path), resolve(plugin))
 assert.deepEqual(entry.policy, { installation: 'AVAILABLE', authentication: 'ON_INSTALL' })
 assert.equal(entry.category, 'Productivity')
-const allowedRoots = new Set(['plugin.json', '.codex-plugin', 'LICENSE', 'README.md', 'scripts', 'runtime', 'skills'])
+const allowedRoots = new Set(['plugin.json', '.codex-plugin', 'LICENSE', 'README.md', 'THIRD_PARTY_NOTICES.txt', 'mcp.json', 'server', 'ui', 'scripts', 'runtime', 'skills'])
 for (const entry of await readdir(plugin, { withFileTypes: true })) {
   assert(allowedRoots.has(entry.name), `Unexpected bundled entry: ${entry.name}`)
   assert(!entry.isSymbolicLink(), `Symlink package entry: ${entry.name}`)
 }
-for (const script of ['execution.mjs', 'execution-store.mjs', 'native-executor.mjs', 'verification.mjs', 'state.mjs', 'supervisor.mjs']) {
+for (const script of ['control.mjs', 'execution.mjs', 'execution-store.mjs', 'native-executor.mjs', 'verification.mjs', 'state.mjs', 'supervisor.mjs']) {
   const stat = await lstat(join(plugin, 'scripts', script))
   assert(stat.isFile() && !stat.isSymbolicLink(), `Missing or unsafe runtime script: ${script}`)
 }
+for (const file of ['runtime/mcp-server.mjs', 'ui/panel.html', 'THIRD_PARTY_NOTICES.txt']) assert((await lstat(join(plugin, file))).isFile())
 process.stdout.write(JSON.stringify({ ok: true, name: manifest.name, version: manifest.version, skillCount: skills.length }) + '\n')

@@ -6,6 +6,7 @@ import { execute, inspect, models } from './native-executor.mjs'
 import { verify } from './verification.mjs'
 import { run as supervisor, recordCheckpoint } from './supervisor.mjs'
 import { fail, SupervisorError, readInput, workspacePaths } from './state.mjs'
+import { readControl } from './control.mjs'
 
 const HELP = `Harzva Supervisor execution chain (Codex native queue).
 Usage: node scripts/execution.mjs <command> --workspace <project> [options]
@@ -89,7 +90,14 @@ async function withRunner(store, action) {
   try { return await action() } finally { releaseRunner(store, lease.token) }
 }
 
+function requireEnabled(workspace) {
+  if (!readControl(workspace).enabled) fail('SUPERVISOR_DISABLED', 'Supervisor is off for this project. Enable it before dispatching authorized work.')
+}
+
 export async function runJob(store, id, dependencies = {}) {
+  const current = jobFrom(store.snapshot(), id)
+  if (current.status === 'succeeded' || current.status === 'cancelled') return publicJob(current)
+  requireEnabled(store.workspace)
   return withRunner(store, () => runJobOwned(store, id, dependencies))
 }
 
@@ -104,9 +112,11 @@ async function runJobOwned(store, id, dependencies = {}) {
   const workspace = store.snapshot().workspace
   const assignment = supervisor(['status', '--workspace', workspace, '--task', job.taskId])
   while (['authorized', 'failed'].includes(job.status)) {
+    requireEnabled(workspace)
     const previousTurnId = job.attempts.at(-1)?.turnId
     const attempt = store.mutate(state => beginAttempt(state, id))
     job = jobFrom(store.snapshot(), id)
+    let dispatchBlocked = false
     const controller = new AbortController()
     const relayAbort = () => controller.abort()
     dependencies.signal?.addEventListener('abort', relayAbort, { once: true })
@@ -129,6 +139,10 @@ async function runJobOwned(store, id, dependencies = {}) {
         onDispatch: async () => {
           const current = jobFrom(store.snapshot(), id)
           if (current.status !== 'dispatching' || current.attempts.at(-1)?.id !== attempt.id || controller.signal.aborted) fail('CANCELLED', 'Dispatch was superseded.')
+          if (!readControl(workspace).enabled) {
+            dispatchBlocked = true
+            fail('SUPERVISOR_DISABLED', 'Supervisor was turned off before native queue dispatch. Inspect the saved thread receipt before continuing.')
+          }
         },
         onQueued: async ({ threadId, queuedSubmissionId }) => update({ status: 'dispatching', threadId, queuedSubmissionId }),
         onStarted: async ({ threadId, turnId }) => update({ status: 'running', threadId, turnId }),
@@ -139,9 +153,9 @@ async function runJobOwned(store, id, dependencies = {}) {
         update({ status: ['completed', 'failed', 'interrupted'].includes(result.status) ? 'cancelled' : 'uncertain', ...receipt, result: { status: result.status, reason: 'cancellation-requested', cancellationRequested: true, ...(result.transport ? { transport: result.transport } : {}) } })
         return publicJob(jobFrom(store.snapshot(), id))
       }
-      if (result.status !== 'completed') {
-        const status = ['needs-user-action', 'uncertain'].includes(result.status) ? result.status : 'failed'
-        update({ status, ...receipt, result: { status: result.status, reason: 'native-execution-not-completed', ...(result.nativeError ? { nativeError: result.nativeError } : {}), ...(result.transport ? { transport: result.transport } : {}) } })
+      if (result.status !== 'completed' || dispatchBlocked) {
+        const status = dispatchBlocked ? 'uncertain' : ['needs-user-action', 'uncertain'].includes(result.status) ? result.status : 'failed'
+        update({ status, ...receipt, result: { status: result.status, reason: dispatchBlocked ? 'supervisor-disabled-before-dispatch' : 'native-execution-not-completed', ...(result.nativeError ? { nativeError: result.nativeError } : {}), ...(result.transport ? { transport: result.transport } : {}) } })
       } else {
         update({ status: 'verifying', ...receipt, result: { status: 'completed', ...(job.proposal.verification.some(check => check.kind === 'command') ? { verificationStarted: true } : {}) } })
         const checks = await verification(workspace, job.proposal.verification, { signal: controller.signal })
@@ -159,7 +173,7 @@ async function runJobOwned(store, id, dependencies = {}) {
       }
     } catch {
       const current = jobFrom(store.snapshot(), id)
-      if (current.status !== 'cancelled') update({ status: 'uncertain', result: { ...current.attempts.at(-1).result, reason: 'execution-or-persistence-interrupted', ...(current.attempts.at(-1).result?.verificationStarted && !current.verification ? { verificationUncertain: true } : {}), ...(controller.signal.aborted || current.status === 'cancelling' ? { cancellationRequested: true } : {}) } })
+      if (current.status !== 'cancelled') update({ status: 'uncertain', result: { ...current.attempts.at(-1).result, reason: dispatchBlocked ? 'supervisor-disabled-before-dispatch' : 'execution-or-persistence-interrupted', ...(current.attempts.at(-1).result?.verificationStarted && !current.verification ? { verificationUncertain: true } : {}), ...(controller.signal.aborted || current.status === 'cancelling' ? { cancellationRequested: true } : {}) } })
     } finally {
       clearInterval(timer)
       dependencies.signal?.removeEventListener('abort', relayAbort)
@@ -299,6 +313,7 @@ export async function run(argv, dependencies = {}) {
   const limit = Number(values['--limit'] || '10')
   if (!Number.isInteger(limit) || limit < 1 || limit > 100) fail('USAGE', '--limit must be an integer from 1 to 100.')
   const selected = Object.values(store.snapshot().jobs).filter(job => job.status === 'authorized').slice(0, limit)
+  requireEnabled(store.workspace)
   return withRunner(store, async () => {
     const jobs = []
     for (const job of selected) {

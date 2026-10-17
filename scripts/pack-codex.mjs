@@ -21,6 +21,9 @@ const digests = {}
 async function walk(dir) {
   for (const entry of await readdir(dir, { withFileTypes: true })) {
     const path = join(dir, entry.name)
+    const packagePath = relative(plugin, path).replaceAll('\\', '/')
+    // Development sources are retained in Git; the portable package uses built entrypoints.
+    if (packagePath === 'server' || packagePath === 'ui/panel.js' || packagePath === 'ui/panel.template.html') continue
     if (entry.isSymbolicLink()) throw new Error('Symlink in plugin package')
     if (entry.isDirectory()) await walk(path)
     else {

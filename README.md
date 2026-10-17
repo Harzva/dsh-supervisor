@@ -4,7 +4,7 @@ DSH Host + Client plugin for per-session supervision, role-aware Supervisors, du
 
 ## Codex edition
 
-The independent `harzva-supervisor@0.2.1` Codex development plugin lives in
+The independent `harzva-supervisor@0.3.0` Codex development plugin lives in
 [`plugins/codex-supervisor/`](plugins/codex-supervisor/README.md). It packages
 supervision, authorized execution, faculty review and handoff skills, reusing
 the canonical mentor rules. The execution chain binds an immutable proposal
@@ -13,6 +13,13 @@ queue, independently checks files or sandboxed commands, and records a
 progress checkpoint. Run `npm run codex:check` to verify it and
 `npm run codex:pack` to build its portable ZIP. The repo marketplace is
 `.agents/plugins/marketplace.json`.
+
+The local MCP App adds a Supervisor conversation tab with a persisted workspace
+switch. Select a project explicitly in the panel. Switching off blocks new
+dispatch and retry; running work may finish. Switching on does not grant a
+proposal, create work or monitor chats. Bindings are isolated by host thread,
+and updates use a revision check. The package bundles its MCP/UI SDK dependencies;
+development builds require `npm ci`, while installed usage requires no npm install.
 
 The adapter uses the installed Codex 0.149.0 experimental app-server queue
 contract and existing login. Defaults are one attempt, bounded execution and

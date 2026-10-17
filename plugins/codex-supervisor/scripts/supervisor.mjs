@@ -406,7 +406,7 @@ export function run(argv) {
   })
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+if (process.argv[1] && path.basename(process.argv[1]) === 'supervisor.mjs' && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
   try {
     if (Number(process.versions.node.split('.')[0]) < 22) fail('NODE_VERSION', 'Codex Supervisor requires Node.js >= 22.')
     const result = run(process.argv.slice(2))

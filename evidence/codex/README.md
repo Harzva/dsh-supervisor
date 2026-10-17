@@ -1,5 +1,17 @@
 # Codex 接手记录 · 2026-10-17
 
+## 0.3.0 对话页与工程开关
+
+通过官方本地 stdio MCP App 注册 Supervisor thread entrypoint。工程须在面板内明确选择；服务端不把默认安装缓存 cwd 当工程，也不信任 UI 自造 cwd。绑定按宿主提供的 thread ID 隔离，数据位于稳定 PLUGIN_DATA；状态及开关操作只接受该对话的随机 binding ID。关闭阻止新派发与重试；已运行工作仍可验收。开启不创建任务、授权或后台观察器。
+
+实际本机 Codex 0.149.0 识别入口 metadata，直接调用已安装 MCP 完成绑定、OFF/ON 持久保存、stale revision 拒绝和跨 thread 拒绝，最终 UI resource 与安装缓存一致；全程零模型推理，未创建执行任务。[native-panel-installation.json](native-panel-installation.json) 保存脱敏证据。
+
+已安装 HTML 与 runtime 通过官方 AppBridge/PostMessageTransport 隔离测试宿主实测 14 项 UI 检查，包括按钮关联、保存、Space、刷新、重开、亮暗主题、390px 无横向溢出和 stale 状态禁用直到刷新。CX Luna 检查亮色、暗色、窄屏与错误截图，已消除 stale 仍显示开启的语义问题。[ui-panel.json](ui-panel.json) 标明验证范围。iframe 保持 allow-scripts，使用按钮直接调用 SDK；不扩大 allow-forms。工具 outputSchema 同时严格描述成功和静态错误，包含先 listTools 缓存 schema 后的错误验证回归。
+
+115 项 Codex 测试与全套131项回归通过，DSH0.2.4/19文件契约保持，公开扫描0发现。MCP/MCP Apps SDK与许可证均打包，21文件ZIP安装后不需要npm；源码构建需npm ci。桌面自身UI被现有computer-use工具禁止控制，因此**未代用户点击真实Codex页签**，不把测试宿主截图当桌面入口截图。已运行窗口的发现可能需自然重启或新对话刷新。没有市场发布、Release或PR合并。
+
+依据：[官方对话入口扩展](https://developers.openai.com/plugins/build/extensions)、[UI SDK](https://developers.openai.com/plugins/build/chatgpt-ui)、[本地 stdio 打包](https://developers.openai.com/plugins/deploy/desktop-only)。
+
 ## 0.2.1 本地安装与已安装技能验收
 
 本机以支持的 CLI 注册本地开发市场并安装、启用 `harzva-supervisor@harzva-supervisor-dev` 0.2.1。插件缓存 16 个文件与 ZIP 摘要一致。新原生进程通过 `skills/list` 识别五个已启用技能；以明确的 native skill inputs 调用缓存中的 setup 和 execute，在新隔离工程完成五导师初始化、Git 忽略、单次原生 worker 执行、两项独立验收与 sequence 1 的 progress 检查点。脱敏回执在 [local-installation.json](local-installation.json)。107 项测试通过，其中 Codex 91 项。

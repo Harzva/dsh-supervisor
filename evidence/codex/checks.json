@@ -1,7 +1,7 @@
 {
   "date": "2026-10-17",
   "timezone": "Asia/Shanghai",
-  "previousEvidence": "checks-0.2.0.json",
+  "previousEvidence": "checks-0.2.1.json",
   "baseline": {
     "repository": "Harzva/dsh-supervisor",
     "baseBranch": "feat/smart-supervision-v2",
@@ -12,7 +12,7 @@
   },
   "plugin": {
     "name": "harzva-supervisor",
-    "version": "0.2.1",
+    "version": "0.3.0",
     "skills": [
       "setup",
       "supervise",
@@ -21,17 +21,22 @@
       "handoff"
     ],
     "format": "portable + Codex compatibility",
-    "dependencies": 0,
-    "codexContract": "0.149.0 experimental app-server queue"
+    "codexContract": "0.149.0 experimental app-server queue",
+    "localMcpServers": 1,
+    "runtimeNpmInstallRequired": false,
+    "bundledSdk": {
+      "mcp": "1.24.0",
+      "mcpApps": "1.0.1"
+    }
   },
   "checks": {
     "npm run codex:check": {
       "passed": true,
-      "tests": 91
+      "tests": 115
     },
     "npm run verify:p0": {
       "passed": true,
-      "tests": 107,
+      "tests": 131,
       "dshBaselineTests": 16,
       "packFiles": 19,
       "publicScanFindings": 0
@@ -42,55 +47,51 @@
     },
     "standaloneZip": {
       "passed": true,
-      "fileCount": 16,
-      "allFileDigestsMatchSource": true,
-      "installedCacheMatchesPackage": true
+      "fileCount": 21,
+      "installedCacheMatchesPackage": true,
+      "noNpmInstallForRuntime": true
     },
     "independentReview": {
       "passed": true,
-      "tests": 61,
-      "findingsResolved": [
-        "cancel acknowledgement races",
-        "native model forwarding",
-        "recovery queue/Goal/latest-turn conflicts",
-        "verifier abort and uncertain termination",
-        "durable independent verifier intent",
-        "stop later commands after unconfirmed receipts",
-        "stale declared artifact rejection on recovery",
-        "acknowledged native thread startup history race",
-        "diagnostic preservation during inert recovery"
-      ]
+      "scope": "control, bindings, MCP SDK/stdout, error output schemas and visual UI",
+      "panelAndControlTests": 24
     },
     "gitDiffCheck": {
       "passed": true
+    },
+    "officialMcpAppsUi": {
+      "passed": true,
+      "tests": 14,
+      "evidence": "ui-panel.json"
     }
   },
   "hostAcceptance": {
-    "actualPluginParser": {
-      "passed": true,
-      "method": "plugin/read",
-      "skills": 5,
-      "installed": true,
-      "enabled": true
+    "installed": true,
+    "enabled": true,
+    "version": "0.3.0",
+    "entrypoint": {
+      "name": "supervisor_panel",
+      "title": "Supervisor",
+      "type": "thread",
+      "resourceUri": "ui://harzva-supervisor/panel",
+      "metadataConfirmedByNativeHost": true
     },
-    "actualNativeQueue": {
+    "nativeMcp": {
       "passed": true,
-      "evidence": "local-installation.json",
-      "attemptCount": 1,
-      "checksPassed": 2,
-      "progressCheckpointSequence": 1
+      "evidence": "native-panel-installation.json",
+      "offOnSaved": true,
+      "staleWriteDenied": true,
+      "crossThreadDenied": true,
+      "modelInference": 0
     },
-    "nativeSkillInvocation": {
+    "installedUi": {
       "passed": true,
-      "names": [
-        "harzva-supervisor:setup",
-        "harzva-supervisor:execute"
-      ],
-      "source": "actual installed cache via explicit native skill inputs"
+      "evidence": "ui-panel.json",
+      "checkCount": 14,
+      "testHost": "official MCP Apps AppBridge/PostMessageTransport isolated test host using actual installed HTML and MCP runtime"
     },
-    "desktopInstallation": "installed and enabled using supported local CLI",
-    "currentConversationRefresh": "not directly observed; natural restart may be needed",
-    "hostPermissionProfile": "same full-access environment as the current authorized local session; no persistent policy change"
+    "previousInstalledExecutionChainEvidence": "local-installation.json",
+    "desktopEntryClick": "not directly observed; native Codex UI cannot be controlled with the available computer-use tool"
   },
   "repositoryAudit": {
     "method": "GitHub GraphQL",
@@ -106,17 +107,20 @@
     "publicPluginDirectorySubmitted": false
   },
   "artifact": {
-    "archive": "harzva-supervisor-0.2.1.zip",
-    "sha256": "0e095292214e3518cacca283063c8a35a39c4d0404db2672092120ce5e0e09de",
-    "fileCount": 16
+    "archive": "harzva-supervisor-0.3.0.zip",
+    "sha256": "939cf78fffa8d1a60dd005a414693ab3dd7b538213460f1f56d49e37ca7987a0",
+    "fileCount": 21
   },
   "sourceDigests": {
+    "runtime/mcp-server.mjs": "e11df82e9f088f94f6d19a4f9ad255efa8a470c864ad5686576d52a109b7d190",
     "runtime/mentor-registry.mjs": "3b5766d88bab4e6bf94c27cb56b07b0460eb7b2d348dbe9bf4e9560ce405b3d5",
+    "scripts/control.mjs": "dc17c935b919e092921b6bb0f2f9ab9cb0b4a6bcd8c2fdf7d28b4f012ff4fc9e",
     "scripts/execution-store.mjs": "c26d8e12aa0e2cf3629830a22bcdcbf928342484ccbd2f044f88441cf9f20a30",
-    "scripts/execution.mjs": "53da3282292c134718f62f2c16c573cfc796e892295a07051065ee4c67aa0994",
+    "scripts/execution.mjs": "8a8922aaaf29d77eb16118e1f69b0dbe31d6a30689b8edb96f6489f7c4c2a885",
     "scripts/native-executor.mjs": "d865364869368352423779a68a466bcc84f061981e5d39d3da717e85bd86b485",
     "scripts/state.mjs": "4443655d3a13b501c239dcee012c9545c346fd265b2022127aa521d4ac46d03b",
-    "scripts/supervisor.mjs": "d337eb8e4567e1a838e2c2d7a71e7d2d2657cdc95eab3cf73800911a7990a824",
-    "scripts/verification.mjs": "728633d57c56fa578a2716230503378b93afb92f3f2dcb31cbf5cefb69938c95"
+    "scripts/supervisor.mjs": "a39a053d5f21e837c3e5ab9d25d08bc1b701e55b75b9a4424c65c4b20a713def",
+    "scripts/verification.mjs": "728633d57c56fa578a2716230503378b93afb92f3f2dcb31cbf5cefb69938c95",
+    "ui/panel.html": "6c6bc28c3bddecc9bb70a6f42e750610ef25d31d4b5ae6f88fd5e6c770dd3a44"
   }
 }

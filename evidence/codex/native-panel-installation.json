@@ -1,0 +1,40 @@
+{
+  "date": "2026-10-17",
+  "version": "0.3.0",
+  "installed": true,
+  "entrypoint": {
+    "name": "supervisor_panel",
+    "title": "Supervisor",
+    "type": "thread",
+    "resourceUri": "ui://harzva-supervisor/panel",
+    "metadataConfirmedByNativeHost": true
+  },
+  "nativeHost": {
+    "codexVersion": "0.149.0",
+    "directMcpToolCalls": true,
+    "hostOverwritesCallerThreadId": true,
+    "forgedCwdIgnored": true,
+    "modelInference": 0
+  },
+  "binding": {
+    "explicitWorkspaceSelection": true,
+    "noWorkspaceWriteUntilSwitch": true,
+    "crossThreadDenied": true,
+    "noRosterOrExecutionCreated": true
+  },
+  "switch": {
+    "offSaved": true,
+    "onSaved": true,
+    "staleWriteDenied": true,
+    "finalEnabled": true,
+    "revision": 2
+  },
+  "resource": {
+    "bytes": 389151,
+    "sha256": "6c6bc28c3bddecc9bb70a6f42e750610ef25d31d4b5ae6f88fd5e6c770dd3a44",
+    "installedBytesMatchNativeResource": true,
+    "finalUiResourceCheckedAt": "2026-10-17T04:57:09.014Z"
+  },
+  "desktopEntryClick": "not directly observed; native Codex UI cannot be controlled with the available computer-use tool",
+  "previousUiResourceSha256": "783f77b6d0444e361125fb527c45586af70ec86930c617a3bde4fc35cc927db0"
+}

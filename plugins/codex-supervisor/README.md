@@ -1,10 +1,10 @@
-# Harzva Supervisor / DS 学院 — Codex 0.2.1
+# Harzva Supervisor / DS 学院 — Codex 0.3.0
 
 Codex 本地开发版：把已授权工作推进到原生执行、独立验收和持久检查点，并保留学院／导师评审与可校验上下文交接。独立插件标识为 `harzva-supervisor`；DSH 包仍为 `dsh-supervisor@0.2.4`。
 
 ## 安装与调用
 
-需要 Node.js 22 或更新版本。执行链使用已安装 Codex 的登录状态和 experimental app-server 原生队列接口，已对照本机 Codex 0.149.0 合同实现；其他版本须另行核验。插件无 npm 依赖、MCP 或 hooks。`run`／`drain` 期间会启动限定工作区的 Codex app-server 子进程，没有安装常驻后台服务。
+需要 Node.js 22 或更新版本。执行链使用已安装 Codex 的登录状态和 experimental app-server 原生队列接口，已对照本机 Codex 0.149.0 合同实现；其他版本须另行核验。0.3.0 增加本地 stdio MCP App 对话页；官方 MCP / MCP Apps SDK 已打包，安装后无需 npm 安装。构建源码先运行 `npm ci`。`run`／`drain` 期间会启动限定工作区的 Codex app-server 子进程；面板服务只响应查看和开关操作，没有常驻任务观察器或 hooks。
 
 调用脚本的宿主还必须允许写入工程的受保护目录 `.codex/supervisor/`，并允许原生 CLI 使用它自己的缓存和已有登录状态。本机 SDK 的默认 `workspace-write` 调用曾在初始化受保护工程状态时返回 `PATH_ACCESS`；工程位于可写根目录内不等于其 `.codex` 自动可写。按当前任务已经授予的权限使用宿主支持的路径授权或权限 profile，并核验实际结果；插件不修改全局权限，也不自行读取或复制登录凭据。本机在既定完整 profile 中的调用结果不能证明每个默认 `workspace-write` 宿主都支持这些路径。
 
@@ -23,6 +23,21 @@ codex plugin list --available --json
 - “执行这项已经授权的修改，检查产物并记录结果。”
 - “请架构与验证导师独立评审这个迁移方案，最多一轮。”
 - “把当前任务整理成可恢复的上下文交接。”
+
+## 对话页与开关
+
+插件通过官方 MCP App `thread` entrypoint 注册 **Supervisor** 内容页签。宿主刷新插件后，从对话的内容页入口选择 Supervisor。具体菜单位置由宿主控制；已有桌面窗口可能需要自然重启或新对话才能刷新，入口元数据解析不等于已经实测桌面点击。
+
+第一次打开时，在“工程目录”明确输入要管理工程的完整真实路径，再点“关联工程”。面板进程默认 cwd 是安装缓存，不能把它当成当前工程；插件不会扫描其他项目或根据未知对话元数据猜路径。服务端将工程与宿主提供的当前 thread ID 绑定，后续操作只接受该对话的随机 binding ID，不接受替换工程路径。没有宿主 thread 信息时拒绝写入。
+
+- **已开启**：允许通过原执行链派发已经授权的任务；不创建 proposal、授权或后台监听。
+- **已关闭**：阻止新的 `run`、`drain` 派发与自动重试；已运行的任务仍可完成验收，查看、取消和恢复仍可使用。
+- 开关按工程共享；不同对话可各自明确关联同一工程。保存使用 revision 校验；旧界面版本不能覆盖更新后的状态。
+- 关闭正好发生在 native thread 创建后、queue 派发前时，不投 queue，保留真实回执为 `uncertain` 供核对；开启不会自动重投。
+
+未配置过开关时缺省开启，以保持 0.2.1 行为。只有明确的开关写操作才创建工程 `.codex/supervisor/control.v1.json`；打开未绑定面板不会创建工程状态。关联记录位于宿主展开的 `${PLUGIN_DATA}`，有界、0600、原子写入；不存模型提示词、路由或原始对话日志。新工程初始化学院与运行任务仍通过原来的 setup / execute 技能完成。
+
+官方依据：[MCP App 对话入口](https://developers.openai.com/plugins/build/extensions)、[UI 桥](https://developers.openai.com/plugins/build/chatgpt-ui)、[本地 stdio 打包](https://developers.openai.com/plugins/deploy/desktop-only)。当前是本地开发安装；没有公共目录或市场发布。
 
 ## 本地工具
 
