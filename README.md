@@ -2,6 +2,14 @@
 
 DSH Host + Client plugin for per-session supervision, role-aware Supervisors, durable responsibility assignments, context-health warnings and recoverable Handoff workflows.
 
+## Platform repositories
+
+This repository maintains the DSH plugin, `dsh-supervisor@0.2.4`.
+The Codex edition is developed and packaged independently in
+[`Harzva/codex-supervisor`](https://github.com/Harzva/codex-supervisor),
+with the plugin identifier `harzva-supervisor`. The two editions have
+separate build, installation and marketplace submission flows.
+
 ## Supervisor configuration
 
 The plugin accepts an optional legacy-compatible `mentors` array. Existing `faculties` configurations are automatically projected into role-aware Supervisors, so older profiles continue to work.
