@@ -4,6 +4,12 @@ DSH Host + Client plugin for per-session supervision, role-aware Supervisors, du
 
 ## Codex edition
 
+The Codex edition is now maintained independently in
+[`Harzva/codex-supervisor`](https://github.com/Harzva/codex-supervisor).
+This development branch retains the extraction history and prior verification
+materials; current Codex source, builds, issues and review materials belong to
+the independent repository. The default `main` branch here maintains DSH.
+
 The independent `harzva-supervisor@0.4.1` Codex submission candidate lives in
 [`plugins/codex-supervisor/`](plugins/codex-supervisor/README.md). It packages
 supervision, authorized execution, faculty review and handoff skills, reusing
