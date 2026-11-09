@@ -22,7 +22,7 @@ version `0.1.0-alpha.1`. Install the registry first in the same web profile:
 
 ```sh
 dsh plugin --profile web add https://github.com/Harzva/dsh-role-registry/archive/refs/tags/v0.1.0-alpha.1.tar.gz
-dsh plugin --profile web add https://github.com/Harzva/dsh-supervisor/archive/refs/heads/main.tar.gz
+dsh plugin --profile web add https://github.com/Harzva/dsh-supervisor/archive/refs/tags/v0.2.7.tar.gz
 ```
 
 Restart the DSH profile after installation. The built Host and Client modules
