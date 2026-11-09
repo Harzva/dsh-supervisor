@@ -1,9 +1,24 @@
 lockfileVersion: '9.0'
 
 settings:
-  autoInstallPeers: true
+  autoInstallPeers: false
   excludeLinksFromLockfile: false
 
 importers:
 
-  .: {}
+  .:
+    devDependencies:
+      '@harzva/dsh-role-registry':
+        specifier: https://github.com/Harzva/dsh-role-registry/archive/refs/tags/v0.1.0-alpha.1.tar.gz
+        version: https://github.com/Harzva/dsh-role-registry/archive/refs/tags/v0.1.0-alpha.1.tar.gz
+
+packages:
+
+  '@harzva/dsh-role-registry@https://github.com/Harzva/dsh-role-registry/archive/refs/tags/v0.1.0-alpha.1.tar.gz':
+    resolution: {integrity: sha512-6xkyNYRlkEEacKi+yGOEkR6v+Sln16iK5J/rU8p9o1/P+qF5BBFEY34WuExRpKBloxIt9j3EBBr6eZoSYIb/JQ==, tarball: https://github.com/Harzva/dsh-role-registry/archive/refs/tags/v0.1.0-alpha.1.tar.gz}
+    version: 0.1.0-alpha.1
+    engines: {node: ^22.19.0 || >=24}
+
+snapshots:
+
+  '@harzva/dsh-role-registry@https://github.com/Harzva/dsh-role-registry/archive/refs/tags/v0.1.0-alpha.1.tar.gz': {}

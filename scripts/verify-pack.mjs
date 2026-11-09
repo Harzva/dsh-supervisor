@@ -14,6 +14,11 @@ const runtimeFiles = Object.freeze([
   'mentor-registry.js',
   'supervisor-store.js',
   'handoff-service.js',
+  'roundtable-graph.js',
+  'judgement-context.js',
+  'execution-state.js',
+  'progress-assessment.js',
+  'project-memory.js',
 ])
 const requiredFiles = Object.freeze([
   'package.json',
@@ -22,6 +27,7 @@ const requiredFiles = Object.freeze([
   'LICENSE',
   'cordis.patch.yml',
   ...runtimeFiles.map((file) => `lib/${file}`),
+  'docs/groupx-supervisor-upgrade.md',
   'docs/images/supervisor-session-matrix.png',
   'docs/01-需求分析.md',
   'docs/02-架构设计.md',
@@ -32,6 +38,14 @@ const requiredFiles = Object.freeze([
   'docs/smart-supervision-v2/02-架构设计.md',
   'docs/smart-supervision-v2/03-开发计划.md',
   'docs/smart-supervision-v2/04-验收矩阵.md',
+  'docs/supervisor-roundtable-graph/01-需求分析.md',
+  'docs/supervisor-roundtable-graph/02-架构设计.md',
+  'docs/supervisor-roundtable-graph/03-开发计划.md',
+  'docs/supervisor-roundtable-graph/NEXT_GOAL.md',
+  'docs/supervisor-roundtable-graph/frontend-audit-checklist.md',
+  'docs/supervisor-roundtable-graph/issue-11-groupx-badge-evidence.md',
+  'docs/supervisor-roundtable-graph/queued-execution.md',
+  'docs/supervisor-roundtable-graph/task-brief-for-supervisor.md',
 ])
 const forbiddenPrefixes = Object.freeze(['src/', 'scripts/', 'test/', 'artifacts/', 'evidence/', 'baselines/', '.git/'])
 

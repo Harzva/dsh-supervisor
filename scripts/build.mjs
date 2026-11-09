@@ -11,6 +11,11 @@ const runtimeFiles = Object.freeze([
   'mentor-registry.js',
   'supervisor-store.js',
   'handoff-service.js',
+  'roundtable-graph.js',
+  'judgement-context.js',
+  'execution-state.js',
+  'progress-assessment.js',
+  'project-memory.js',
 ])
 
 const sources = await Promise.all(runtimeFiles.map(async (file) => {

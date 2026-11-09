@@ -10,6 +10,11 @@ const runtimeFiles = Object.freeze([
   'mentor-registry.js',
   'supervisor-store.js',
   'handoff-service.js',
+  'roundtable-graph.js',
+  'judgement-context.js',
+  'execution-state.js',
+  'progress-assessment.js',
+  'project-memory.js',
 ])
 const baselineArtifactDigest = '302a5235c4577f040106447951364fe0db05b98d6b4573fb4e67b6d6b962e23a'
 const expectedExports = Object.freeze({
@@ -31,7 +36,7 @@ const manifest = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'))
 const lockfile = await readFile(join(root, 'pnpm-lock.yaml'), 'utf8')
 
 invariant(manifest.name === 'dsh-supervisor', 'unexpected package name')
-invariant(manifest.version === '0.2.4', 'package version must remain 0.2.4 during P0')
+invariant(/^0\.2\.7(?:-dsh\.[a-f0-9]+)?$/.test(manifest.version), 'unexpected release version')
 invariant(manifest.type === 'module', 'package must remain ESM')
 invariant(manifest.repository?.url === 'git+https://github.com/Harzva/dsh-supervisor.git', 'canonical repository changed')
 invariant(manifest.homepage === 'https://github.com/Harzva/dsh-supervisor#readme', 'canonical homepage changed')
@@ -55,7 +60,7 @@ const clientSource = await readFile(join(root, 'src', 'client.js'), 'utf8')
 const inputs = await readFile(join(root, 'INPUTS.md'), 'utf8')
 const baselineEvidence = JSON.parse(await readFile(join(root, 'evidence', 'p0', 'digests.json'), 'utf8'))
 const ignoreRules = await readFile(join(root, '.gitignore'), 'utf8')
-invariant(indexSource.includes("const PACKAGE_VERSION = '0.2.4'"), 'startup diagnostic version is not anchored')
+invariant(indexSource.includes("const PACKAGE_VERSION = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version"), 'startup diagnostic version is not anchored')
 invariant(!/started v0\./.test(indexSource), 'stale startup version remains')
 invariant(!/browser half（v0\./.test(clientSource), 'stale Client version remains')
 invariant(!/静态包 `dsh-supervisor` v0\./.test(inputs), 'stale package version remains in INPUTS.md')

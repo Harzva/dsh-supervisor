@@ -21,7 +21,7 @@ const patterns = Object.freeze([
   ['private-key', privateKeyPattern],
   ['aws-access-key', /AKIA[0-9A-Z]{16}/],
   ['github-token', /gh[pousr]_[A-Za-z0-9_]{20,}/],
-  ['provider-token', /sk-[A-Za-z0-9_-]{20,}/],
+  ['provider-token', /(?<![A-Za-z0-9_])sk-[A-Za-z0-9_-]{20,}/],
   ['credential-assignment', credentialAssignment],
 ])
 
@@ -34,7 +34,7 @@ function inspectText(file, text) {
 async function walk(directory) {
   const entries = await readdir(directory, { withFileTypes: true })
   for (const entry of entries) {
-    if (entry.isDirectory() && ignoredDirectories.has(entry.name)) continue
+    if (ignoredDirectories.has(entry.name)) continue
     const path = join(directory, entry.name)
     if (entry.isDirectory()) {
       await walk(path)

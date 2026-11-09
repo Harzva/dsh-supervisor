@@ -1,4 +1,6 @@
 // Canonical role and assignment source recovered from the 0.2.4 runtime.
+import { normalizeRoleRef, roleRefKey } from '@harzva/dsh-role-registry'
+
 const DEFAULT_PALETTE = Object.freeze([
   '#2563eb', '#7c3aed', '#0f766e', '#b45309', '#be185d',
   '#0369a1', '#4d7c0f', '#9f1239', '#5b21b6', '#0e7490',
@@ -8,8 +10,9 @@ const ROLE_META = Object.freeze({
   architecture: { label: '架构 Supervisor', avatar: 'compass' },
   research: { label: '研究 Supervisor', avatar: 'scope' },
   execution: { label: '执行 Supervisor', avatar: 'bolt' },
-  verification: { label: '验证 Supervisor', avatar: 'shield' },
+  verification: { label: '评估验收 Supervisor', avatar: 'shield' },
   handoff: { label: '交接 Supervisor', avatar: 'bridge' },
+  critic: { label: '批评家 Supervisor', avatar: 'cross' },
 })
 
 const DEFAULT_MENTORS = Object.freeze([
@@ -34,6 +37,7 @@ const ROLE_TAGS = Object.freeze({
   execution: ['开发', '实现', '执行', '代码', '调试', '发布'],
   verification: ['测试', '验证', '安全', '验收', '质量'],
   handoff: ['handoff', '交接', '压缩', '上下文'],
+  critic: ['批评', '风险', '反方', '质疑', '漏洞'],
 })
 
 function cleanString(value, max = 200) {
@@ -115,12 +119,16 @@ export function normalizeMentors(value, faculties = []) {
       const role = /handoff|交接|压缩|上下文/.test(nameIdentity) ? 'handoff'
         : /code|工程|代码|开发|实现|调试/.test(nameIdentity) ? 'execution'
           : /research|研究|调研|事实|资料|论文/.test(nameIdentity) ? 'research'
-            : /test|verify|验证|测试|安全|质量|验收/.test(nameIdentity) ? 'verification'
-              : /handoff|交接|压缩|上下文/.test(identity) ? 'handoff'
-                : /code|工程|代码|开发|实现|调试/.test(identity) ? 'execution'
-                  : /research|研究|调研|事实|资料|论文/.test(identity) ? 'research'
-                    : /test|verify|验证|测试|安全|质量|验收/.test(identity) ? 'verification'
-                      : 'architecture'
+            : /critic|批评|质疑|挑刺|反方|风险|漏洞/.test(nameIdentity) ? 'critic'
+              : /verify|verify|评估|验收|安全|质量|达标/.test(nameIdentity) ? 'verification'
+                : /test|verify|验证|测试|安全|质量|验收/.test(nameIdentity) ? 'verification'
+                  : /handoff|交接|压缩|上下文/.test(identity) ? 'handoff'
+                    : /code|工程|代码|开发|实现|调试/.test(identity) ? 'execution'
+                      : /research|研究|调研|事实|资料|论文/.test(identity) ? 'research'
+                        : /critic|批评|质疑|挑刺|反方|风险|漏洞/.test(identity) ? 'critic'
+                          : /verify|评估|验收|安全|质量|达标/.test(identity) ? 'verification'
+                            : /test|verify|验证|测试|安全|质量|验收/.test(identity) ? 'verification'
+                              : 'architecture'
       return {
         ...faculty,
         role,
@@ -145,6 +153,41 @@ function wildcardMatch(value, pattern) {
   return new RegExp('^' + escaped + '$', 'i').test(value)
 }
 
+// Safe RoleRef normalizer: returns a frozen { id, version } or undefined when
+// the input is absent or does not satisfy the neutral role-protocol contract.
+// This mirrors @harzva/dsh-role-registry#normalizeRoleRef but never throws,
+// so a corrupt or stale persisted roleRef degrades to "no role" (fail-closed)
+// instead of crashing the supervisor.
+export function normalizeRoleRefLike(value) {
+  if (value === undefined || value === null) return undefined
+  try {
+    return normalizeRoleRef(value)
+  } catch {
+    return undefined
+  }
+}
+
+// Shared RoleRef key (id@version), or '' when the input is not a valid ref.
+export function roleRefKeyOf(value) {
+  const ref = normalizeRoleRefLike(value)
+  return ref ? roleRefKey(ref) : ''
+}
+
+// Tri-state classification of an optional persisted RoleRef. This is the
+// fail-closed source of truth for issue-6: we must NOT silently drop a present
+// but invalid (corrupt) ref and fall back to a mentor. The three states:
+//   { present:false }            -> user never selected / explicitly cleared  => default mentor path
+//   { present:true, valid:true } -> a well-formed RoleRef                       => resolve via registry
+//   { present:true, valid:false} -> a CORRUPT saved ref (bad shape)             => fail closed with error
+export function classifyRoleRef(value) {
+  if (value === undefined || value === null) return { present: false, valid: false, ref: undefined }
+  try {
+    return { present: true, valid: true, ref: normalizeRoleRef(value) }
+  } catch {
+    return { present: true, valid: false, ref: undefined }
+  }
+}
+
 function scoreMentor(mentor, facts) {
   let score = 0
   const tags = Array.isArray(facts.tags) ? facts.tags.map((tag) => String(tag).toLocaleLowerCase()) : []
@@ -166,9 +209,15 @@ function scoreMentor(mentor, facts) {
 export function resolveAssignment(facts, mentors, existing, loadByMentor = {}) {
   const byId = new Map(mentors.map((mentor) => [mentor.id, mentor]))
   if (existing && byId.has(existing.primaryMentorId)) {
+    const { roleRef: existingRoleRef, ...defaults } = existing
+    const classified = classifyRoleRef(existingRoleRef)
     return {
-      ...existing,
+      ...defaults,
       collaboratorIds: cleanList(existing.collaboratorIds, 2, 64).filter((id) => id !== existing.primaryMentorId && byId.has(id)),
+      ...(classified.valid ? { roleRef: classified.ref } : {}),
+      // Present-but-invalid saved ref: preserve the corruption marker so the
+      // consumer FAILS CLOSED instead of silently re-roling to a mentor.
+      ...(classified.present && !classified.valid ? { roleRefCorrupt: true } : {}),
     }
   }
   if (mentors.length === 0) return null
@@ -182,6 +231,18 @@ export function resolveAssignment(facts, mentors, existing, loadByMentor = {}) {
       || hashText(String(facts?.sessionId || '') + ':' + left.mentor.id) - hashText(String(facts?.sessionId || '') + ':' + right.mentor.id)
   })
   const selected = ranked[0]
+  // Reassigning an unavailable mentor changes the execution route, not the
+  // user's expert selection. Preserve exact refs and corruption markers so
+  // their normal resolution path can fail closed if the role disappeared.
+  const roleSelection = {}
+  if (existing && typeof existing === 'object') {
+    const classified = classifyRoleRef(existing.roleRef)
+    if (classified.valid) roleSelection.roleRef = classified.ref
+    if ((classified.present && !classified.valid) || existing.roleRefCorrupt) roleSelection.roleRefCorrupt = true
+    for (const key of ['roleRefSource', 'defaultRoleRef', 'defaultRoleSource']) {
+      if (Object.hasOwn(existing, key)) roleSelection[key] = existing[key]
+    }
+  }
   return {
     sessionId: cleanString(facts?.sessionId, 128),
     primaryMentorId: selected.mentor.id,
@@ -189,7 +250,9 @@ export function resolveAssignment(facts, mentors, existing, loadByMentor = {}) {
     assignmentSource: selected.score > 0 ? 'rule' : 'fallback',
     reason: selected.score > 0 ? '责任范围匹配' : '稳定负载分配',
     assignedAt: Date.now(),
-    version: 1,
+    version: Number.isSafeInteger(existing?.version) && existing.version > 0 && existing.version < Number.MAX_SAFE_INTEGER
+      ? existing.version + 1 : 1,
+    ...roleSelection,
   }
 }
 
@@ -234,3 +297,24 @@ export function normalizeSupervisorModels(value, mentors) {
 }
 
 export const MENTOR_ROLES = ROLE_META
+
+// 挑选实际参与接管/建议的监督者 id 集合：主责 + 协作（观众）。
+// 协作为空时回退到只有主责；从不回退到「全部学院」——那会让卡片上的
+// 协作数与真正被咨询的监督者不一致（协作成为摆设）。
+// 返回去重且有效的 id 数组；分配不存在时返回空数组。
+export function participantMentorIds(assignment) {
+  const primary = assignment && typeof assignment.primaryMentorId === 'string'
+    ? assignment.primaryMentorId.trim()
+    : ''
+  const seen = new Set(primary ? [primary] : [])
+  const ids = primary ? [primary] : []
+  const collaborators = assignment && Array.isArray(assignment.collaboratorIds) ? assignment.collaboratorIds : []
+  for (const raw of collaborators) {
+    const id = typeof raw === 'string' ? raw.trim() : ''
+    if (!id || seen.has(id)) continue
+    seen.add(id)
+    ids.push(id)
+    if (ids.length >= 3) break // 主责 + 最多 2 协作
+  }
+  return ids
+}

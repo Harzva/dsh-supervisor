@@ -1,6 +1,6 @@
 # DSH Smart Supervision v2 规划索引
 
-> 状态：设计基线已批准；P0 已于 2026-08-28 获单独授权并完成本地工程恢复，因 canonical Supervisor Git/远端和 P10 运行预算尚未获批而保持部分完成。P1/P2 未授权。
+> 状态：设计基线已批准；P0 已完成工程真源、private canonical Git/远端、P10 有界运行锁值与生产 Profile 新 LKG 的验收闭环。`p0-0.2.4` 应仅在 exact post-commit 门通过后创建，其存在性不由提交内自证。P1/P2 未授权。
 >
 > 日期：2026-08-27
 
@@ -8,14 +8,16 @@
 
 本目录以标准开发流程定义 `dsh-supervisor` 的下一代智能监管系统。规划目标是把当前基于 todo 与短建议的接管模式，升级为原生 Goal 感知、证据驱动评估、可重规划、可有界召集 GroupX 讨论并可恢复的监督控制面。
 
-本目录包含已批准的需求、架构、开发计划、验收标准，以及 P0 的脱敏工程证据。P0 未实现监管业务功能，也未安装、重启或修改 Profile。
+本目录包含已批准的需求、架构、开发计划、验收标准，以及 P0 的脱敏工程证据。P0 未实现监管业务功能，也未对 Profile 执行安装、重启、覆盖或恢复；闭环复核发现的历史 manifest/lock 漂移和产品负责人对当前 exact digest pair 的新 LKG 处置均已保留记录。
 
 ## 审批记录
 
 - 审批日期：2026-08-27（Asia/Shanghai）。
 - 审批主体：产品负责人。
 - 已批准范围：ADR-001～ADR-015，以及 [`01-需求分析.md`](01-需求分析.md) 的 PD-001～PD-010。
-- 后续未授权事项：P1～P10 实施、创建/修改远端、push、发布、安装或修改 Profile、真实 Council。
+- P0 收口授权：允许建立 private `Harzva/dsh-supervisor`、透明 Git 基线、`main`/`feat/smart-supervision-v2` 并上传；允许锁定 P10 矩阵与预算，但 P0 不执行模型调用。
+- Profile LKG 处置：产品负责人接受 manifest `1b0533552d05842998e7151280d84f5b4a9a9e4915510c1f1738e48df9876af2` 与 lock/installed projection `1a75aa1ecd07dfb2a2d35b3e9df5a6c571fc7af8e0b456a82975f2e3819339f1` 为新的 P0 LKG；标签前任一 digest 不一致即禁止打标，不恢复旧锁。
+- 后续未授权事项：P1～P10 实施、转为 public、npm 发布、安装或修改 Profile、真实 Council。
 - P0 授权边界：允许安全可恢复的本地源码恢复、构建、测试、pack 和脱敏证据；不允许伪造 Git 历史或把现有脏工作树当作 P4 实施基线。
 - 范围保留：FR-022 Matrix 与 FR-023 HARVIS/业务角色包仍是 P2 可选范围，由 P0 另行锁定；本次审批不隐式纳入。
 - 变更控制：任何改变已批准语义、预算、安全边界或所有权的提议，必须先新增/修订 ADR 并重新审批。
@@ -39,7 +41,7 @@
 - 当前 `faculties`、`mentors`、Supervisor session-group 和 GroupX 运行成员是四种不同实体，没有共享角色权威源。
 - 当前 `dsh-identity-library` 已实现 Identity/Harness/Brain 分离和 Prompt 不出 Host 的安全边界，但尚无版本化通用角色合同。
 - 当前 DSH 原生 GroupX 成员是人工选择的 provider/model 执行者；版本化 RoleRef 和多轮角色注册表仍处于规划阶段。
-- P0 已从当前运行产物恢复规范 `src`，建立单一 build/test/pack/scan 门槛并统一 package/启动诊断为 `0.2.4`；canonical Supervisor Git/远端仍未确定。固定 tarball 与后续 Client 修复的差异已单独记录，现有持久 Store 行为未修改。
+- P0 已从当前运行产物恢复规范 `src`，建立单一 build/test/pack/scan 门槛并统一 package/启动诊断为 `0.2.4`；canonical source 已落在 private `Harzva/dsh-supervisor` 的透明根基线。固定 tarball 与后续 Client 修复的差异已单独记录，原 tarball 因含历史 runtime identifier 只保留为本机私有工件，现有持久 Store 行为未修改。
 
 ## 已批准 ADR
 
@@ -83,4 +85,4 @@ ParticipantPlan                本次讨论冻结的 exact execution roster
 
 ## 实施授权门
 
-ADR-001～ADR-015 与 PD-001～PD-010 已通过设计审批，P0 也已收到独立启动授权。后续阶段仍按 [`03-开发计划.md`](03-开发计划.md) 逐阶段授权；P0 授权不外溢为创建远程仓库、推送/发布、安装到 Profile、真实模型预算或自动讨论的授权。
+ADR-001～ADR-015 与 PD-001～PD-010 已通过设计审批。P0 已按独立授权完成 private 仓库上传、Profile exact LKG 复核和 final exact commit 的 fresh-clone 门；`p0-0.2.4` 只允许作为该 commit 的 post-commit 标记，其存在性由 Git ref 证明。后续阶段仍按 [`03-开发计划.md`](03-开发计划.md) 逐阶段授权；P0 的仓库与标签动作、Profile LKG 接受和 P10 锁值不外溢为 P1/P2 实施、public/npm 发布、Profile 安装或修改、真实模型调用或自动讨论授权。

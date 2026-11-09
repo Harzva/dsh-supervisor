@@ -1,6 +1,6 @@
 {
   "name": "dsh-supervisor",
-  "version": "0.2.4",
+  "version": "0.2.7",
   "description": "DSH Supervisor：每会话独立监控、角色责任分配、模型路由、建议采纳与 Handoff。",
   "license": "Apache-2.0",
   "repository": {
@@ -26,11 +26,34 @@
     "lib/mentor-registry.js",
     "lib/supervisor-store.js",
     "lib/handoff-service.js",
+    "lib/roundtable-graph.js",
+    "lib/judgement-context.js",
+    "lib/execution-state.js",
+    "lib/progress-assessment.js",
     "cordis.patch.yml",
     "README.md",
-    "docs",
     "INPUTS.md",
-    "LICENSE"
+    "LICENSE",
+    "docs/groupx-supervisor-upgrade.md",
+    "docs/01-需求分析.md",
+    "docs/02-架构设计.md",
+    "docs/03-开发计划.md",
+    "docs/05-验收报告.md",
+    "docs/smart-supervision-v2/README.md",
+    "docs/smart-supervision-v2/01-需求分析.md",
+    "docs/smart-supervision-v2/02-架构设计.md",
+    "docs/smart-supervision-v2/03-开发计划.md",
+    "docs/smart-supervision-v2/04-验收矩阵.md",
+    "docs/supervisor-roundtable-graph/01-需求分析.md",
+    "docs/supervisor-roundtable-graph/02-架构设计.md",
+    "docs/supervisor-roundtable-graph/03-开发计划.md",
+    "docs/supervisor-roundtable-graph/NEXT_GOAL.md",
+    "docs/supervisor-roundtable-graph/frontend-audit-checklist.md",
+    "docs/supervisor-roundtable-graph/issue-11-groupx-badge-evidence.md",
+    "docs/supervisor-roundtable-graph/queued-execution.md",
+    "docs/supervisor-roundtable-graph/task-brief-for-supervisor.md",
+    "lib/project-memory.js",
+    "docs/images/supervisor-session-matrix.png"
   ],
   "scripts": {
     "build": "node scripts/build.mjs",
@@ -48,6 +71,9 @@
     },
     "client": {
       "platform": "web",
+      "external": [
+        "@harzva/dsh-role-registry"
+      ],
       "inject": [
         "@deepseek-ai/dsh-client-runtime",
         "@deepseek-ai/dsh-api-remotes",
@@ -68,5 +94,11 @@
   ],
   "engines": {
     "node": "^22.19.0 || >=24"
+  },
+  "peerDependencies": {
+    "@harzva/dsh-role-registry": "0.1.0-alpha.1"
+  },
+  "devDependencies": {
+    "@harzva/dsh-role-registry": "https://github.com/Harzva/dsh-role-registry/archive/refs/tags/v0.1.0-alpha.1.tar.gz"
   }
 }
