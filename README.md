@@ -10,6 +10,17 @@ The Codex edition is developed and packaged independently in
 with the plugin identifier `harzva-supervisor`. The two editions have
 separate build, installation and marketplace submission flows.
 
+## Screenshot: session matrix integration
+
+![Supervisor controls in the DSH session matrix](docs/images/supervisor-session-matrix.png)
+
+The screenshot shows Supervisor 0.2.7 in a local DSH 0.2.2-rc.1 preview,
+with the separate Better Sidebar and session-board plugins providing the
+matrix. It contains a single test session. This repository’s current `main`
+contains Supervisor 0.2.4; the 0.2.7 working version shown here has not yet
+been incorporated into this branch. Model-driven supervision and takeover
+were not exercised in this preview.
+
 ## Supervisor configuration
 
 The plugin accepts an optional legacy-compatible `mentors` array. Existing `faculties` configurations are automatically projected into role-aware Supervisors, so older profiles continue to work.
