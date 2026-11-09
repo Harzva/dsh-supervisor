@@ -21,6 +21,19 @@ contains Supervisor 0.2.4; the 0.2.7 working version shown here has not yet
 been incorporated into this branch. Model-driven supervision and takeover
 were not exercised in this preview.
 
+## Install
+
+For the DSH web profile, install the source archive with the DSH CLI:
+
+```sh
+dsh plugin --profile web add https://github.com/Harzva/dsh-supervisor/archive/refs/heads/main.tar.gz
+```
+
+This branch contains version 0.2.4. Installation and the Supervisor mentors
+endpoint were smoke-tested in an isolated DSH 0.2.2-rc.1 web profile. The
+session-matrix shown above is provided by separate plugins; model-driven
+supervision and takeover have not been validated in that test.
+
 ## Supervisor configuration
 
 The plugin accepts an optional legacy-compatible `mentors` array. Existing `faculties` configurations are automatically projected into role-aware Supervisors, so older profiles continue to work.

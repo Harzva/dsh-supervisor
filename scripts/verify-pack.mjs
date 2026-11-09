@@ -22,6 +22,7 @@ const requiredFiles = Object.freeze([
   'LICENSE',
   'cordis.patch.yml',
   ...runtimeFiles.map((file) => `lib/${file}`),
+  'docs/images/supervisor-session-matrix.png',
   'docs/01-需求分析.md',
   'docs/02-架构设计.md',
   'docs/03-开发计划.md',
